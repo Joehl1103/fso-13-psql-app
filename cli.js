@@ -62,6 +62,7 @@ app.get("/api/blogs", async (req, res) => {
     const results = await Blog.findAll();
     res.json(results);
   } catch (error) {
+    console.log(`error: ${error.message}`);
     res.status(404).end();
   }
 });
@@ -70,11 +71,25 @@ app.use(express.json());
 
 app.post("/api/blogs", async (req, res) => {
   try {
-    console.log("body", req.body);
     const result = await Blog.create(req.body);
     res.status(200).json(result);
   } catch (error) {
     console.log(`error: ${error.message}`);
+    res.status(404).end();
+  }
+});
+
+app.delete("/api/blogs/:id", async (req, res) => {
+  try {
+    console.log("params", req.params.id);
+    const id = req.params.id;
+    if (!id) {
+      throw new Error(`No id provided.`);
+    }
+    await Blog.destroy({ where: { id: id } });
+    res.status(204).end();
+  } catch (error) {
+    console.error(`Error: ${e.message}`);
     res.status(404).end();
   }
 });
