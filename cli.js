@@ -3,6 +3,8 @@ require("dotenv").config();
 // const app = express();
 const { Sequelize, DataTypes, QueryTypes, Model } = require("sequelize");
 const fs = require("fs");
+const express = require("express");
+const app = express();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
@@ -55,21 +57,36 @@ Blog.init(
   },
 );
 
-async function main() {
+app.get("/api/blogs", async (req, res) => {
   try {
-    await sequelize.authenticate();
-    console.log("Connection established.");
-    const blogs = await sequelize.query("SELECT * FROM blogs", {
-      type: QueryTypes.SELECT,
-    });
-    blogs.forEach((b) => {
-      console.log(`${b.author}: '${b.title}', ${b.likes} likes`);
-    });
-    await sequelize.close();
-    console.log("Connection closed");
+    const results = await Blog.findAll();
+    res.json(results);
   } catch (error) {
-    console.error("Something went wrong", error);
+    res.status(404).end();
   }
-}
+});
 
-main();
+// async function main() {
+//   try {
+//     await sequelize.authenticate();
+//     console.log("Connection established.");
+//     const blogs = await sequelize.query("SELECT * FROM blogs", {
+//       type: QueryTypes.SELECT,
+//     });
+//     blogs.forEach((b) => {
+//       console.log(`${b.author}: '${b.title}', ${b.likes} likes`);
+//     });
+//     await sequelize.close();
+//     console.log("Connection closed");
+//   } catch (error) {
+//     console.error("Something went wrong", error);
+//   }
+// }
+//
+// main();
+//
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, async () => {
+  console.log(`Server running on port ${PORT}`);
+});
