@@ -81,7 +81,6 @@ app.post("/api/blogs", async (req, res) => {
 
 app.delete("/api/blogs/:id", async (req, res) => {
   try {
-    console.log("params", req.params.id);
     const id = req.params.id;
     if (!id) {
       throw new Error(`No id provided.`);
