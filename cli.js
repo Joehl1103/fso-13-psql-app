@@ -66,6 +66,19 @@ app.get("/api/blogs", async (req, res) => {
   }
 });
 
+app.use(express.json());
+
+app.post("/api/blogs", async (req, res) => {
+  try {
+    console.log("body", req.body);
+    const result = await Blog.create(req.body);
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(`error: ${error.message}`);
+    res.status(404).end();
+  }
+});
+
 // async function main() {
 //   try {
 //     await sequelize.authenticate();
