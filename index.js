@@ -23,16 +23,20 @@ console.log("before defining router");
 app.use("/api/blogs", blogsRouter);
 console.log("after defining router");
 
-const start = async () => {
-  try {
-    await connectToDatabase();
-    app.listen(PORT, () => {
-      console.log(`Server listening at http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.log(`error: ${error.message}`);
-    return process.exit(1);
-  }
+const start = async (PORT) => {
+  await connectToDatabase();
+  app.listen(PORT, (error) => {
+    console.log(`Attempting to connect on port ${PORT}`);
+    if (error) {
+      if (error.code === "EADDRINUSE") {
+        console.warn(`Port ${PORT} already in use.`);
+        start(PORT + 1);
+        return;
+      }
+      throw error;
+    }
+    console.log(`Server listening at http://localhost:${PORT}`);
+  });
 };
 
-start();
+start(PORT);
