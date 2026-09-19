@@ -11,5 +11,6 @@ async function syncModels() {
 
 module.exports = {
   Blog,
+  User,
   syncModels,
 };

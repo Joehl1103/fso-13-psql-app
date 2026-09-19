@@ -13,6 +13,7 @@ const {
 } = require("./util/middleware");
 
 const blogsRouter = require("./controllers/blogs");
+const usersRouter = require("./controllers/users");
 
 app.use(requestLog);
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(upstreamMiddleware);
 
 app.use("/api/blogs", blogsRouter);
+app.use("/api/users", usersRouter);
 
 app.use(downstreamErrorHandler);
 
