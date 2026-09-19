@@ -3,74 +3,23 @@ const app = express();
 
 const { PORT } = require("./util/config");
 const { connectToDatabase } = require("./util/db");
+const {
+  requestLog,
+  upstreamMiddleware,
+  downstreamErrorHandler,
+} = require("./util/middleware");
 
 const blogsRouter = require("./controllers/blogs");
 
-// NOTE: leaving this so that I can inspect the connection at start
-app.use((req, res, next) => {
-  console.log({
-    method: req.method,
-    originalUrl: req.originalUrl,
-    baseUrl: req.baseUrl,
-    path: req.path,
-  });
-  next();
-});
-
-function printInfo(message, req, res) {
-  console.error(
-    `${message} ${res.statusCode} ${req.method} ${req.originalUrl}`,
-  );
-}
+app.use(requestLog);
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  res.on("finish", () => {
-    if (res.statusCode >= 400) {
-      printInfo("HTTP ERROR", req, res);
-    } else {
-      printInfo("", req, res);
-    }
-  });
-  next();
-});
+app.use(upstreamMiddleware);
 
 app.use("/api/blogs", blogsRouter);
 
-app.use((req, res, next) => {
-  const error = new Error(
-    `Route not found: ${req.method} '${req.originalUrl}'`,
-  );
-
-  error.status = 404;
-
-  next(error);
-});
-
-app.use((err, req, res, next) => {
-  console.error("EXPRESS ERROR");
-  console.error({
-    message: err.message,
-    status: err.status,
-    method: req.method,
-    url: req.originalUrl,
-    stack: err.stack,
-  });
-
-  if (res.headerSent) {
-    return next(err);
-  }
-
-  const status = err.status || 500;
-
-  res.status(status).json({
-    error: err.message,
-    status,
-    method: req.method,
-    url: req.originalUrl,
-  });
-});
+app.use(downstreamErrorHandler);
 
 const start = async (PORT) => {
   await connectToDatabase();

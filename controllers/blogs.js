@@ -6,14 +6,6 @@ function printError(error) {
   console.log(`Error: ${error.message}`);
 }
 
-async function paramCheck(req, res, next) {
-  const id = req.params.id;
-  if (!id) {
-    res.status(400).end("No id provided.");
-  }
-  next();
-}
-
 router.get("/", async (req, res) => {
   console.log("hello");
   try {
@@ -35,7 +27,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", paramCheck, async (req, res) => {
+router.patch("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const body = req.body;
@@ -50,7 +42,7 @@ router.patch("/:id", paramCheck, async (req, res) => {
   }
 });
 
-router.delete("/:id", paramCheck, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     await Blog.destroy({ where: { id: id } });
