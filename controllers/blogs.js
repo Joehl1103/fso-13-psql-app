@@ -38,7 +38,12 @@ router.post("/", async (req, res) => {
 router.patch("/:id", paramCheck, async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(`hello with id: ${id}`);
+    const body = req.body;
+    const response = await Blog.update(
+      { likes: body.likes },
+      { returning: true, where: { id: id } },
+    );
+    res.status(200).json(response[1]);
   } catch (error) {
     printError(error);
     res.status(404).end();
@@ -48,9 +53,6 @@ router.patch("/:id", paramCheck, async (req, res) => {
 router.delete("/:id", paramCheck, async (req, res) => {
   try {
     const id = req.params.id;
-    if (!id) {
-      res.status(400).end();
-    }
     await Blog.destroy({ where: { id: id } });
     res.status(204).end();
   } catch (error) {
