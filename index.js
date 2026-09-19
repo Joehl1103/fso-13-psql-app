@@ -17,11 +17,60 @@ app.use((req, res, next) => {
   next();
 });
 
+function printInfo(message, req, res) {
+  console.error(
+    `${message} ${res.statusCode} ${req.method} ${req.originalUrl}`,
+  );
+}
+
 app.use(express.json());
 
-console.log("before defining router");
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    if (res.statusCode >= 400) {
+      printInfo("HTTP ERROR", req, res);
+    } else {
+      printInfo("", req, res);
+    }
+  });
+  next();
+});
+
 app.use("/api/blogs", blogsRouter);
-console.log("after defining router");
+
+app.use((req, res, next) => {
+  const error = new Error(
+    `Route not found: ${req.method} '${req.originalUrl}'`,
+  );
+
+  error.status = 404;
+
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  console.error("EXPRESS ERROR");
+  console.error({
+    message: err.message,
+    status: err.status,
+    method: req.method,
+    url: req.originalUrl,
+    stack: err.stack,
+  });
+
+  if (res.headerSent) {
+    return next(err);
+  }
+
+  const status = err.status || 500;
+
+  res.status(status).json({
+    error: err.message,
+    status,
+    method: req.method,
+    url: req.originalUrl,
+  });
+});
 
 const start = async (PORT) => {
   await connectToDatabase();
