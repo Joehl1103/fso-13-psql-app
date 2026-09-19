@@ -1,9 +1,11 @@
 const Sequelize = require("sequelize");
 const fs = require("node:fs");
 const { DATABASE_URL } = require("./config");
+const { logSql } = require("./sql");
 
 const sequelize = new Sequelize(DATABASE_URL, {
   dialect: "postgres",
+  logging: logSql,
   dialectOptions: {
     ssl: {
       require: true,

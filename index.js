@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
+const colors = require("picocolors");
 
 const { PORT } = require("./util/config");
 const { connectToDatabase } = require("./util/db");
+const { syncModels } = require("./models");
+
 const {
   requestLog,
   upstreamMiddleware,
@@ -23,8 +26,9 @@ app.use(downstreamErrorHandler);
 
 const start = async (PORT) => {
   await connectToDatabase();
+  await syncModels();
   app.listen(PORT, (error) => {
-    console.log(`Attempting to connect on port ${PORT}`);
+    console.log(colors.yellow(`Attempting to connect on port ${PORT}`));
     if (error) {
       if (error.code === "EADDRINUSE") {
         console.warn(`Port ${PORT} already in use.`);
@@ -33,7 +37,7 @@ const start = async (PORT) => {
       }
       throw error;
     }
-    console.log(`Server listening at http://localhost:${PORT}`);
+    console.log(colors.yellow(`Server listening at http://localhost:${PORT}`));
   });
 };
 

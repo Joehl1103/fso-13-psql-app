@@ -10,7 +10,7 @@ function upstreamMiddleware(error, req, res, next) {
       return res.status(400).end("No id");
     }
   }
-  res.on("finish", () => {
+  res.addEventListener("finish", () => {
     if (res.statusCode >= 400) {
       printInfo("HTTP ERROR", req, res);
     } else {
