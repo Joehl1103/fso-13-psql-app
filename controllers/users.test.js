@@ -1,18 +1,23 @@
 import supertest from "supertest";
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, beforeEach } from "vitest";
 import { User } from "../models";
 
 import app from "../app.js";
 
+const users = [
+  { username: "joe", name: "joe", password: "ABcd12!&" },
+  { username: "joey", name: "joey", password: "ABcd12!&" },
+];
+
+async function createUsers() {
+  for (const user of users) {
+    await User.create(user);
+  }
+}
+
 describe("GET users", () => {
-  test.only("gets all users should get all users", async () => {
-    const users = [
-      { username: "joe", name: "joe", password: "ABcd12!&" },
-      { username: "joey", name: "joey", password: "ABcd12!&" },
-    ];
-    for (const user of users) {
-      await User.create(user);
-    }
+  test("gets all users should get all users", async () => {
+    await createUsers();
     const response = await supertest(app).get("/api/users");
     const expectedUsers = users.map((u) => {
       const { username, name } = u;
@@ -53,5 +58,27 @@ describe("POST user", () => {
 
     expect(response.statusCode).toBe(201);
     expect(response.body).toStrictEqual({ username: "joe", name: "joe" });
+  });
+});
+
+describe("PUT", () => {
+  beforeEach(async () => {
+    await createUsers();
+  });
+  test.only("PUT for non-existing user returns 404", async () => {
+    const response = await supertest(app).put("/api/users/henrietta");
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe("unable to find a user by that username");
+  });
+
+  test("PUT by username can change username or name", async () => {
+    const response = supertest(app).put("/api/users/joe", {
+      name: "diffJoe",
+    });
+    expect(response.body).toStrictEqual({
+      username: "joe",
+      name: "diffJoe",
+    });
   });
 });

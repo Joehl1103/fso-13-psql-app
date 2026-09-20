@@ -34,6 +34,7 @@ function downstreamErrorHandler(err, req, res, next) {
       .status(500)
       .json({ error: { message: err.message, detail: err.detail } });
   } else {
+    console.log(colors.red("GENERAL ERROR"));
     console.error({
       message: err.message,
       status: err.status,

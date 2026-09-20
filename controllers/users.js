@@ -73,14 +73,37 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", async (req, res) => {
-  const response = await User.findAll();
-  const users = response
-    .map((u) => u.toJSON())
-    .map((u) => {
-      const { username, name, ...rest } = u;
-      return { username, name };
+  try {
+    const response = await User.findAll();
+    const users = response
+      .map((u) => u.toJSON())
+      .map((u) => {
+        const { username, name, ...rest } = u;
+        return { username, name };
+      });
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/:username", async (req, res, next) => {
+  const username = req.params.username;
+  try {
+    const user = await User.findOne({
+      where: {
+        username: username,
+      },
     });
-  res.status(200).json(users);
+    if (!user) {
+      throw Object.assign(new Error("unable to find a user by that username"), {
+        status: 404,
+        code: "NOT_FOUND",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
 });
 
 export default router;
