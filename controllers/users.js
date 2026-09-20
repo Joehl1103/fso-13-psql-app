@@ -10,7 +10,7 @@ function parsePassword(password) {
   const pwLen = password.length;
   if (pwLen < 8) {
     errorMessages.push("pw too short. Minimum 8 characters.");
-    return;
+    return errorMessages;
   }
   const hasUC = /[A-Z]/.test(password);
   const hasLC = /[a-z]/.test(password);
@@ -37,8 +37,8 @@ function parseUser(body) {
     errorMessages.push("no password");
   } else {
     const pwAnalysis = parsePassword(password);
-    if (pwAnalysis) {
-      pwAnalysis.push(errorMessages);
+    if (pwAnalysis.length > 0) {
+      errorMessages.push(pwAnalysis);
     }
   }
   return errorMessages;
@@ -48,10 +48,18 @@ router.post("/", async (req, res, next) => {
   try {
     const userParse = parseUser(req.body);
     if (userParse.length > 0) {
-      throw new Error(userParse.join(", "));
+      let errorMessage;
+      if (userParse.length > 1) {
+        errorMessage = userParse.join(", ");
+      } else {
+        console.log("here");
+        errorMessage = userParse[0];
+      }
+      throw new Error(errorMessage);
     }
-    const result = await User.create(req.body);
-    res.status(200).end(result);
+    // const result = await User.create(req.body);
+    // res.status(200).end(JSON.stringify(result));
+    res.status(201).end();
   } catch (error) {
     console.log("error", error);
     next(error);
