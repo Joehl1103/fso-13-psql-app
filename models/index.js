@@ -1,5 +1,5 @@
-const Blog = require("./blog");
-const User = require("./user");
+import Blog from "./blog.js";
+import User from "./user.js";
 
 User.hasMany(Blog);
 Blog.belongsTo(User);
@@ -9,8 +9,4 @@ async function syncModels() {
   Blog.sync({ alter: true });
 }
 
-module.exports = {
-  Blog,
-  User,
-  syncModels,
-};
+export { Blog, User, syncModels };

@@ -1,4 +1,4 @@
-const { format } = require("sql-formatter");
+import { format } from "sql-formatter";
 
 function logSql(message) {
   const sql = message
@@ -15,6 +15,4 @@ function logSql(message) {
   console.log("─────────────────────\n");
 }
 
-module.exports = {
-  logSql,
-};
+export { logSql };

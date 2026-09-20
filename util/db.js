@@ -1,26 +1,34 @@
-const Sequelize = require("sequelize");
-const fs = require("node:fs");
-const { DATABASE_URL } = require("./config");
-const { logSql } = require("./sql");
+import fs from "node:fs";
+import Sequelize from "sequelize";
 
-const sequelize = new Sequelize(DATABASE_URL, {
+import { DATABASE_URL, DATABASE_SSL } from "./config.js";
+import { logSql } from "./sql.js";
+
+const databaseOptions = {
   dialect: "postgres",
-  logging: logSql,
-  dialectOptions: {
+  // logging: logSql,
+  logging: false,
+};
+
+if (DATABASE_SSL) {
+  const cert = fs
+    .readFileSync(
+      "/Users/josephshomefolder/.postgres/fso_13_postgres_aiven_ca.pem",
+    )
+    .toString();
+  databaseOptions.dialectOptions = {
     ssl: {
-      require: true,
+      require: DATABASE_SSL,
       /*
        * ⚠️ Security Warning: Do not use rejectUnauthorized: false in production environments,
        * as it makes your application vulnerable to Man-in-the-Middle (MitM) attacks.
        * */
-      ca: fs
-        .readFileSync(
-          "/Users/josephshomefolder/.postgres/fso_13_postgres_aiven_ca.pem",
-        )
-        .toString(),
+      ca: cert,
     },
-  },
-});
+  };
+}
+
+const sequelize = new Sequelize(DATABASE_URL, databaseOptions);
 
 const connectToDatabase = async () => {
   try {
@@ -33,4 +41,4 @@ const connectToDatabase = async () => {
   return null;
 };
 
-module.exports = { connectToDatabase, sequelize };
+export { connectToDatabase, sequelize };

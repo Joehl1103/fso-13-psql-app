@@ -1,30 +1,9 @@
-const express = require("express");
-const app = express();
-const colors = require("picocolors");
+import colors from "picocolors";
 
-const { PORT } = require("./util/config");
-const { connectToDatabase } = require("./util/db");
-const { syncModels } = require("./models");
-
-const {
-  requestLog,
-  upstreamMiddleware,
-  downstreamErrorHandler,
-} = require("./util/middleware");
-
-const blogsRouter = require("./controllers/blogs");
-const usersRouter = require("./controllers/users");
-
-app.use(requestLog);
-
-app.use(express.json());
-
-app.use(upstreamMiddleware);
-
-app.use("/api/blogs", blogsRouter);
-app.use("/api/users", usersRouter);
-
-app.use(downstreamErrorHandler);
+import app from "./app.js";
+import { PORT } from "./util/config.js";
+import { connectToDatabase } from "./util/db.js";
+import { syncModels } from "./models/index.js";
 
 const start = async (PORT) => {
   await connectToDatabase();

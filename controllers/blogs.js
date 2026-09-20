@@ -1,6 +1,8 @@
-const router = require("express").Router();
+import express from "express";
 
-const { Blog } = require("../models");
+import { Blog } from "../models/index.js";
+
+const router = express.Router();
 
 function printError(error) {
   console.log(`Error: ${error.message}`);
@@ -53,4 +55,4 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

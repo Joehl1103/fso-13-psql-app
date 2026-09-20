@@ -1,14 +1,60 @@
-const router = require("express").Router();
-const { User } = require("../models");
+import bcrypt from "bcrypt";
+import express from "express";
+
+import { User } from "../models/index.js";
+
+const router = express.Router();
+
+function parsePassword(password) {
+  const errorMessages = [];
+  const pwLen = password.length;
+  if (pwLen < 8) {
+    errorMessages.push("pw too short. Minimum 8 characters.");
+    return;
+  }
+  const hasUC = /[A-Z]/.test(password);
+  const hasLC = /[a-z]/.test(password);
+  const hasNum = /[\d]/.test(password);
+  const hasSC = /[^A-Za-z0-9\s]/.test(password);
+  if (!hasUC || !hasLC || !hasNum || !hasSC) {
+    errorMessages.push(
+      "Password must contain at least one upper case letter, one lower case letter, one number and onespecialCharacter.",
+    );
+  }
+  return errorMessages;
+}
+
+function parseUser(body) {
+  const errorMessages = [];
+  const { username, name, password } = body;
+  if (!username) {
+    errorMessages.push("no username.");
+  }
+  if (!name) {
+    errorMessages.push("no name.");
+  }
+  if (!password) {
+    errorMessages.push("no password");
+  } else {
+    const pwAnalysis = parsePassword(password);
+    if (pwAnalysis) {
+      pwAnalysis.push(errorMessages);
+    }
+  }
+  return errorMessages;
+}
 
 router.post("/", async (req, res, next) => {
-  console.log("req.body", req.body);
   try {
+    const userParse = parseUser(req.body);
+    if (userParse.length > 0) {
+      throw new Error(userParse.join(", "));
+    }
     const result = await User.create(req.body);
-    const { username } = req.body;
-    res.status(200).end(`User '${username} created.`);
+    res.status(200).end(result);
   } catch (error) {
-    console.log(error);
+    console.log("error", error);
+    next(error);
   }
 });
 
@@ -18,4 +64,4 @@ router.get("/", async (req, res) => {
   console.log(users);
 });
 
-module.exports = router;
+export default router;
