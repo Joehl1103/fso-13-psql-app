@@ -22,7 +22,6 @@ function upstreamMiddleware(error, req, res, next) {
 }
 
 function downstreamErrorHandler(err, req, res, next) {
-  console.log("in error handler");
   if (/Sequelize/.test(err.name)) {
     console.log(colors.red("SEQUELIZE ERROR"));
     console.log({
@@ -35,7 +34,6 @@ function downstreamErrorHandler(err, req, res, next) {
       .status(500)
       .json({ error: { message: err.message, detail: err.detail } });
   } else {
-    console.log("here");
     console.error({
       message: err.message,
       status: err.status,

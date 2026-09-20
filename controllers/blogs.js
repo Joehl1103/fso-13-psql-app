@@ -9,7 +9,6 @@ function printError(error) {
 }
 
 router.get("/", async (req, res) => {
-  console.log("hello");
   try {
     const results = await Blog.findAll();
     res.json(results);

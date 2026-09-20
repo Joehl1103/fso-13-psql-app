@@ -33,6 +33,6 @@ describe("POST user", () => {
       .set("Content-Type", "application/json");
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toBe({ username: "joe", name: "joe" });
+    expect(response.body).toStrictEqual({ username: "joe", name: "joe" });
   });
 });

@@ -5,6 +5,8 @@ import { User } from "../models/index.js";
 
 const router = express.Router();
 
+const SALT_ROUNDS = 10;
+
 function parsePassword(password) {
   const errorMessages = [];
   const pwLen = password.length;
@@ -24,9 +26,8 @@ function parsePassword(password) {
   return errorMessages;
 }
 
-function parseUser(body) {
+function parseUser(username, name, password) {
   const errorMessages = [];
-  const { username, name, password } = body;
   if (!username) {
     errorMessages.push("no username.");
   }
@@ -45,23 +46,28 @@ function parseUser(body) {
 }
 
 router.post("/", async (req, res, next) => {
+  const { username, name, password } = req.body;
   try {
-    const userParse = parseUser(req.body);
+    const userParse = parseUser(username, name, password);
     if (userParse.length > 0) {
       let errorMessage;
       if (userParse.length > 1) {
         errorMessage = userParse.join(", ");
       } else {
-        console.log("here");
         errorMessage = userParse[0];
       }
       throw new Error(errorMessage);
     }
-    // const result = await User.create(req.body);
-    // res.status(200).end(JSON.stringify(result));
-    res.status(201).end();
+
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    const result = await User.create({ ...req.body, password: passwordHash });
+    const {
+      username: returnedUsername,
+      name: returnedName,
+      ...rest
+    } = result.toJSON();
+    res.status(201).json({ username: returnedUsername, name: returnedName });
   } catch (error) {
-    console.log("error", error);
     next(error);
   }
 });
