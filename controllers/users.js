@@ -73,9 +73,14 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", async (req, res) => {
-  console.log("hello");
-  const users = await User.findAll();
-  console.log(users);
+  const response = await User.findAll();
+  const users = response
+    .map((u) => u.toJSON())
+    .map((u) => {
+      const { username, name, ...rest } = u;
+      return { username, name };
+    });
+  res.status(200).json(users);
 });
 
 export default router;
