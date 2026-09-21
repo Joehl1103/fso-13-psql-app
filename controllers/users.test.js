@@ -82,7 +82,7 @@ describe("PUT", () => {
     expect(response.body.error).toBe("no update content");
   });
 
-  test.only("PUT by username can change username or name", async () => {
+  test("PUT by username can change username or name", async () => {
     const response = await supertest(app)
       .put("/api/users/joe")
       .set("Content-Type", "application/json")
@@ -92,5 +92,33 @@ describe("PUT", () => {
       username: "joe",
       name: "diffJoe",
     });
+  });
+});
+
+describe("DELETE", () => {
+  beforeEach(async () => {
+    await createUsers();
+  });
+  test("DELETE", async () => {
+    const response = await supertest(app)
+      .delete("/api/users/1")
+      .set("Content-Type", "application/json");
+
+    expect(response.status).toBe(204);
+
+    const allRows = await supertest(app).get("/api/users");
+    expect(allRows.status).toBe(200);
+    const usernames = allRows.body.map((u) => u.username);
+    expect(usernames).not.toContain("joe");
+  });
+  test.only("DELETE non-existing id returns 500", async () => {
+    const response = await supertest(app)
+      .delete("/api/users/3")
+      .set("Content-Type", "application/json");
+
+    expect(response.status).toBe(500);
+    expect(response.body.error).toStrictEqual(
+      "number of destroyed rows greater than or less than expected (1): 0",
+    );
   });
 });

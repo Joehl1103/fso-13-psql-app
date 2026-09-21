@@ -128,4 +128,24 @@ router.put("/:username", async (req, res, next) => {
   }
 });
 
+router.delete("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const response = await User.destroy({ where: { id: id } });
+    if (response !== 1) {
+      throw Object.assign(
+        new Error(
+          `number of destroyed rows greater than or less than expected (1): ${response}`,
+        ),
+        {
+          status: 500,
+        },
+      );
+    }
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
