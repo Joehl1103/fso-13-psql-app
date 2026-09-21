@@ -90,6 +90,12 @@ router.get("/", async (req, res) => {
 router.put("/:username", async (req, res, next) => {
   const username = req.params.username;
   try {
+    const body = req.body;
+    if (!body) {
+      throw Object.assign(new Error("no update content"), {
+        status: 400,
+      });
+    }
     const user = await User.findOne({
       where: {
         username: username,
@@ -101,6 +107,7 @@ router.put("/:username", async (req, res, next) => {
         code: "NOT_FOUND",
       });
     }
+    await User.update();
   } catch (error) {
     next(error);
   }

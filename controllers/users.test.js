@@ -65,17 +65,29 @@ describe("PUT", () => {
   beforeEach(async () => {
     await createUsers();
   });
-  test.only("PUT for non-existing user returns 404", async () => {
-    const response = await supertest(app).put("/api/users/henrietta");
+  test("PUT for non-existing user returns 404", async () => {
+    const response = await supertest(app)
+      .put("/api/users/henrietta")
+      .set("Content-Type", "application.json");
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("unable to find a user by that username");
   });
 
+  test.only("no body returns 400", async () => {
+    const response = await supertest(app)
+      .put("/api/users/joe", {})
+      .set("Content-Type", "application.json");
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("no update content");
+  });
+
   test("PUT by username can change username or name", async () => {
-    const response = supertest(app).put("/api/users/joe", {
-      name: "diffJoe",
-    });
+    const response = supertest(app)
+      .put("/api/users/joe", {
+        name: "diffJoe",
+      })
+      .set("Content-Type", "application.json");
     expect(response.body).toStrictEqual({
       username: "joe",
       name: "diffJoe",
