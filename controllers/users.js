@@ -90,8 +90,7 @@ router.get("/", async (req, res) => {
 router.put("/:username", async (req, res, next) => {
   const username = req.params.username;
   try {
-    const body = req.body;
-    if (!body) {
+    if (!req.body) {
       throw Object.assign(new Error("no update content"), {
         status: 400,
       });
@@ -107,7 +106,23 @@ router.put("/:username", async (req, res, next) => {
         code: "NOT_FOUND",
       });
     }
-    await User.update();
+    const response = await User.update(req.body, {
+      where: { username: username },
+      returning: true,
+    });
+    const [numAffectedRows, rowRes] = response;
+    if (numAffectedRows !== 1) {
+      throw Object.assign(
+        new Error(
+          `Affected rows greater than or less than original. Affected rows: ${numAffectedRows}`,
+        ),
+        {
+          status: 500,
+        },
+      );
+    }
+    const { name: returnedName, username: returnedUsername } = rowRes[0];
+    res.status(200).json({ username: returnedUsername, name: returnedName });
   } catch (error) {
     next(error);
   }

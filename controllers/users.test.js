@@ -74,7 +74,7 @@ describe("PUT", () => {
     expect(response.body.error).toBe("unable to find a user by that username");
   });
 
-  test.only("no body returns 400", async () => {
+  test("no body returns 400", async () => {
     const response = await supertest(app)
       .put("/api/users/joe", {})
       .set("Content-Type", "application.json");
@@ -82,12 +82,12 @@ describe("PUT", () => {
     expect(response.body.error).toBe("no update content");
   });
 
-  test("PUT by username can change username or name", async () => {
-    const response = supertest(app)
-      .put("/api/users/joe", {
-        name: "diffJoe",
-      })
-      .set("Content-Type", "application.json");
+  test.only("PUT by username can change username or name", async () => {
+    const response = await supertest(app)
+      .put("/api/users/joe")
+      .set("Content-Type", "application/json")
+      .send('{ "name": "diffJoe" }');
+    expect(response.statusCode).toBe(200);
     expect(response.body).toStrictEqual({
       username: "joe",
       name: "diffJoe",
