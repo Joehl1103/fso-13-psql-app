@@ -18,7 +18,7 @@ async function createUsers() {
 }
 
 describe("GET users", () => {
-  test.only("gets all users should get all users", async () => {
+  test("gets all users should get all users", async () => {
     await createUsers();
     const response = await supertest(app).get("/api/users");
     const expectedUsers = users.map((u) => {
@@ -28,7 +28,7 @@ describe("GET users", () => {
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual(
       expectedUsers.map((u, i) => ({
-        id: i,
+        id: i + 1,
         ...u,
         createdAt: expect.stringMatching(timeStampRegex),
         updatedAt: expect.stringMatching(timeStampRegex),

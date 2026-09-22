@@ -79,7 +79,7 @@ router.get("/", async (req, res, next) => {
       .map((u) => u.toJSON())
       .map((u) => {
         console.log("user", u);
-        const { password, ...rest } = u.dataValues;
+        const { password, ...rest } = u;
         return rest;
       });
     res.status(200).json(users);
@@ -97,7 +97,6 @@ router.get("/:id", async (req, res, next) => {
         status: 404,
       });
     }
-    console.log("response", JSON.stringify(user));
     const { password, ...rest } = user.dataValues;
     res.status(200).json(rest);
   } catch (error) {
