@@ -72,17 +72,34 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const response = await User.findAll();
     const users = response
       .map((u) => u.toJSON())
       .map((u) => {
         console.log("user", u);
-        const { username, name, createdAt, updatedAt, ...rest } = u;
-        return { username, name, createdAt, updatedAt };
+        const { password, ...rest } = u.dataValues;
+        return rest;
       });
     res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/:id", async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw Object.assign(new Error("Unable to find user with that id."), {
+        status: 404,
+      });
+    }
+    console.log("response", JSON.stringify(user));
+    const { password, ...rest } = user.dataValues;
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }

@@ -25,8 +25,10 @@ describe("GET users", () => {
       const { username, name } = u;
       return { username, name };
     });
+    expect(response.status).toBe(200);
     expect(response.body).toStrictEqual(
-      expectedUsers.map((u) => ({
+      expectedUsers.map((u, i) => ({
+        id: i,
         ...u,
         createdAt: expect.stringMatching(timeStampRegex),
         updatedAt: expect.stringMatching(timeStampRegex),
@@ -36,10 +38,22 @@ describe("GET users", () => {
 });
 
 describe("GET users by id", () => {
+  test("non-existent user should return 404", async () => {
+    const response = await supertest(app).get("/api/users/5");
+    expect(response.status).toBe(404);
+    expect(response.error.text).toBe("Unable to find user with that id.");
+  });
   test("get user by id should get user by id", async () => {
     await createUsers();
     const response = await supertest(app).get("/api/users/1");
-    expect(response.body).toStrictEqual({ username: "joe", name: "joe" });
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      id: 1,
+      username: "joe",
+      name: "joe",
+      createdAt: expect.stringMatching(timeStampRegex),
+      updatedAt: expect.stringMatching(timeStampRegex),
+    });
   });
 });
 describe("POST user", () => {
