@@ -27,20 +27,20 @@ function downstreamErrorHandler(err, req, res, next) {
       .json({ error: { message: err.message, detail: err.detail } });
   } else {
     console.log(colors.red("GENERAL ERROR"));
-    console.error({
-      message: err.message,
-      status: err.status,
-      method: req.method,
-      url: req.originalUrl,
-      stack: err.stack,
-    });
+    // console.error({
+    //   message: err.message,
+    //   status: err.status,
+    //   method: req.method,
+    //   url: req.originalUrl,
+    //   stack: err.stack,
+    // });
 
     if (res.headerSent) {
       return next(err);
     }
 
     const status = err.status || 500;
-    console.log("error", err);
+    console.log("status", status);
     res.status(status).end(err.message);
   }
 }

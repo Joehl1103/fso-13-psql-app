@@ -57,15 +57,14 @@ describe("GET users by id", () => {
   });
 });
 describe("POST user", () => {
-  test("short password returns 500", async () => {
+  test.only("short password returns 500", async () => {
     const response = await supertest(app)
       .post("/api/users")
       .send({ username: "joe", name: "joe", password: "ABCD" })
       .set("Content-Type", "application/json");
 
-    const { error: errorMessage, status } = response.body;
-    expect(status).toBe(500);
-    expect(errorMessage).toBe("pw too short. Minimum 8 characters.");
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("pw too short. Minimum 8 characters.");
   });
   test("password with correct length but incorrect criteria returns 500", async () => {
     const response = await supertest(app)

@@ -57,11 +57,15 @@ router.post("/", async (req, res, next) => {
         errorMessage = userParse[0];
       }
       throw new Error(errorMessage);
+      // throw Object.assign(new Error(errorMessage), {
+      //   status: 500,
+      // });
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await User.create({ ...req.body, password: passwordHash });
     const {
+      // TODO: add id
       username: returnedUsername,
       name: returnedName,
       ...rest
