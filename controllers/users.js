@@ -78,8 +78,9 @@ router.get("/", async (req, res) => {
     const users = response
       .map((u) => u.toJSON())
       .map((u) => {
-        const { username, name, ...rest } = u;
-        return { username, name };
+        console.log("user", u);
+        const { username, name, createdAt, updatedAt, ...rest } = u;
+        return { username, name, createdAt, updatedAt };
       });
     res.status(200).json(users);
   } catch (error) {

@@ -9,6 +9,8 @@ const users = [
   { username: "joey", name: "joey", password: "ABcd12!&" },
 ];
 
+const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
 async function createUsers() {
   for (const user of users) {
     await User.create(user);
@@ -16,17 +18,30 @@ async function createUsers() {
 }
 
 describe("GET users", () => {
-  test("gets all users should get all users", async () => {
+  test.only("gets all users should get all users", async () => {
     await createUsers();
     const response = await supertest(app).get("/api/users");
     const expectedUsers = users.map((u) => {
       const { username, name } = u;
       return { username, name };
     });
-    expect(response.body).toStrictEqual(expectedUsers);
+    expect(response.body).toStrictEqual(
+      expectedUsers.map((u) => ({
+        ...u,
+        createdAt: expect.stringMatching(timeStampRegex),
+        updatedAt: expect.stringMatching(timeStampRegex),
+      })),
+    );
   });
 });
 
+describe("GET users by id", () => {
+  test("get user by id should get user by id", async () => {
+    await createUsers();
+    const response = await supertest(app).get("/api/users/1");
+    expect(response.body).toStrictEqual({ username: "joe", name: "joe" });
+  });
+});
 describe("POST user", () => {
   test("short password returns 500", async () => {
     const response = await supertest(app)
