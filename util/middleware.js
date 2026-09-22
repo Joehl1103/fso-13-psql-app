@@ -2,7 +2,6 @@ import colors from "picocolors";
 function printInfo(message, req, res, next) {
   console.log(`${message} ${res.statusCode} ${req.method} ${res.originalUrl}`);
 }
-
 function upstreamMiddleware(error, req, res, next) {
   const method = req.method;
   if (method === "PATCH" || method === "DELETE") {

@@ -90,7 +90,7 @@ router.get("/", async (req, res) => {
 router.put("/:username", async (req, res, next) => {
   const username = req.params.username;
   try {
-    if (!req.body) {
+    if (!req.body || Object.keys(req.body).length === 0) {
       throw Object.assign(new Error("no update content"), {
         status: 400,
       });

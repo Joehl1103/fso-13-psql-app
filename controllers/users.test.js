@@ -68,7 +68,8 @@ describe("PUT", () => {
   test("PUT for non-existing user returns 404", async () => {
     const response = await supertest(app)
       .put("/api/users/henrietta")
-      .set("Content-Type", "application.json");
+      .set("Content-Type", "application/json")
+      .send('{"name": "diffJoe"}');
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("unable to find a user by that username");
@@ -76,8 +77,9 @@ describe("PUT", () => {
 
   test("no body returns 400", async () => {
     const response = await supertest(app)
-      .put("/api/users/joe", {})
-      .set("Content-Type", "application.json");
+      .put("/api/users/joe")
+      .set("Content-Type", "application/json")
+      .send("{}");
     expect(response.status).toBe(400);
     expect(response.body.error).toBe("no update content");
   });
@@ -111,7 +113,7 @@ describe("DELETE", () => {
     const usernames = allRows.body.map((u) => u.username);
     expect(usernames).not.toContain("joe");
   });
-  test.only("DELETE non-existing id returns 500", async () => {
+  test("DELETE non-existing id returns 500", async () => {
     const response = await supertest(app)
       .delete("/api/users/3")
       .set("Content-Type", "application/json");
