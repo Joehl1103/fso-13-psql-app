@@ -8,6 +8,7 @@ import {
 
 import blogsRouter from "./controllers/blogs.js";
 import usersRouter from "./controllers/users.js";
+import loginRouter from "./controllers/login.js";
 
 const app = express();
 
@@ -16,7 +17,8 @@ const app = express();
 app.use(express.json());
 
 // app.use(upstreamMiddleware);
-
+console.log("before login");
+app.use("/api/login", loginRouter);
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
 

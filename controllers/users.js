@@ -62,12 +62,15 @@ router.post("/", async (req, res, next) => {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await User.create({ ...req.body, password: passwordHash });
     const {
-      // TODO: add id
+      id,
       username: returnedUsername,
       name: returnedName,
       ...rest
     } = result.toJSON();
-    res.status(201).json({ username: returnedUsername, name: returnedName });
+    console.log({ id, username: returnedUsername, name: returnedName });
+    res
+      .status(201)
+      .json({ id, username: returnedUsername, name: returnedName });
   } catch (error) {
     next(error);
   }

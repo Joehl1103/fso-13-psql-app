@@ -18,7 +18,7 @@ function downstreamErrorHandler(err, req, res, next) {
     err.name === "SequelizeValidationError" ||
     err.name === "SequelizeUniqueConstraintError"
   ) {
-    const { name, errors } = err;
+    const { errors } = err;
     err.message = errors[0].message;
   }
 

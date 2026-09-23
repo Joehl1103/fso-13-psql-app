@@ -1,25 +1,21 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach } from "vitest";
-import { User } from "../models";
+import { User } from "../models/index.js";
+import { users } from "../vitest.setup.js";
 
 import app from "../app.js";
 
-const users = [
-  { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
-  { username: "joey@joey.com", name: "joey", password: "ABcd12!&" },
-];
-
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-async function createUsers() {
-  for (const user of users) {
-    await User.create(user);
-  }
-}
+// async function createUsers() {
+//   for (const user of users) {
+//     await User.create(user);
+//   }
+// }
 
 describe("GET users", () => {
   test("gets all users should get all users", async () => {
-    await createUsers();
+    // await createUsers();
     const response = await supertest(app).get("/api/users");
     const expectedUsers = users.map((u) => {
       const { username, name } = u;
@@ -44,7 +40,7 @@ describe("GET users by id", () => {
     expect(response.error.text).toBe("Unable to find user with that id.");
   });
   test("get user by id should get user by id", async () => {
-    await createUsers();
+    //    await createUsers();
     const response = await supertest(app).get("/api/users/1");
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({
@@ -68,7 +64,7 @@ describe("POST user", () => {
   });
 
   test("non-unique email should fail", async () => {
-    await createUsers();
+    //    await createUsers();
     const response = await supertest(app)
       .post("/api/users")
       .send({ username: "joe@joe.com", name: "joe", password: "ABcd1234!" })
@@ -100,21 +96,23 @@ describe("POST user", () => {
   test("username as email,name, correct password returns 200", async () => {
     const response = await supertest(app)
       .post("/api/users")
-      .send({ username: "joe@joe.com", name: "joe", password: "ABcd12!&" })
+      .send({ username: "joe2@joe2.com", name: "joe", password: "ABcd12!&" })
       .set("Content-Type", "application/json");
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toStrictEqual({
-      username: "joe@joe.com",
+    const { id, username, name } = response.body;
+    expect(id).toBeTypeOf("number");
+    expect({ username, name }).toStrictEqual({
+      username: "joe2@joe2.com",
       name: "joe",
     });
   });
 });
 
 describe("PUT", () => {
-  beforeEach(async () => {
-    await createUsers();
-  });
+  //  beforeEach(async () => {
+  //   await createUsers();
+  //});
   test("PUT for non-existing user returns 404", async () => {
     const response = await supertest(app)
       .put("/api/users/henrietta@h.com")
@@ -148,9 +146,9 @@ describe("PUT", () => {
 });
 
 describe("DELETE", () => {
-  beforeEach(async () => {
-    await createUsers();
-  });
+  // beforeEach(async () => {
+  //   await createUsers();
+  // });
   test("DELETE", async () => {
     const response = await supertest(app)
       .delete("/api/users/1")
