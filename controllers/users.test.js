@@ -57,7 +57,7 @@ describe("GET users by id", () => {
   });
 });
 describe("POST user", () => {
-  test.only("short password returns 500", async () => {
+  test("short password returns 500", async () => {
     const response = await supertest(app)
       .post("/api/users")
       .send({ username: "joe", name: "joe", password: "ABCD" })
@@ -72,9 +72,8 @@ describe("POST user", () => {
       .send({ username: "joe", name: "joe", password: "ABCD1234" })
       .set("Content-Type", "application/json");
 
-    const { error: errorMessage, status } = response.body;
-    expect(status).toBe(500);
-    expect(errorMessage).toBe(
+    expect(response.status).toBe(500);
+    expect(response.text).toBe(
       "Password must contain at least one upper case letter, one lower case letter, one number and onespecialCharacter.",
     );
   });
@@ -100,7 +99,7 @@ describe("PUT", () => {
       .send('{"name": "diffJoe"}');
 
     expect(response.status).toBe(404);
-    expect(response.body.error).toBe("unable to find a user by that username");
+    expect(response.text).toBe("unable to find a user by that username");
   });
 
   test("no body returns 400", async () => {
@@ -109,7 +108,7 @@ describe("PUT", () => {
       .set("Content-Type", "application/json")
       .send("{}");
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe("no update content");
+    expect(response.text).toBe("no update content");
   });
 
   test("PUT by username can change username or name", async () => {
@@ -147,7 +146,7 @@ describe("DELETE", () => {
       .set("Content-Type", "application/json");
 
     expect(response.status).toBe(500);
-    expect(response.body.error).toStrictEqual(
+    expect(response.text).toStrictEqual(
       "number of destroyed rows greater than or less than expected (1): 0",
     );
   });
