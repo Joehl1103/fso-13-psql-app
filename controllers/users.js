@@ -67,7 +67,6 @@ router.post("/", async (req, res, next) => {
       name: returnedName,
       ...rest
     } = result.toJSON();
-    console.log({ id, username: returnedUsername, name: returnedName });
     res
       .status(201)
       .json({ id, username: returnedUsername, name: returnedName });

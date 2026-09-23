@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "NODE_ENV=test vitest"
+    "test": "NODE_ENV=test vitest --no-file-parallelism",
+    "test-note": "to avoid running out of connections"
   },
   "keywords": [],
   "author": "",

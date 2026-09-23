@@ -1,11 +1,23 @@
 import { afterAll, beforeAll, beforeEach } from "vitest";
-
 import { DATABASE_URL } from "./util/config";
 import { sequelize } from "./util/db";
 import "./models/index.js";
-import { User, Blog } from "./models/index.js";
 import supertest from "supertest";
 import app from "./app.js";
+import Sequelize from "sequelize";
+import { DATABASE_URL } from "./util/config.js";
+
+const databaseOptions = {
+  dialect: "postgres",
+  logging: false,
+  pool: {
+    max: 2,
+    min: 0,
+    idle: 10000,
+  },
+};
+
+const sequelize = new Sequelize(DATABASE_URL, databaseOptions);
 
 const databaseName = new URL(DATABASE_URL).pathname.slice(1);
 

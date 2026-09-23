@@ -6,7 +6,7 @@ import { logSql } from "./sql.js";
 
 const databaseOptions = {
   dialect: "postgres",
-  logging: logSql,
+  logging: false,
 };
 
 if (DATABASE_SSL) {
