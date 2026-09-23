@@ -5,8 +5,8 @@ import { User } from "../models";
 import app from "../app.js";
 
 const users = [
-  { username: "joe", name: "joe", password: "ABcd12!&" },
-  { username: "joey", name: "joey", password: "ABcd12!&" },
+  { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
+  { username: "joey@joey.com", name: "joey", password: "ABcd12!&" },
 ];
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
@@ -49,7 +49,7 @@ describe("GET users by id", () => {
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({
       id: 1,
-      username: "joe",
+      username: "joe@joe.com",
       name: "joe",
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
@@ -57,6 +57,26 @@ describe("GET users by id", () => {
   });
 });
 describe("POST user", () => {
+  test("username that is not email should fail", async () => {
+    const response = await supertest(app)
+      .post("/api/users")
+      .send({ username: "joe", name: "joe", password: "ABcd1234!" })
+      .set("Content-Type", "application/json");
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("Validation isEmail on username failed");
+  });
+
+  test("non-unique email should fail", async () => {
+    await createUsers();
+    const response = await supertest(app)
+      .post("/api/users")
+      .send({ username: "joe@joe.com", name: "joe", password: "ABcd1234!" })
+      .set("Content-Type", "application/json");
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("username must be unique");
+  });
+
   test("short password returns 500", async () => {
     const response = await supertest(app)
       .post("/api/users")
@@ -77,14 +97,17 @@ describe("POST user", () => {
       "Password must contain at least one upper case letter, one lower case letter, one number and onespecialCharacter.",
     );
   });
-  test("username,name, correct password returns 200", async () => {
+  test("username as email,name, correct password returns 200", async () => {
     const response = await supertest(app)
       .post("/api/users")
-      .send({ username: "joe", name: "joe", password: "ABcd12!&" })
+      .send({ username: "joe@joe.com", name: "joe", password: "ABcd12!&" })
       .set("Content-Type", "application/json");
 
     expect(response.statusCode).toBe(201);
-    expect(response.body).toStrictEqual({ username: "joe", name: "joe" });
+    expect(response.body).toStrictEqual({
+      username: "joe@joe.com",
+      name: "joe",
+    });
   });
 });
 
@@ -94,7 +117,7 @@ describe("PUT", () => {
   });
   test("PUT for non-existing user returns 404", async () => {
     const response = await supertest(app)
-      .put("/api/users/henrietta")
+      .put("/api/users/henrietta@h.com")
       .set("Content-Type", "application/json")
       .send('{"name": "diffJoe"}');
 
@@ -104,7 +127,7 @@ describe("PUT", () => {
 
   test("no body returns 400", async () => {
     const response = await supertest(app)
-      .put("/api/users/joe")
+      .put("/api/users/joe@joe.com")
       .set("Content-Type", "application/json")
       .send("{}");
     expect(response.status).toBe(400);
@@ -113,12 +136,12 @@ describe("PUT", () => {
 
   test("PUT by username can change username or name", async () => {
     const response = await supertest(app)
-      .put("/api/users/joe")
+      .put("/api/users/joe@joe.com")
       .set("Content-Type", "application/json")
       .send('{ "name": "diffJoe" }');
     expect(response.statusCode).toBe(200);
     expect(response.body).toStrictEqual({
-      username: "joe",
+      username: "joe@joe.com",
       name: "diffJoe",
     });
   });

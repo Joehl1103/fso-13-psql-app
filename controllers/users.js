@@ -57,9 +57,6 @@ router.post("/", async (req, res, next) => {
         errorMessage = userParse[0];
       }
       throw new Error(errorMessage);
-      // throw Object.assign(new Error(errorMessage), {
-      //   status: 500,
-      // });
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -82,7 +79,6 @@ router.get("/", async (req, res, next) => {
     const users = response
       .map((u) => u.toJSON())
       .map((u) => {
-        console.log("user", u);
         const { password, ...rest } = u;
         return rest;
       });
