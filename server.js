@@ -29,7 +29,4 @@ async function start(PORT) {
   }
 }
 
-export default {
-  start,
-  listen,
-};
+export { start, listen };
