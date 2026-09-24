@@ -5,11 +5,21 @@ import app from "../app";
 const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 
 describe("LOGIN", () => {
+  test.only("incorrect password returns 401", async () => {
+    const response = await supertest(app)
+      .post("/api/login")
+      .set("Content-Type", "application/json")
+      .send({ username: "joe@joe.com", password: "incorrect-password" });
+
+    expect(response.status).toBe(401);
+    expect(response.text).toBe("Incorrect password.");
+  });
+
   test("login returns login", async () => {
     const response = await supertest(app)
       .post("/api/login")
       .set("Content-Type", "application/json")
-      .send("{ username: 'joe@joe.com', password: 'ABcd12!&' }");
+      .send({ username: "joe@joe.com", password: "ABcd12!&" });
     expect(response.status).toBe(200);
     const { token, username, name } = response.body;
     expect(token).toMatch(jwtRegex);

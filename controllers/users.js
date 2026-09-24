@@ -2,10 +2,9 @@ import bcrypt from "bcrypt";
 import express from "express";
 
 import { User } from "../models/index.js";
+import { SALT_ROUNDS } from "../util/config.js";
 
 const router = express.Router();
-
-const SALT_ROUNDS = 10;
 
 function parsePassword(password) {
   const errorMessages = [];
