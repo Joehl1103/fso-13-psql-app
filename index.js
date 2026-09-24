@@ -5,35 +5,30 @@ import { PORT } from "./util/config.js";
 import { connectToDatabase } from "./util/db.js";
 import { syncModels } from "./models/index.js";
 
-const start = async (PORT) => {
-  try {
-    await connectToDatabase();
-    await syncModels();
-    app.listen(PORT, (error) => {
-      console.log(colors.yellow(`Attempting to connect on port ${PORT}`));
-      if (error) {
-        if (error.code === "EADDRINUSE") {
-          console.warn(`Port ${PORT} already in use.`);
-          start(PORT + 1);
-          return;
-        }
-        throw error;
-      }
-      console.log(
-        colors.yellow(`Server listening at http://localhost:${PORT}`),
-      );
+function listen(app, PORT) {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(PORT);
+    server.once("listening", () => {
+      resolve(server);
     });
+    server.once("error", (error) => {
+      reject(error);
+    });
+  });
+}
+async function start(PORT) {
+  await connectToDatabase();
+  await syncModels();
+  try {
+    await listen(app, PORT);
+    console.log(colors.yellow(`Server listening at http://localhost:${PORT}`));
   } catch (error) {
-    if (/Sequelize/.test(error.name)) {
-      console.log({
-        name: error.name,
-        code: error.code,
-        parent: error.parent,
-        sql: error.sql,
-      });
+    if (error.code === "EADDRINUSE") {
+      console.warn(`Port ${PORT} already in use.`);
+      listen(app, PORT + 1);
+      return;
     }
-    console.error(error.message);
   }
-};
+}
 
 start(PORT);

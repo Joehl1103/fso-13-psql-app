@@ -10,7 +10,9 @@ if (!SECRET) {
 
 router.post("/", async (req, res, next) => {
   console.log("hello");
-  const body = request.body;
+  console.log(req);
+  const body = req.body;
+  console.log("body", body);
   try {
     const user = await User.findOne({ where: { username: body.username } });
     console.log("user", user);
