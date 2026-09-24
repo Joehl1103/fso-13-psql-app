@@ -2,6 +2,8 @@ import { afterAll, beforeAll, beforeEach } from "vitest";
 import supertest from "supertest";
 import app from "./app.js";
 import { sequelize } from "./util/db.js";
+import path from "node:path";
+const filename = path.basename(import.meta.filename);
 
 export const users = [
   { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
@@ -17,11 +19,15 @@ if (process.env.NODE_ENV !== "test" || !databaseName.endsWith("test")) {
 }
 
 beforeAll(async () => {
+  console.log(`${filename} || Authenticating test database ${databaseName}.`);
   await sequelize.authenticate();
+  console.log(`${filename} || Test database '${databaseName}' authenticated.`);
+  console.log(`${filename} || Syncing TEST models.`);
   await sequelize.sync({
     force: true,
     match: /_test$/,
   });
+  console.log(`${filename} || TEST models synced.`);
 });
 
 beforeEach(async () => {

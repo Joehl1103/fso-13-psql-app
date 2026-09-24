@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import Sequelize from "sequelize";
+import path from "node:path";
 
 import { DATABASE_URL, DATABASE_SSL } from "./config.js";
 import { logSql } from "./sql.js";
+const filename = path.basename(import.meta.filename);
 
 const databaseOptions = {
   dialect: "postgres",
@@ -31,10 +33,15 @@ const sequelize = new Sequelize(DATABASE_URL, databaseOptions);
 
 const connectToDatabase = async () => {
   try {
+    console.log(
+      `${filename} || Connecting to database at '${DATABASE_URL}'...`,
+    );
     await sequelize.authenticate();
-    console.log("connected to database");
+    console.log(`${filename} || Connected to database`);
   } catch (error) {
-    console.error(`Failed to connect to the database: ${error.message}`);
+    console.error(
+      `${filename} || Failed to connect to the database: ${error.message}`,
+    );
     return process.exit(1);
   }
   return null;
