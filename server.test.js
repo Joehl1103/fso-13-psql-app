@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import net from "node:net";
 
-import { listen } from "./server.js";
+import { listenOrIncrement } from "./server.js";
 import app from "./app.js";
 
 describe("start", () => {
@@ -13,7 +13,7 @@ describe("start", () => {
     });
 
     const occupiedPort = blocker.address().port;
-    const server = await listen(app, occupiedPort + 1);
+    const server = await listenOrIncrement(app, occupiedPort, 1);
 
     expect(server.address().port).toBe(occupiedPort + 1);
 

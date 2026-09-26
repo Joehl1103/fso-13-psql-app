@@ -10,21 +10,24 @@ if (!SECRET) {
 }
 
 router.post("/", async (req, res, next) => {
-  console.log("hello");
   const body = req.body;
-  console.log("body", body);
+  const { password: receivedPassword } = body;
   try {
     const user = await User.findOne({ where: { username: body.username } });
-    const { password } = user;
-    const passwordCorrect = bcrypt.compare(password, SALT_ROUNDS);
+    const { password: hashedPassword, username, id } = user.toJSON();
+    console.log("id", id);
+    const passwordCorrect = await bcrypt.compare(
+      receivedPassword,
+      hashedPassword,
+    );
     if (!passwordCorrect) {
       throw Object.assign(new Error(`Incorrect password`), {
         status: 401,
       });
     }
-    console.log("user", user);
-    console.log("login");
-    res.status(200).end("login");
+
+    const token = jwt.sign({ username, id }, SECRET);
+    res.status(200).json({ token, username, id });
   } catch (error) {
     console.log("error", error);
     next(error);
