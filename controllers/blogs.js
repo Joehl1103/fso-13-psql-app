@@ -23,6 +23,11 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const token = req.body.token;
+  if (!token) {
+    throw Object.assign(new Error(`No token present`), {
+      status: 500,
+    });
+  }
   const { id } = jwt.verify(token, SECRET);
   try {
     const result = await Blog.create({
