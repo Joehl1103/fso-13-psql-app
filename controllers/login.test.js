@@ -14,7 +14,7 @@ describe("LOGIN", () => {
     expect(response.text).toBe("Incorrect password");
   });
 
-  test.only("login returns login", async () => {
+  test("login returns token,username,id", async () => {
     const response = await supertest(app)
       .post("/api/login")
       .set("Content-Type", "application/json")

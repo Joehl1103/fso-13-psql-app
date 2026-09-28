@@ -15,7 +15,6 @@ router.post("/", async (req, res, next) => {
   try {
     const user = await User.findOne({ where: { username: body.username } });
     const { password: hashedPassword, username, id } = user.toJSON();
-    console.log("id", id);
     const passwordCorrect = await bcrypt.compare(
       receivedPassword,
       hashedPassword,
@@ -29,7 +28,6 @@ router.post("/", async (req, res, next) => {
     const token = jwt.sign({ username, id }, SECRET);
     res.status(200).json({ token, username, id });
   } catch (error) {
-    console.log("error", error);
     next(error);
   }
 });

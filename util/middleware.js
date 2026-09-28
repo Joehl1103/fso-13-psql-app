@@ -12,6 +12,19 @@ import colors from "picocolors";
 //   });
 //   next();
 // }
+//
+
+function blogPostValidator(req, res, next) {
+  console.log("validating request for blog post.");
+  const { author, url, title, token } = req.body;
+  console.log({
+    author: author,
+    url: url,
+    title: title,
+    token: token,
+  });
+  next();
+}
 
 function downstreamErrorHandler(err, req, res, next) {
   if (
@@ -38,6 +51,7 @@ function downstreamErrorHandler(err, req, res, next) {
 
 export {
   downstreamErrorHandler,
+  blogPostValidator,
   // requestLog,
   // upstreamMiddleware
 };

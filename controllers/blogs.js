@@ -1,4 +1,7 @@
 import express from "express";
+import jwt from "jsonwebtoken";
+import { SECRET } from "../util/config.js";
+import { blogPostValidator, readRequest } from "../util/middleware.js";
 
 import { Blog } from "../models/index.js";
 
@@ -11,7 +14,7 @@ function printError(error) {
 router.get("/", async (req, res) => {
   try {
     const results = await Blog.findAll();
-    res.json(results);
+    res.status(200).json(results);
   } catch (error) {
     printError(error);
     res.status(404).end();
@@ -19,12 +22,17 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  const token = req.body.token;
+  const { id } = jwt.verify(token, SECRET);
   try {
-    const result = await Blog.create(req.body);
-    res.status(200).json(result);
+    const result = await Blog.create({
+      ...req.body,
+      userId: id,
+      likes: 0,
+    });
+    res.status(200).json(result.toJSON());
   } catch (error) {
-    printError(error);
-    res.status(404).end();
+    next(error);
   }
 });
 
