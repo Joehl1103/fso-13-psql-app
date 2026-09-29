@@ -109,8 +109,7 @@ describe("DELETE", () => {
     expect(response.text).toBe("No token provided");
   });
 
-  test.only("deletion fails if token belongs to different user", async () => {
-    console.log("joey.token", joey.token);
+  test("deletion fails if token belongs to different user", async () => {
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
@@ -121,5 +120,11 @@ describe("DELETE", () => {
     );
   });
 
-  test("deletion if user id is same as blog id ", async () => {});
+  test.only("deletion if user id is same as blog id ", async () => {
+    const response = await supertest(app)
+      .delete(`/api/blogs/${blogId}`)
+      .set("Content-Type", "application/json")
+      .send({ token: joe.token });
+    expect(response.status).toBe(204);
+  });
 });

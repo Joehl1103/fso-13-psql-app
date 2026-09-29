@@ -102,7 +102,6 @@ router.delete("/:id", async (req, res, next) => {
         },
       );
     }
-    console.log("blog", blog);
     if (!blog || blog.length === 0) {
       throw Object.assign(
         new Error(
