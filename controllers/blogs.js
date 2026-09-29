@@ -70,14 +70,54 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
+  //NOTE: no body means no token since only tokens are sent
+  if (!req.body || !req.body.token) {
+    throw Object.assign(new Error("No token provided"), {
+      status: 500,
+    });
+  }
+  const user = jwt.verify(req.body.token, SECRET);
+  if (!user) {
+    throw Object.assign(
+      new Error(
+        "Something went wrong because there is no user that can be identified by that token.",
+      ),
+      {
+        status: 500,
+      },
+    );
+  }
+  const paramId = req.params.id;
   try {
+    const blog = await Blog.findByPk(paramId);
+    const { userId: blogUserId } = blog.toJSON();
+    if (blogUserId !== user.id) {
+      throw Object.assign(
+        new Error(
+          "Cannot fulfill request because token does not belong to owner.",
+        ),
+        {
+          status: 500,
+        },
+      );
+    }
+    console.log("blog", blog);
+    if (!blog || blog.length === 0) {
+      throw Object.assign(
+        new Error(
+          "Something went wrong because there is no blog with that id.",
+        ),
+        {
+          status: 500,
+        },
+      );
+    }
     const id = req.params.id;
     await Blog.destroy({ where: { id: id } });
     res.status(204).end();
   } catch (error) {
-    printError(error);
-    res.status(404).end();
+    next(error);
   }
 });
 

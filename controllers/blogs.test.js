@@ -52,7 +52,7 @@ beforeAll(async () => {
 });
 
 describe("POST", () => {
-  test.only("creating blog with token creates blog with user id", async () => {
+  test("creating blog with token creates blog with user id", async () => {
     const payload = {
       author: joe.name,
       url: "http://joeys-blog.com",
@@ -88,9 +88,38 @@ describe("POST", () => {
 });
 
 describe("DELETE", () => {
-  beforeEach(async () => {});
+  let blogId;
+  beforeEach(async () => {
+    const payload = {
+      author: joe.name,
+      url: "http://joeys-blog.com",
+      title: "Talkin' about my blog",
+      token: joe.token,
+    };
+    const response = await supertest(app)
+      .post("/api/blogs")
+      .set("Content-Type", "application/json")
+      .send(payload);
+    ({ id: blogId } = response.body);
+  });
 
-  test("deletion fails if user id is different same as blog id ", async () => {});
+  test("deletion fails if no token provided", async () => {
+    const response = await supertest(app).delete(`/api/blogs/${blogId}`);
+    expect(response.status).toBe(500);
+    expect(response.text).toBe("No token provided");
+  });
+
+  test.only("deletion fails if token belongs to different user", async () => {
+    console.log("joey.token", joey.token);
+    const response = await supertest(app)
+      .delete(`/api/blogs/${blogId}`)
+      .set("Content-Type", "application/json")
+      .send({ token: joey.token });
+    expect(response.status).toBe(500);
+    expect(response.text).toBe(
+      "Cannot fulfill request because token does not belong to owner.",
+    );
+  });
 
   test("deletion if user id is same as blog id ", async () => {});
 });
