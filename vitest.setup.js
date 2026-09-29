@@ -28,14 +28,6 @@ beforeAll(async () => {
     match: /_test$/,
   });
   console.log(`${filename} || TEST models synced.`);
-});
-
-beforeEach(async () => {
-  await sequelize.truncate({
-    cascade: true,
-    restartIdentity: true,
-  });
-
   for (const user of users) {
     await supertest(app)
       .post("/api/users")
@@ -44,6 +36,12 @@ beforeEach(async () => {
   }
 });
 
+beforeEach(async () => {});
+
 afterAll(async () => {
+  await sequelize.truncate({
+    cascade: true,
+    restartIdentity: true,
+  });
   await sequelize.close();
 });

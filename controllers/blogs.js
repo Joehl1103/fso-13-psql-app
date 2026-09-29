@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { SECRET } from "../util/config.js";
 import { blogPostValidator, readRequest } from "../util/middleware.js";
 
-import { Blog } from "../models/index.js";
+import { Blog, User } from "../models/index.js";
 
 const router = express.Router();
 
@@ -20,23 +20,51 @@ router.get("/", async (req, res) => {
     res.status(404).end();
   }
 });
-
-router.post("/", async (req, res) => {
+function printReq(req, res, next) {
+  console.log("req body in printReq", {
+    body: req.body,
+  });
+  next();
+}
+router.post("/", printReq, async (req, res) => {
   const token = req.body.token;
   if (!token) {
     throw Object.assign(new Error(`No token present`), {
       status: 500,
     });
   }
-  const { id } = jwt.verify(token, SECRET);
   try {
-    const result = await Blog.create({
-      ...req.body,
+    console.log("here", token);
+    const userFromDecodedToken = jwt.verify(token, SECRET);
+    console.log("userFromDecodedToken", userFromDecodedToken);
+    const user = await User.findAll();
+    console.log("user", user);
+    console.log("!user", !user);
+    if (!user) {
+      console.error(
+        `No user found by primary key with ${userFromDecodedToken.id}`,
+      );
+      throw Object.assign(
+        new Error(`No user found with id ${userFromDecodedToken.id}`),
+        {
+          status: 500,
+        },
+      );
+    }
+    console.log("here");
+    const payload = {
+      author: req.body.author,
+      url: req.body.url,
+      title: req.body.title,
       userId: id,
       likes: 0,
-    });
+    };
+    const result = await Blog.create(payload);
+    console.log("here");
+    console.log("result", result);
     res.status(200).json(result.toJSON());
   } catch (error) {
+    console.log("error", error);
     next(error);
   }
 });
