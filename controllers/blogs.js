@@ -20,13 +20,8 @@ router.get("/", async (req, res) => {
     res.status(404).end();
   }
 });
-function printReq(req, res, next) {
-  console.log("req body in printReq", {
-    body: req.body,
-  });
-  next();
-}
-router.post("/", printReq, async (req, res) => {
+
+router.post("/", async (req, res) => {
   const token = req.body.token;
   if (!token) {
     throw Object.assign(new Error(`No token present`), {
@@ -34,16 +29,11 @@ router.post("/", printReq, async (req, res) => {
     });
   }
   try {
-    console.log("here", token);
     const userFromDecodedToken = jwt.verify(token, SECRET);
-    console.log("userFromDecodedToken", userFromDecodedToken);
-    const user = await User.findAll();
-    console.log("user", user);
-    console.log("!user", !user);
+    const user = await User.findOne({
+      where: { username: userFromDecodedToken.username },
+    });
     if (!user) {
-      console.error(
-        `No user found by primary key with ${userFromDecodedToken.id}`,
-      );
       throw Object.assign(
         new Error(`No user found with id ${userFromDecodedToken.id}`),
         {
@@ -51,20 +41,16 @@ router.post("/", printReq, async (req, res) => {
         },
       );
     }
-    console.log("here");
     const payload = {
       author: req.body.author,
       url: req.body.url,
       title: req.body.title,
-      userId: id,
+      userId: user.id,
       likes: 0,
     };
     const result = await Blog.create(payload);
-    console.log("here");
-    console.log("result", result);
     res.status(200).json(result.toJSON());
   } catch (error) {
-    console.log("error", error);
     next(error);
   }
 });

@@ -53,19 +53,16 @@ beforeAll(async () => {
 
 describe("POST", () => {
   test.only("creating blog with token creates blog with user id", async () => {
-    console.log("joe", joe);
     const payload = {
       author: joe.name,
       url: "http://joeys-blog.com",
       title: "Talkin' about my blog",
       token: joe.token,
     };
-    console.log("payload", payload);
     const blogsResponse = await supertest(app)
       .post("/api/blogs")
       .set("Content-Type", "application/json")
       .send(payload);
-    console.log("blogsResponse.body", blogsResponse.body);
     const { author, id, likes, title, url, userId } = blogsResponse.body;
     expect(id).toBeTypeOf("number");
     expect(author).toBe(joe.name);
