@@ -17,7 +17,6 @@ const users = [
   },
 ];
 
-//
 let usersWithData;
 
 const databaseName = sequelize.getDatabaseName();
