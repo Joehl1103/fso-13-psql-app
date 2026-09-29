@@ -5,10 +5,20 @@ import { sequelize } from "./util/db.js";
 import path from "node:path";
 const filename = path.basename(import.meta.filename);
 
-export const users = [
-  { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
-  { username: "joey@joey.com", name: "joey", password: "ABcd12!&" },
+//---
+const users = [
+  {
+    name: "joe",
+    data: { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
+  },
+  {
+    name: "joey",
+    data: { username: "joey@joey.com", name: "joey", password: "ABcd12!&" },
+  },
 ];
+
+//
+let usersWithData;
 
 const databaseName = sequelize.getDatabaseName();
 
@@ -16,6 +26,24 @@ if (process.env.NODE_ENV !== "test" || !databaseName.endsWith("test")) {
   throw new Error(
     `Tests refused to run against non-test database: ${databaseName}`,
   );
+}
+
+async function getToken(username, password) {
+  const payload = {
+    username: username,
+    password: password,
+  };
+  const res = await supertest(app)
+    .post("/api/login")
+    .set("Content-Type", "application/json")
+    .send(payload);
+  return res.body.token;
+}
+
+async function getId(username) {
+  const res = await supertest(app).get("/api/users");
+  const user = res.body.filter((u) => u.username === username)[0];
+  return user.id;
 }
 
 beforeAll(async () => {
@@ -28,12 +56,18 @@ beforeAll(async () => {
     match: /_test$/,
   });
   console.log(`${filename} || TEST models synced.`);
-  for (const user of users) {
-    await supertest(app)
-      .post("/api/users")
-      .set("Content-Type", "application/json")
-      .send(user);
-  }
+  usersWithData = await Promise.all(
+    users.map(async (u) => {
+      const { username, password } = u.data;
+      const token = await getToken(username, password);
+      const id = await getId(username);
+      return { ...u, data: { ...u.data, token: token, id: id } };
+    }),
+  );
+  const joeObj = usersWithData.filter((u) => u.name === "joe")[0];
+  joe = joeObj.data;
+  const joeyObj = usersWithData.filter((u) => u.name === "joey")[0];
+  joey = joeyObj.data;
 });
 
 beforeEach(async () => {});
