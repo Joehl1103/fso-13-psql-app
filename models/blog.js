@@ -26,9 +26,6 @@ Blog.init(
       type: DataTypes.INTEGER,
       defaultvalue: 0,
     },
-    createdBy: {
-      type: DataTypes.INTEGER,
-    },
   },
   {
     sequelize,

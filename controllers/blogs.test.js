@@ -2,8 +2,6 @@ import supertest from "supertest";
 import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import app from "../app.js";
 
-//NOTE: I am having difficulty constructing the data object that I can use with all of my tests
-
 const users = [
   {
     name: "joe",
@@ -49,6 +47,42 @@ beforeAll(async () => {
   joe = joeObj.data;
   const joeyObj = usersWithData.filter((u) => u.name === "joey")[0];
   joey = joeyObj.data;
+});
+
+describe("GET", () => {
+  beforeEach(async () => {
+    const blogPayload = [
+      {
+        author: joe.name,
+        url: "http://joes-blog.com",
+        title: "Talkin' about my blog",
+        token: joe.token,
+      },
+      {
+        author: joey.name,
+        url: "http://joeys-blog.com",
+        title: "Talkin' about my blog",
+        token: joey.token,
+      },
+    ];
+    await Promise.all(
+      blogPayload.map(async (b) => {
+        console.log("b", b);
+        return await supertest(app)
+          .post("/api/blogs")
+          .set("Content-Type", "application/json")
+          .send(b);
+      }),
+    );
+  });
+  test.only("getting all blogs returns all blogs and their users", async () => {
+    const response = await supertest(app).get("/api/blogs");
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(2);
+    response.body.forEach((b) => {
+      expect(b.userId).toBeTypeOf("number");
+    });
+  });
 });
 
 describe("POST", () => {
