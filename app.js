@@ -5,8 +5,8 @@ import {
   downstreamErrorHandler,
 } from "./util/middleware.js";
 
-import blogsRouter from "./controllers/blogs.js";
-import usersRouter from "./controllers/users.js";
+import blogsRouter from "./controllers/blogs.ts";
+import usersRouter from "./controllers/users.ts";
 import loginRouter from "./controllers/login.js";
 
 const app = express();

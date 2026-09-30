@@ -2,6 +2,10 @@ import bcrypt from "bcrypt";
 import express from "express";
 
 import { User } from "../models/index.js";
+import type {
+  UserRequestType,
+  UserResponseType,
+} from "../models/modelTypes.ts";
 import { SALT_ROUNDS } from "../util/config.js";
 
 const router = express.Router();
@@ -45,7 +49,8 @@ function parseUser(username, name, password) {
 }
 
 router.post("/", async (req, res, next) => {
-  const { username, name, password } = req.body;
+  const body: UserRequestType = req.body;
+  const { username, name, password } = body;
   try {
     const userParse = parseUser(username, name, password);
     if (userParse.length > 0) {
@@ -66,6 +71,11 @@ router.post("/", async (req, res, next) => {
       name: returnedName,
       ...rest
     } = result.toJSON();
+    const payload: UserResponseType = {
+      id,
+      username: returnedUsername,
+      name: returnedName,
+    };
     res
       .status(201)
       .json({ id, username: returnedUsername, name: returnedName });

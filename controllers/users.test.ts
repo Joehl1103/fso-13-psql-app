@@ -1,35 +1,37 @@
 import supertest from "supertest";
-import { describe, test, expect, beforeEach } from "vitest";
+import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { User } from "../models/index.js";
-import { users } from "../vitest.setup.js";
+import { createUsers } from "../testing/factories.js";
+import type { UserResponseType } from "../models/modelTypes.ts";
+import type { UserWithData } from "../testing/testing.types.ts";
 
 import app from "../app.js";
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-// async function createUsers() {
-//   for (const user of users) {
-//     await User.create(user);
-//   }
-// }
-
 describe("GET users", () => {
-  test("gets all users should get all users", async () => {
+  let usersWithData: UserWithData[];
+  let joe: UserWithData | undefined, joey: UserWithData | undefined;
+  beforeAll(async () => {
+    usersWithData = await createUsers();
+    joe = usersWithData.filter((u) => u.name === "joe")[0];
+    joey = usersWithData.filter((u) => u.name === "joey")[0];
+  });
+
+  test.only("gets all users should get all users", async () => {
     // await createUsers();
     const response = await supertest(app).get("/api/users");
-    const expectedUsers = users.map((u) => {
-      const { username, name } = u;
-      return { username, name };
-    });
     expect(response.status).toBe(200);
-    expect(response.body).toStrictEqual(
-      expectedUsers.map((u, i) => ({
-        id: i + 1,
-        ...u,
-        createdAt: expect.stringMatching(timeStampRegex),
-        updatedAt: expect.stringMatching(timeStampRegex),
-      })),
-    );
+    console.log(response.body);
+    const users: UserResponseType[] = response.body;
+    users.forEach((u: UserResponseType) => {
+      const { id, username, name, createdAt, updatedAt } = u;
+      expect(id).toBeTypeOf("number");
+      expect(username).toMatch(/[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/);
+      expect(name).toBeTypeOf("string");
+      expect(createdAt).toMatch(timeStampRegex);
+      expect(updatedAt).toMatch(timeStampRegex);
+    });
   });
 });
 

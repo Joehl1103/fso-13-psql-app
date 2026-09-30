@@ -5,19 +5,19 @@ import { sequelize } from "./util/db.js";
 import path from "node:path";
 const filename = path.basename(import.meta.filename);
 
-//---
-const users = [
-  {
-    name: "joe",
-    data: { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
-  },
-  {
-    name: "joey",
-    data: { username: "joey@joey.com", name: "joey", password: "ABcd12!&" },
-  },
-];
+// //---
+// const users = [
+//   {
+//     name: "joe",
+//     data: { username: "joe@joe.com", name: "joe", password: "ABcd12!&" },
+//   },
+//   {
+//     name: "joey",
+//     data: { username: "joey@joey.com", name: "joey", password: "ABcd12!&" },
+//   },
+// ];
 
-let usersWithData;
+// let usersWithData;
 
 const databaseName = sequelize.getDatabaseName();
 
@@ -55,21 +55,21 @@ beforeAll(async () => {
     match: /_test$/,
   });
   console.log(`${filename} || TEST models synced.`);
-  usersWithData = await Promise.all(
-    users.map(async (u) => {
-      const { username, password } = u.data;
-      const token = await getToken(username, password);
-      const id = await getId(username);
-      return { ...u, data: { ...u.data, token: token, id: id } };
-    }),
-  );
-  const joeObj = usersWithData.filter((u) => u.name === "joe")[0];
-  joe = joeObj.data;
-  const joeyObj = usersWithData.filter((u) => u.name === "joey")[0];
-  joey = joeyObj.data;
+  // usersWithData = await Promise.all(
+  //   users.map(async (u) => {
+  //     const { username, password } = u.data;
+  //     const token = await getToken(username, password);
+  //     const id = await getId(username);
+  //     return { ...u, data: { ...u.data, token: token, id: id } };
+  //   }),
+  // );
+  // const joeObj = usersWithData.filter((u) => u.name === "joe")[0];
+  // joe = joeObj.data;
+  // const joeyObj = usersWithData.filter((u) => u.name === "joey")[0];
+  // joey = joeyObj.data;
 });
 
-beforeEach(async () => {});
+// beforeEach(async () => {});
 
 afterAll(async () => {
   await sequelize.truncate({

@@ -1,28 +1,24 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../util/config.js";
-import { blogPostValidator, readRequest } from "../util/middleware.js";
-
+import type { BlogType } from "../models/modelTypes.js";
 import { Blog, User } from "../models/index.js";
 
 const router = express.Router();
 
-function printError(error) {
-  console.log(`Error: ${error.message}`);
-}
-
 router.get("/", async (req, res) => {
   try {
     const results = await Blog.findAll();
+    console.log("results", results);
     res.status(200).json(results);
   } catch (error) {
-    printError(error);
     res.status(404).end();
   }
 });
 
 router.post("/", async (req, res) => {
-  const token = req.body.token;
+  console.log("body", req.body);
+  const token: string = req.body.token;
   if (!token) {
     throw Object.assign(new Error(`No token present`), {
       status: 500,
@@ -65,7 +61,6 @@ router.patch("/:id", async (req, res) => {
     );
     res.status(200).json(response[1]);
   } catch (error) {
-    printError(error);
     res.status(404).end();
   }
 });

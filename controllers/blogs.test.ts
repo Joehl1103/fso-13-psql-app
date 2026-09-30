@@ -1,38 +1,30 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import app from "../app.js";
+import { createUsers, createBlogs } from "../testing/factories.js";
+import type {
+  User,
+  UserWithData,
+  BlogResType,
+} from "../testing/testing.types.ts";
+
+let usersWithData: UserWithData[];
+let joe: UserWithData | undefined, joey: UserWithData | undefined;
+beforeAll(async () => {
+  usersWithData = await createUsers();
+  joe = usersWithData.filter((u) => u.name === "joe")[0];
+  joey = usersWithData.filter((u) => u.name === "joey")[0];
+});
 
 describe("GET", () => {
   beforeEach(async () => {
-    const blogPayload = [
-      {
-        author: joe.name,
-        url: "http://joes-blog.com",
-        title: "Talkin' about my blog",
-        token: joe.token,
-      },
-      {
-        author: joey.name,
-        url: "http://joeys-blog.com",
-        title: "Talkin' about my blog",
-        token: joey.token,
-      },
-    ];
-    await Promise.all(
-      blogPayload.map(async (b) => {
-        console.log("b", b);
-        return await supertest(app)
-          .post("/api/blogs")
-          .set("Content-Type", "application/json")
-          .send(b);
-      }),
-    );
+    await createBlogs(usersWithData);
   });
   test.only("getting all blogs returns all blogs and their users", async () => {
     const response = await supertest(app).get("/api/blogs");
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(2);
-    response.body.forEach((b) => {
+    response.body.forEach((b: BlogResType) => {
       expect(b.userId).toBeTypeOf("number");
     });
   });
@@ -107,7 +99,7 @@ describe("DELETE", () => {
     );
   });
 
-  test.only("deletion if user id is same as blog id ", async () => {
+  test("deletion if user id is same as blog id ", async () => {
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
