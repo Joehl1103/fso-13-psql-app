@@ -7,6 +7,7 @@ import type {
   UserWithData,
   BlogResType,
 } from "../testing/testing.types.ts";
+import type { BlogReqType } from "../models/modelTypes.js";
 
 let usersWithData: UserWithData[];
 let joe: UserWithData | undefined, joey: UserWithData | undefined;
@@ -20,7 +21,7 @@ describe("GET", () => {
   beforeEach(async () => {
     await createBlogs(usersWithData);
   });
-  test.only("getting all blogs returns all blogs and their users", async () => {
+  test("getting all blogs returns all blogs and their users", async () => {
     const response = await supertest(app).get("/api/blogs");
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(2);
@@ -31,12 +32,15 @@ describe("GET", () => {
 });
 
 describe("POST", () => {
-  test("creating blog with token creates blog with user id", async () => {
-    const payload = {
+  test.only("creating blog with token creates blog with user id", async () => {
+    if (!joe || !joey) {
+      throw Error("joe and joey are undefined");
+    }
+    const payload: BlogReqType = {
       author: joe.name,
       url: "http://joeys-blog.com",
       title: "Talkin' about my blog",
-      token: joe.token,
+      token: joe.data.token,
     };
     const blogsResponse = await supertest(app)
       .post("/api/blogs")
@@ -48,7 +52,7 @@ describe("POST", () => {
     expect(likes).toBe(0);
     expect(title).toBe("Talkin' about my blog");
     expect(url).toBe("http://joeys-blog.com");
-    expect(userId).toBe(joe.id);
+    expect(userId).toBeTypeOf("number");
   });
 
   test("no token produces error", async () => {

@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { User } from "../models/index.js";
-import { createUsers } from "../testing/factories.js";
+import { createUsers, createBlogs } from "../testing/factories.js";
 import type { UserResponseType } from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
 
@@ -16,6 +16,7 @@ describe("GET users", () => {
     usersWithData = await createUsers();
     joe = usersWithData.filter((u) => u.name === "joe")[0];
     joey = usersWithData.filter((u) => u.name === "joey")[0];
+    await createBlogs(usersWithData);
   });
 
   test.only("gets all users should get all users", async () => {
@@ -25,12 +26,13 @@ describe("GET users", () => {
     console.log(response.body);
     const users: UserResponseType[] = response.body;
     users.forEach((u: UserResponseType) => {
-      const { id, username, name, createdAt, updatedAt } = u;
+      const { id, username, name, createdAt, updatedAt, blogs } = u;
       expect(id).toBeTypeOf("number");
       expect(username).toMatch(/[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/);
       expect(name).toBeTypeOf("string");
       expect(createdAt).toMatch(timeStampRegex);
       expect(updatedAt).toMatch(timeStampRegex);
+      expect(blogs).toBeTruthy();
     });
   });
 });

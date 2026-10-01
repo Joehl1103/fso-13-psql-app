@@ -1,16 +1,23 @@
+interface UserResponseTypeFromSequelize extends UserResponseType {
+  password: string;
+}
 interface UserResponseType extends UserNoPW {
   createdAt: string;
   updatedAt: string;
 }
 
 type UserNoPW = Omit<UserType, "password">;
-type UserRequestType = Omit<UserType, "id">;
-
+type UserRequestType = Omit<UserType, "id" | "blogs">;
+interface UserFromToken extends UserFromTokenBase {
+  iat: number;
+}
+type UserFromTokenBase = Omit<UserType, "password" | "name" | "blogs">;
 interface UserType {
   id: number;
   username: string;
   name: string;
   password: string;
+  blogs: number[];
 }
 
 interface BlogResType extends BlogType {
@@ -18,11 +25,21 @@ interface BlogResType extends BlogType {
   userId: number;
 }
 
+interface BlogReqType extends BlogType {
+  token: string;
+}
+
 interface BlogType {
   author: string;
   url: string;
   title: string;
-  token: string;
 }
 
-export type { UserRequestType, UserResponseType, BlogType, BlogResType };
+export type {
+  UserRequestType,
+  UserResponseType,
+  BlogReqType,
+  BlogResType,
+  UserFromToken,
+  UserResponseTypeFromSequelize,
+};

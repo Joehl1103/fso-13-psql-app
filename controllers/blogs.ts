@@ -1,10 +1,19 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { SECRET } from "../util/config.js";
-import type { BlogType } from "../models/modelTypes.js";
+import config from "../util/config.js";
+const SECRET: string = config.SECRET;
+import type {
+  BlogReqType,
+  BlogType,
+  UserFromToken,
+} from "../models/modelTypes.js";
 import { Blog, User } from "../models/index.js";
 
 const router = express.Router();
+
+if (!SECRET) {
+  throw new Error("SECRET is undefined");
+}
 
 router.get("/", async (req, res) => {
   try {
@@ -17,15 +26,16 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  console.log("body", req.body);
-  const token: string = req.body.token;
+  const body: BlogReqType = req.body;
+  const { author, url, title, token } = body;
   if (!token) {
     throw Object.assign(new Error(`No token present`), {
       status: 500,
     });
   }
   try {
-    const userFromDecodedToken = jwt.verify(token, SECRET);
+    const jwtPayload = jwt.verify(token, SECRET);
+    console.log("userFromDecodedToken", userFromDecodedToken);
     const user = await User.findOne({
       where: { username: userFromDecodedToken.username },
     });
@@ -38,9 +48,9 @@ router.post("/", async (req, res) => {
       );
     }
     const payload = {
-      author: req.body.author,
-      url: req.body.url,
-      title: req.body.title,
+      author,
+      url,
+      title,
       userId: user.id,
       likes: 0,
     };

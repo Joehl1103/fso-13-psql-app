@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import express from "express";
 
-import { User } from "../models/index.js";
+import { User, Blog } from "../models/index.js";
 import type {
   UserRequestType,
   UserResponseType,
+  UserResponseTypeFromSequelize,
 } from "../models/modelTypes.ts";
 import { SALT_ROUNDS } from "../util/config.js";
 
@@ -87,12 +88,21 @@ router.post("/", async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   try {
     const response = await User.findAll();
-    const users = response
-      .map((u) => u.toJSON())
-      .map((u) => {
-        const { password, ...rest } = u;
-        return rest;
-      });
+    const users: UserResponseType[] = await Promise.all(
+      response
+        .map((u) => u.toJSON())
+        .map(
+          async (
+            u: UserResponseTypeFromSequelize,
+          ): Promise<UserResponseType> => {
+            const { password, ...rest } = u;
+            const { id } = rest;
+            const blogs = await Blog.findAll();
+            console.log("blogs", blogs);
+            return rest;
+          },
+        ),
+    );
     res.status(200).json(users);
   } catch (error) {
     next(error);
