@@ -31,8 +31,8 @@ describe("GET", () => {
   });
 });
 
-describe("POST", () => {
-  test.only("creating blog with token creates blog with user id", async () => {
+describe.only("POST", () => {
+  test("creating blog with token creates blog with user id", async () => {
     if (!joe || !joey) {
       throw Error("joe and joey are undefined");
     }

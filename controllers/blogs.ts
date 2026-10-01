@@ -22,6 +22,12 @@ router.get("/", async (req, res) => {
   }
 });
 
+interface JwtPayload {
+  username: string;
+  id: number;
+  iat: number;
+}
+
 router.post("/", async (req, res) => {
   const body: BlogReqType = req.body;
   const { author, url, title, token } = body;
@@ -31,10 +37,9 @@ router.post("/", async (req, res) => {
     });
   }
   try {
-    const jwtPayload = jwt.verify(token, SECRET);
-    console.log("userFromDecodedToken", userFromDecodedToken);
+    const jwtPayload = jwt.verify(token, SECRET) as JwtPayload;
     const user = await User.findOne({
-      where: { username: userFromDecodedToken.username },
+      where: { username: jwtPayload.username },
     });
     if (!user) {
       throw Object.assign(
