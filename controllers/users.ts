@@ -6,13 +6,14 @@ import type {
   UserRequestType,
   UserResponseType,
   UserResponseTypeFromSequelize,
+  BlogResType,
 } from "../models/modelTypes.ts";
 import config from "../util/config.ts";
 const { SALT_ROUNDS } = config;
 
 const router = express.Router();
 
-function parsePassword(password) {
+function parsePassword(password: string) {
   const errorMessages = [];
   const pwLen = password.length;
   if (pwLen < 8) {
@@ -31,7 +32,7 @@ function parsePassword(password) {
   return errorMessages;
 }
 
-function parseUser(username, name, password) {
+function parseUser(username: string, name: string, password: string) {
   const errorMessages = [];
   if (!username) {
     errorMessages.push("no username.");
@@ -78,33 +79,26 @@ router.post("/", async (req, res, next) => {
       username: returnedUsername,
       name: returnedName,
     };
-    res
-      .status(201)
-      .json({ id, username: returnedUsername, name: returnedName });
+    res.status(201).json(payload);
   } catch (error) {
     next(error);
   }
 });
 
+async function getBlogIds(userId: number): number[] {}
+
 router.get("/", async (req, res, next) => {
   try {
     const response = await User.findAll();
-    const users: UserResponseType[] = await Promise.all(
-      response
-        .map((u) => u.toJSON())
-        .map(
-          async (
-            u: UserResponseTypeFromSequelize,
-          ): Promise<UserResponseType> => {
-            const { password, ...rest } = u;
-            const { id } = rest;
-            const blogs = await Blog.findAll();
-            console.log("blogs", blogs);
-            return rest;
-          },
-        ),
-    );
-    res.status(200).json(users);
+    //TODO: refactor this into separate sequential transformations that are easier to reason about
+    const returnedUsersWithoutPassword = response
+      .map((u: User) => u.toJSON())
+      .map((u: User) => {
+        const { password, ...rest } = u;
+        return rest;
+      });
+    console.log("returnedUsers", returnedUsers);
+    // res.status(200).json(users);
   } catch (error) {
     next(error);
   }

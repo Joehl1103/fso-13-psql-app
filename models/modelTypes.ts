@@ -21,6 +21,7 @@ interface UserType {
 }
 
 interface BlogResType extends BlogType {
+  id: number;
   likes: number;
   userId: number;
 }

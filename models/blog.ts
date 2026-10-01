@@ -1,8 +1,21 @@
 import { DataTypes, Model } from "sequelize";
+import type {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  ForeignKey,
+} from "sequelize";
 
 import { sequelize } from "../util/db.js";
 
-class Blog extends Model {}
+class Blog extends Model<InferAttributes<Blog>, InferCreationAttributes<Blog>> {
+  declare id: CreationOptional<number>;
+  declare author: string;
+  declare url: string;
+  declare title: string;
+  declare likes: number;
+  declare userId: ForeignKey<number>;
+}
 
 Blog.init(
   {
@@ -13,6 +26,7 @@ Blog.init(
     },
     author: {
       type: DataTypes.TEXT,
+      allowNull: false,
     },
     url: {
       type: DataTypes.TEXT,
@@ -24,7 +38,11 @@ Blog.init(
     },
     likes: {
       type: DataTypes.INTEGER,
-      defaultvalue: 0,
+      defaultValue: 0,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   },
   {
