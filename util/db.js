@@ -2,7 +2,9 @@ import fs from "node:fs";
 import Sequelize from "sequelize";
 import path from "node:path";
 
-import { DATABASE_URL, DATABASE_SSL } from "./config.ts";
+import config from "./config.ts";
+const DATABASE_URL = config.DATABASE_URL;
+const DATABASE_SSL = config.DATABASE_SSL;
 import { logSql } from "./sql.js";
 const filename = path.basename(import.meta.filename);
 

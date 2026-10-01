@@ -7,7 +7,8 @@ import type {
   UserResponseType,
   UserResponseTypeFromSequelize,
 } from "../models/modelTypes.ts";
-import { SALT_ROUNDS } from "../util/config.js";
+import config from "../util/config.ts";
+const { SALT_ROUNDS } = config;
 
 const router = express.Router();
 

@@ -1,7 +1,8 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { SECRET } from "../util/config.js";
+import config from "../util/config.ts";
+const SECRET = config.SECRET;
 import { User } from "../models/index.js";
 const router = express.Router();
 

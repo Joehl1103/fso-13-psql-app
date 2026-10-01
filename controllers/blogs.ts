@@ -1,17 +1,14 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import config from "../util/config.js";
-const SECRET: string = config.SECRET;
-import type {
-  BlogReqType,
-  BlogType,
-  UserFromToken,
-} from "../models/modelTypes.js";
+import config from "../util/config.ts";
+const { SECRET } = config;
+import type { BlogReqType } from "../models/modelTypes.js";
 import { Blog, User } from "../models/index.js";
 
 const router = express.Router();
 
 if (!SECRET) {
+  console.log("SECRET", SECRET);
   throw new Error("SECRET is undefined");
 }
 
