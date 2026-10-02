@@ -17,7 +17,7 @@ interface UserType {
   username: string;
   name: string;
   password: string;
-  blogs: number[];
+  blogs: number[] | any[];
 }
 
 interface BlogResType extends BlogType {

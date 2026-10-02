@@ -1,3 +1,5 @@
+import type { Request, Response, NextFunction } from "express";
+import { BaseError, ValidationError } from "sequelize";
 import colors from "picocolors";
 // function printInfo(message, req, res, next) {
 //   console.log(`${message} ${res.statusCode} ${req.method} ${res.originalUrl}`);
@@ -14,7 +16,7 @@ import colors from "picocolors";
 // }
 //
 
-function blogPostValidator(req, res, next) {
+function blogPostValidator(req: Request, res: Response, next: NextFunction) {
   console.log("validating request for blog post.");
   const { author, url, title, token } = req.body;
   console.log({
@@ -26,17 +28,28 @@ function blogPostValidator(req, res, next) {
   next();
 }
 
-function downstreamErrorHandler(err, req, res, next) {
+type DownstreamError = Error | BaseError | ValidationError;
+
+function downstreamErrorHandler(
+  err: DownstreamError,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   if (
     err.name === "SequelizeValidationError" ||
     err.name === "SequelizeUniqueConstraintError"
   ) {
-    const { errors } = err;
-    err.message = errors[0].message;
+    if (err instanceof ValidationError && err.errors) {
+      const { errors } = err;
+      errors.length > 0
+        ? (err.message = errors.map((e) => e.message).join(" "))
+        : (err.message =
+            "could not find errors object on SequelizeValidationError");
+    }
   }
 
-  const status = err.status || 500;
-  res.status(status).end(err.message);
+  res.status(500).end(err.message);
 }
 
 // function requestLog(req, res, next) {

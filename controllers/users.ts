@@ -134,15 +134,18 @@ router.get("/", async (req, res, next) => {
     console.log("here-3");
     const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
     console.log("here-4");
-    console.log("here-5");
-    const map: Map<number, number[]> = buildUserIdToBlogIdMap(
+    const userIdToBlogIdMap: Map<number, number[]> = buildUserIdToBlogIdMap(
       userIds,
       allBlogsJson,
     );
-    console.log("map", map);
-    //TODO: check blog id array is correct
-    //TODO: add blog ids to response
-    // res.status(200).json(users);
+    const usersWithBlogs: UserNoPW[] = returnedUsersWithoutPassword.map((u) => {
+      const blogIdArray: number[] | undefined = userIdToBlogIdMap.get(u.id);
+      if (blogIdArray === undefined) {
+        return { ...u, blogs: [] };
+      }
+      return { ...u, blogs: blogIdArray };
+    });
+    res.status(200).json(usersWithBlogs);
   } catch (error) {
     next(error);
   }

@@ -1,15 +1,17 @@
 import supertest from "supertest";
-import { describe, test, expect, beforeEach, beforeAll } from "vitest";
-import { User } from "../models/index.js";
+import { describe, test, expect, beforeAll } from "vitest";
 import { createUsers, createBlogs } from "../testing/factories.js";
-import type { UserRequestType } from "../models/modelTypes.ts";
+import type {
+  UserRequestType,
+  UserResponseTypeFromSequelize,
+} from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
 
 import app from "../app.js";
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-describe.only("GET users", () => {
+describe("GET users", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData | undefined, joey: UserWithData | undefined;
   beforeAll(async () => {
@@ -22,8 +24,8 @@ describe.only("GET users", () => {
   test("gets all users should get all users", async () => {
     const response = await supertest(app).get("/api/users");
     expect(response.status).toBe(200);
-    const users: UserResponseType[] = response.body;
-    users.forEach((u: UserResponseType) => {
+    const users: UserResponseTypeFromSequelize[] = response.body;
+    users.forEach((u: UserResponseTypeFromSequelize) => {
       const { id, username, name, createdAt, updatedAt, blogs } = u;
       expect(id).toBeTypeOf("number");
       expect(username).toMatch(/[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/);
@@ -35,10 +37,11 @@ describe.only("GET users", () => {
   });
 });
 
-describe("GET users by id", () => {
-  test("non-existent user should return 404", async () => {
+describe.only("GET users by id", () => {
+  test.only("non-existent user should return 404", async () => {
     const response = await supertest(app).get("/api/users/5");
     expect(response.status).toBe(404);
+    console.log("response.error", response.error);
     expect(response.error.text).toBe("Unable to find user with that id.");
   });
   test("get user by id should get user by id", async () => {
