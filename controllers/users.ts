@@ -5,8 +5,7 @@ import { User, Blog } from "../models/index.js";
 import type {
   UserRequestType,
   UserResponseType,
-  UserResponseTypeFromSequelize,
-  BlogResType,
+  UserNoPW,
 } from "../models/modelTypes.ts";
 import config from "../util/config.ts";
 const { SALT_ROUNDS } = config;
@@ -85,19 +84,23 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-async function getBlogIds(userId: number): number[] {}
-
 router.get("/", async (req, res, next) => {
   try {
     const response = await User.findAll();
     //TODO: refactor this into separate sequential transformations that are easier to reason about
-    const returnedUsersWithoutPassword = response
-      .map((u: User) => u.toJSON())
-      .map((u: User) => {
+    const returnedUsersWithoutPassword: UserResponseType[] = response
+      .map((u) => u.toJSON())
+      .map((u) => {
         const { password, ...rest } = u;
         return rest;
       });
-    console.log("returnedUsers", returnedUsers);
+    const allBlogs: Blog[] = await Blog.findAll();
+    const userIdToBlogIdMap = new Map();
+    allBlogs.forEach((b: Blog) => {
+      console.log(b);
+      // if (userIdToBlogIdMap.get()) {
+      // }
+    });
     // res.status(200).json(users);
   } catch (error) {
     next(error);

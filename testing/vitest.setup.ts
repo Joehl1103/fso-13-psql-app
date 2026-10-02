@@ -1,14 +1,9 @@
-import { afterAll, beforeAll, beforeEach } from "vitest";
-import supertest from "supertest";
-import app from "./app.js";
-import { sequelize } from "./util/db.js";
+import { afterAll, beforeAll } from "vitest";
+import { sequelize } from "../util/db.js";
 import path from "node:path";
-const filename = path.basename(import.meta.filename);
-import type { UserWithData, User } from "./testing.types.js";
+const filename: string = path.basename(import.meta.filename);
 
-//---
-
-const databaseName = sequelize.getDatabaseName();
+const databaseName: string = sequelize.getDatabaseName();
 
 if (process.env.NODE_ENV !== "test" || !databaseName.endsWith("test")) {
   throw new Error(

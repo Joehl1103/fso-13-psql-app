@@ -1,7 +1,11 @@
 import type { UserWithData, User } from "./testing.types.ts";
 import supertest from "supertest";
 import app from "../app.js";
-import type { UserRequestType, BlogType } from "../models/modelTypes.js";
+import type {
+  UserRequestType,
+  BlogType,
+  UserResponseTypeFromSequelize,
+} from "../models/modelTypes.js";
 
 const user: UserWithData = {
   name: "",
@@ -45,23 +49,36 @@ const userSource: UserWithData[] = data.map((u) =>
 );
 
 async function createUsers(): Promise<UserWithData[]> {
-  return await Promise.all(
-    userSource.map(async (u: UserWithData) => {
+  console.group("createUsers");
+  console.log("A");
+  await Promise.all(
+    userSource.map(async (u: UserWithData, i: number) => {
       const { username, name, password } = u.data;
       const payload: UserRequestType = {
         username: username,
         name: name,
         password: password,
       };
-      await supertest(app)
+      console.log(`${i} A.1`);
+      const res = await supertest(app)
         .post("/api/users")
         .set("Content-Type", "application/json")
         .send(payload);
-      const token = await getToken(username, password);
-      const id = await getId(username);
+      // const res.body: UserResponseTypeFromSequelize
+    }),
+  );
+  const users = await supertest(app).get("/api/users");
+  console.log("users", users);
+  console.log("B");
+  const usersWithTokensAndData = await Promise.all(
+    userSource.map(async (u: UserWithData) => {
+      const token = await getToken(u.data.username, u.data.password);
+      const id = await getId(u.data.username);
       return { ...u, data: { ...u.data, token: token, id: id } };
     }),
   );
+  console.groupEnd();
+  return usersWithTokensAndData;
 }
 
 async function createBlogs(users: UserWithData[]): Promise<BlogType[]> {

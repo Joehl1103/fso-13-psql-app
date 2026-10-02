@@ -1,17 +1,17 @@
-interface UserResponseTypeFromSequelize extends UserResponseType {
-  password: string;
-}
-interface UserResponseType extends UserNoPW {
+interface UserResponseTypeFromSequelize extends UserNoPW {
   createdAt: string;
   updatedAt: string;
 }
 
 type UserNoPW = Omit<UserType, "password">;
+
 type UserRequestType = Omit<UserType, "id" | "blogs">;
+
 interface UserFromToken extends UserFromTokenBase {
   iat: number;
 }
 type UserFromTokenBase = Omit<UserType, "password" | "name" | "blogs">;
+
 interface UserType {
   id: number;
   username: string;
@@ -38,9 +38,9 @@ interface BlogType {
 
 export type {
   UserRequestType,
-  UserResponseType,
   BlogReqType,
   BlogResType,
   UserFromToken,
   UserResponseTypeFromSequelize,
+  UserNoPW,
 };

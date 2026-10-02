@@ -2,7 +2,10 @@ import supertest from "supertest";
 import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { User } from "../models/index.js";
 import { createUsers, createBlogs } from "../testing/factories.js";
-import type { UserResponseType } from "../models/modelTypes.ts";
+import type {
+  UserRequestType,
+  UserResponseType,
+} from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
 
 import app from "../app.js";
@@ -13,13 +16,17 @@ describe("GET users", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData | undefined, joey: UserWithData | undefined;
   beforeAll(async () => {
+    console.log("here");
     usersWithData = await createUsers();
+    console.log("here 2");
     joe = usersWithData.filter((u) => u.name === "joe")[0];
+    console.log("here 3");
     joey = usersWithData.filter((u) => u.name === "joey")[0];
+    console.log("here 4");
     await createBlogs(usersWithData);
   });
 
-  test.only("gets all users should get all users", async () => {
+  test("gets all users should get all users", async () => {
     // await createUsers();
     const response = await supertest(app).get("/api/users");
     expect(response.status).toBe(200);
@@ -56,7 +63,7 @@ describe("GET users by id", () => {
     });
   });
 });
-describe("POST user", () => {
+describe.only("POST user", () => {
   test("username that is not email should fail", async () => {
     const response = await supertest(app)
       .post("/api/users")
@@ -68,10 +75,18 @@ describe("POST user", () => {
   });
 
   test("non-unique email should fail", async () => {
-    //    await createUsers();
+    const payload: UserRequestType = {
+      username: "joe@joe.com",
+      name: "joe",
+      password: "ABcd1234!",
+    };
+    await supertest(app)
+      .post("/api/users")
+      .send(payload)
+      .set("Content-Type", "application/json");
     const response = await supertest(app)
       .post("/api/users")
-      .send({ username: "joe@joe.com", name: "joe", password: "ABcd1234!" })
+      .send(payload)
       .set("Content-Type", "application/json");
     expect(response.status).toBe(500);
     expect(response.text).toBe("username must be unique");
