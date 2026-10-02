@@ -43,8 +43,6 @@ const userSource: UserWithData[] = data.map((u) =>
 );
 
 async function createUsers(): Promise<UserWithData[]> {
-  console.group("createUsers");
-  console.log("A");
   const usersWithId: UserWithData[] = await Promise.all(
     userSource.map(async (u: UserWithData, i: number) => {
       const { username, name, password } = u.data;
@@ -53,26 +51,21 @@ async function createUsers(): Promise<UserWithData[]> {
         name: name,
         password: password,
       };
-      console.log(`${i} A.1`);
       const res = await supertest(app)
         .post("/api/users")
         .set("Content-Type", "application/json")
         .send(payload);
       const { id } = res.body;
       const resUser = await supertest(app).get(`/api/users/${id}`);
-      console.log("user", resUser.body);
       return { ...u, data: { ...u.data, id: resUser.body.id } };
     }),
   );
-  console.log("users", users);
-  console.log("B");
   const usersWithTokensAndData = await Promise.all(
     usersWithId.map(async (u: UserWithData) => {
       const token = await getToken(u.data.username, u.data.password);
       return { ...u, data: { ...u.data, token: token } };
     }),
   );
-  console.groupEnd();
   return usersWithTokensAndData;
 }
 

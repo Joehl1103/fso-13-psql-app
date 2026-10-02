@@ -3,9 +3,9 @@ import express from "express";
 
 import { User, Blog } from "../models/index.js";
 import type {
-  UserRequestType,
-  UserResponseType,
   UserNoPW,
+  UserRequestType,
+  BlogResType,
 } from "../models/modelTypes.ts";
 import config from "../util/config.ts";
 const { SALT_ROUNDS } = config;
@@ -84,23 +84,64 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+type UserIdToBlogMap = Map<number, number[] | any[]>;
+
+function buildUserIdToBlogIdMap(
+  userIds: number[],
+  blogs: BlogResType[],
+): Map<number, number[]> {
+  const userIdToBlogIdMap: UserIdToBlogMap = new Map(
+    userIds.map((id) => [id, []]),
+  );
+  console.group("forEach");
+  blogs.forEach((b) => {
+    console.log("A");
+    const userIdExists: boolean = userIdToBlogIdMap.has(b.userId);
+    console.log("B");
+    if (userIdExists) {
+      //NOTE: I do not know why this could be undefined, since I am initializing the [userId,[]] and then checking whether or not the userId exists
+      const blogIdArray: number[] | any[] | undefined = userIdToBlogIdMap.get(
+        b.userId,
+      );
+      if (blogIdArray !== undefined && !blogIdArray.includes(b.id)) {
+        const newBlogIdArray: number[] = [...blogIdArray, b.id];
+        userIdToBlogIdMap.set(b.userId, newBlogIdArray);
+      } else {
+        userIdToBlogIdMap.set(b.userId, [b.id]);
+      }
+    } else {
+      throw Error(`User id ${b.userId} does not exists`);
+    }
+  });
+  console.groupEnd();
+  return userIdToBlogIdMap;
+}
+
 router.get("/", async (req, res, next) => {
+  console.log("here");
   try {
     const response = await User.findAll();
-    //TODO: refactor this into separate sequential transformations that are easier to reason about
-    const returnedUsersWithoutPassword: UserResponseType[] = response
+    console.log("here-1");
+    const returnedUsersWithoutPassword: UserNoPW[] = response
       .map((u) => u.toJSON())
       .map((u) => {
         const { password, ...rest } = u;
-        return rest;
+        return { ...rest, blogs: [] };
       });
-    const allBlogs: Blog[] = await Blog.findAll();
-    const userIdToBlogIdMap = new Map();
-    allBlogs.forEach((b: Blog) => {
-      console.log(b);
-      // if (userIdToBlogIdMap.get()) {
-      // }
-    });
+    const userIds: number[] = response.map((u) => u.toJSON()).map((u) => u.id);
+    console.log("here-2");
+    const allBlogs = await Blog.findAll();
+    console.log("here-3");
+    const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
+    console.log("here-4");
+    console.log("here-5");
+    const map: Map<number, number[]> = buildUserIdToBlogIdMap(
+      userIds,
+      allBlogsJson,
+    );
+    console.log("map", map);
+    //TODO: check blog id array is correct
+    //TODO: add blog ids to response
     // res.status(200).json(users);
   } catch (error) {
     next(error);

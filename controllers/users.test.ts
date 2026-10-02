@@ -2,10 +2,7 @@ import supertest from "supertest";
 import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { User } from "../models/index.js";
 import { createUsers, createBlogs } from "../testing/factories.js";
-import type {
-  UserRequestType,
-  UserResponseType,
-} from "../models/modelTypes.ts";
+import type { UserRequestType } from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
 
 import app from "../app.js";
@@ -16,21 +13,15 @@ describe.only("GET users", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData | undefined, joey: UserWithData | undefined;
   beforeAll(async () => {
-    console.log("here");
     usersWithData = await createUsers();
-    console.log("here 2");
     joe = usersWithData.filter((u) => u.name === "joe")[0];
-    console.log("here 3");
     joey = usersWithData.filter((u) => u.name === "joey")[0];
-    console.log("here 4");
     await createBlogs(usersWithData);
   });
 
   test("gets all users should get all users", async () => {
-    // await createUsers();
     const response = await supertest(app).get("/api/users");
     expect(response.status).toBe(200);
-    console.log(response.body);
     const users: UserResponseType[] = response.body;
     users.forEach((u: UserResponseType) => {
       const { id, username, name, createdAt, updatedAt, blogs } = u;
