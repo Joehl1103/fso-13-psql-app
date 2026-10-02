@@ -28,12 +28,6 @@ async function getToken(username: string, password: string): Promise<string> {
   return res.body.token;
 }
 
-async function getId(username: string): Promise<number> {
-  const res = await supertest(app).get("/api/users");
-  const user = res.body.filter((u: User) => u.username === username)[0];
-  return user.id;
-}
-
 function generateUser(
   username: string,
   name: string,
@@ -51,7 +45,7 @@ const userSource: UserWithData[] = data.map((u) =>
 async function createUsers(): Promise<UserWithData[]> {
   console.group("createUsers");
   console.log("A");
-  await Promise.all(
+  const usersWithId: UserWithData[] = await Promise.all(
     userSource.map(async (u: UserWithData, i: number) => {
       const { username, name, password } = u.data;
       const payload: UserRequestType = {
@@ -64,17 +58,18 @@ async function createUsers(): Promise<UserWithData[]> {
         .post("/api/users")
         .set("Content-Type", "application/json")
         .send(payload);
-      // const res.body: UserResponseTypeFromSequelize
+      const { id } = res.body;
+      const resUser = await supertest(app).get(`/api/users/${id}`);
+      console.log("user", resUser.body);
+      return { ...u, data: { ...u.data, id: resUser.body.id } };
     }),
   );
-  const users = await supertest(app).get("/api/users");
   console.log("users", users);
   console.log("B");
   const usersWithTokensAndData = await Promise.all(
-    userSource.map(async (u: UserWithData) => {
+    usersWithId.map(async (u: UserWithData) => {
       const token = await getToken(u.data.username, u.data.password);
-      const id = await getId(u.data.username);
-      return { ...u, data: { ...u.data, token: token, id: id } };
+      return { ...u, data: { ...u.data, token: token } };
     }),
   );
   console.groupEnd();

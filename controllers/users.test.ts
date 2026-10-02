@@ -12,7 +12,7 @@ import app from "../app.js";
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-describe("GET users", () => {
+describe.only("GET users", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData | undefined, joey: UserWithData | undefined;
   beforeAll(async () => {
@@ -63,7 +63,7 @@ describe("GET users by id", () => {
     });
   });
 });
-describe.only("POST user", () => {
+describe("POST user", () => {
   test("username that is not email should fail", async () => {
     const response = await supertest(app)
       .post("/api/users")
