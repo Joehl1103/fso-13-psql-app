@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { BaseError, ValidationError } from "sequelize";
+import { ValidationError } from "sequelize";
+import type { DownstreamError } from "./errorTypes.ts";
 import colors from "picocolors";
 // function printInfo(message, req, res, next) {
 //   console.log(`${message} ${res.statusCode} ${req.method} ${res.originalUrl}`);
@@ -27,8 +28,6 @@ function blogPostValidator(req: Request, res: Response, next: NextFunction) {
   });
   next();
 }
-
-type DownstreamError = Error | BaseError | ValidationError;
 
 function downstreamErrorHandler(
   err: DownstreamError,

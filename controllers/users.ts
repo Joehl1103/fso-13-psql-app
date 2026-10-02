@@ -7,6 +7,7 @@ import type {
   UserRequestType,
   BlogResType,
 } from "../models/modelTypes.ts";
+import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import config from "../util/config.ts";
 const { SALT_ROUNDS } = config;
 
@@ -156,9 +157,7 @@ router.get("/:id", async (req, res, next) => {
   try {
     const user = await User.findByPk(id);
     if (!user) {
-      throw Object.assign(new Error("Unable to find user with that id."), {
-        status: 404,
-      });
+      throw new ErrorWithCustomStatus(404, "Unable to find user with that id.");
     }
     const { password, ...rest } = user.dataValues;
     res.status(200).json(rest);
