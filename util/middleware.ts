@@ -54,7 +54,7 @@ function downstreamErrorHandler(
   } else {
     code = 500;
   }
-
+  console.log("err.message", err.message);
   res.status(code).end(err.message);
 }
 

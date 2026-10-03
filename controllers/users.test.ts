@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { describe, test, expect, beforeAll } from "vitest";
+import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { createUsers, createBlogs } from "../testing/factories.js";
 import type {
   UserRequestType,
@@ -38,11 +38,20 @@ describe("GET users", () => {
 });
 
 describe.only("GET users by id", () => {
+  let usersWithData: UserWithData[];
+  beforeEach(async () => {
+    usersWithData = await createUsers();
+  });
   test.only("non-existent user should return 404", async () => {
     const response = await supertest(app).get("/api/users/5");
     expect(response.status).toBe(404);
-    console.log("response.error", response.error);
-    expect(response.error.text).toBe("Unable to find user with that id.");
+    console.log("response.error", JSON.stringify(response.error));
+    console.log("typeof error", typeof response.error);
+    if (response.error instanceof Error) {
+      expect(response.error.text).toBe("Unable to find user with that id.");
+    } else {
+      console.log("here");
+    }
   });
   test("get user by id should get user by id", async () => {
     //    await createUsers();

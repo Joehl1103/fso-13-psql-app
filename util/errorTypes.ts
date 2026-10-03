@@ -8,9 +8,19 @@ class ErrorWithCustomStatus extends Error {
   constructor(status: number, message: string) {
     super();
     this.status = status;
-    this.message = message;
+    this.message = this.setMessage(message);
     this.name = "ErrorWithCustomStatus";
   }
+
+  setMessage(message: string): string {
+    console.log("message", message);
+    return message;
+  }
+}
+
+interface ErrorResponseType {
+  status: number;
+  text: string;
 }
 
 export type { DownstreamError };
