@@ -1,17 +1,16 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
-import { User, Blog } from "../models/index.js";
+import { User } from "../models/index.js";
 import type {
   UserNoPW,
   UserRequestType,
-  BlogResType,
-  UserResponseTypeFromSequelize,
   UserPOSTResponseTypeFromAPI,
 } from "../models/modelTypes.ts";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
-import { parseUser, buildUserIdToBlogIdMap } from "./userHelpers.ts";
+import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../util/config.ts";
+import type { UserIdToBlogMap } from "./userTypes.ts";
 const { SALT_ROUNDS } = config;
 
 const router = express.Router();
@@ -50,69 +49,41 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-interface GetUserIdRequest extends Request {}
-
-async function getUserIdToBlogMap(
-  req: GetUserIdRequest,
-  res: Response,
-  next: NextFunction,
-) {
-  const users: User[] = await User.findAll();
-  const usersJson: UserResponseTypeFromSequelize[] = users.map((u) =>
-    u.toJSON(),
-  );
-  const userIds: number[] = usersJson.map(
-    (u: UserResponseTypeFromSequelize) => u.id,
-  );
-  const allBlogs = await Blog.findAll();
-  const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
-  const userIdToBlogMap: Map<number, number[] | any[]> = buildUserIdToBlogIdMap(
-    userIds,
-    allBlogsJson,
-  );
-  console.log("userIdToBlogMap", userIdToBlogMap);
-  req.userIdToBlogMap = userIdToBlogMap as any;
-  next();
-}
-
-router.get(
-  "/",
-  getUserIdToBlogMap,
-  async (req: GetUserIdRequest, res, next) => {
-    const userIdToBlogMap: Map<number, number[] | any[]> =
-      req.body.userIdToBlogMap;
-    try {
-      const response = await User.findAll();
-      const returnedUsersWithoutPassword: UserNoPW[] = response
-        .map((u) => u.toJSON())
-        .map((u) => {
-          const { password, ...rest } = u;
-          return { ...rest, blogs: [] };
-        });
-      const usersWithBlogs: UserNoPW[] = returnedUsersWithoutPassword.map(
-        (u) => {
-          const blogIdArray: number[] | undefined = userIdToBlogMap.get(u.id);
-          if (blogIdArray === undefined) {
-            return { ...u, blogs: [] };
-          }
-          return { ...u, blogs: blogIdArray };
-        },
-      );
-      res.status(200).json(usersWithBlogs);
-    } catch (error) {
-      next(error);
-    }
-  },
-);
+router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
+  const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
+  try {
+    const response = await User.findAll();
+    const returnedUsersWithoutPassword: UserNoPW[] = response
+      .map((u) => u.toJSON())
+      .map((u) => {
+        const { password, ...rest } = u;
+        return { ...rest, blogs: [] };
+      });
+    const usersWithBlogs: UserNoPW[] = returnedUsersWithoutPassword.map((u) => {
+      const blogIdArray: number[] | undefined = userIdToBlogMap.get(u.id);
+      if (blogIdArray === undefined) {
+        return { ...u, blogs: [] };
+      }
+      return { ...u, blogs: blogIdArray };
+    });
+    res.status(200).json(usersWithBlogs);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get(
   "/:id",
   getUserIdToBlogMap,
-  async (req: GetUserIdRequest, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
+    console.log("in GET :/id");
     if (!req.params.id) {
       throw new Error("No id.");
     }
     const id: number = Number(req.params.id);
+    console.log("id", id);
+    const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
+    console.log("userIdToBlogMap", userIdToBlogMap);
     try {
       const user = await User.findByPk(id);
       if (!user) {
@@ -122,7 +93,12 @@ router.get(
         );
       }
       const { password, ...rest } = user.dataValues;
-      res.status(200).json(rest);
+      console.log("id", id);
+      console.log("userIdToBlogMap", userIdToBlogMap);
+      console.log("userIdToBlogMap.get(id)", userIdToBlogMap.get(id));
+      const output: UserNoPW = { ...rest, blogs: userIdToBlogMap.get(id) };
+      console.log("THIS output", output);
+      res.status(200).json(output);
     } catch (error) {
       next(error);
     }

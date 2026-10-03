@@ -13,7 +13,6 @@ class ErrorWithCustomStatus extends Error {
   }
 
   setMessage(message: string): string {
-    console.log("message", message);
     return message;
   }
 }

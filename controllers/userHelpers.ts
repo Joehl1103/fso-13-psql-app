@@ -1,5 +1,10 @@
 import type { UserIdToBlogMap } from "./userTypes.ts";
-import type { BlogResType } from "../models/modelTypes.ts";
+import type {
+  BlogResType,
+  UserResponseTypeFromSequelize,
+} from "../models/modelTypes.ts";
+import { User, Blog } from "../models/index.js";
+import type { Request, Response, NextFunction } from "express";
 
 function parsePassword(password: string): string[] | any[] {
   const errorMessages: string[] | any[] = [];
@@ -69,4 +74,29 @@ function buildUserIdToBlogIdMap(
   return userIdToBlogIdMap;
 }
 
-export { parseUser, buildUserIdToBlogIdMap };
+async function getUserIdToBlogMap(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const users: User[] = await User.findAll();
+  const usersJson: UserResponseTypeFromSequelize[] = users.map((u) =>
+    u.toJSON(),
+  );
+  console.log("users", usersJson);
+  const userIds: number[] = usersJson.map(
+    (u: UserResponseTypeFromSequelize) => u.id,
+  );
+  const allBlogs = await Blog.findAll();
+  const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
+  console.log("allBlogsJson", allBlogsJson);
+  const userIdToBlogMap: Map<number, number[] | any[]> = buildUserIdToBlogIdMap(
+    userIds,
+    allBlogsJson,
+  );
+  console.log("userIdToBlogMap in getUserIdToBlogMap", userIdToBlogMap);
+  req.userIdToBlogMap = userIdToBlogMap;
+  next();
+}
+
+export { parseUser, buildUserIdToBlogIdMap, getUserIdToBlogMap };

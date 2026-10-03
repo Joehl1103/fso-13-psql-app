@@ -8,14 +8,12 @@ import { Blog, User } from "../models/index.js";
 const router = express.Router();
 
 if (!SECRET) {
-  console.log("SECRET", SECRET);
   throw new Error("SECRET is undefined");
 }
 
 router.get("/", async (req, res) => {
   try {
     const results = await Blog.findAll();
-    console.log("results", results);
     res.status(200).json(results);
   } catch (error) {
     res.status(404).end();

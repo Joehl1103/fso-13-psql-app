@@ -1,5 +1,12 @@
 import supertest from "supertest";
-import { describe, test, expect, beforeEach, beforeAll } from "vitest";
+import {
+  describe,
+  test,
+  expect,
+  beforeEach,
+  beforeAll,
+  afterAll,
+} from "vitest";
 import { createUsers, createBlogs } from "../testing/factories.js";
 import type {
   UserRequestType,
@@ -7,12 +14,13 @@ import type {
   BlogResType,
 } from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
+import { sequelize } from "../util/db.js";
 
 import app from "../app.js";
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-describe("GET users", () => {
+describe.only("GET users", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData | undefined, joey: UserWithData | undefined;
   beforeAll(async () => {
@@ -20,6 +28,9 @@ describe("GET users", () => {
     joe = usersWithData.filter((u) => u.name === "joe")[0];
     joey = usersWithData.filter((u) => u.name === "joey")[0];
     await createBlogs(usersWithData);
+  });
+  afterAll(async () => {
+    sequelize.truncate({ cascade: true });
   });
 
   test("gets all users should get all users", async () => {
@@ -44,10 +55,15 @@ describe.only("GET users by id", () => {
   let blogs: BlogResType[];
   beforeAll(async () => {
     usersWithData = await createUsers();
+    console.log("usersWithData", usersWithData);
     joe = usersWithData.find((u) => u.name === "joe") as UserWithData;
     blogs = await createBlogs(usersWithData);
   });
-  test.only("non-existent user should return 404", async () => {
+  afterAll(async () => {
+    sequelize.truncate({ cascade: true });
+  });
+  test("non-existent user should return 404", async () => {
+    console.log("***TEST: non-existent user should return 404***");
     const response = await supertest(app).get("/api/users/5");
     expect(response.status).toBe(404);
     console.log("response.error", JSON.stringify(response.error));
@@ -55,10 +71,13 @@ describe.only("GET users by id", () => {
     if (response.error instanceof Error) {
       expect(response.error.text).toBe("Unable to find user with that id.");
     } else {
-      console.log("here");
     }
   });
   test("get user by id should get user by id", async () => {
+    console.log("***TEST: get user by id should get user by id***");
+    console.log("joe", joe);
+    console.log(joe.data.id);
+
     const response = await supertest(app).get(`/api/users/${joe.data.id}`);
     expect(response.status).toBe(200);
     const joesBlogIds: number[] = [];
@@ -67,7 +86,6 @@ describe.only("GET users by id", () => {
         joesBlogIds.push(b.id);
       }
     });
-    console.log("response.body", response.body);
     expect(response.body).toStrictEqual({
       id: joe.data.id,
       username: `${joe.data.username}`,
