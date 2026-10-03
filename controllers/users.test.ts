@@ -3,7 +3,7 @@ import { describe, test, expect, beforeEach, beforeAll } from "vitest";
 import { createUsers, createBlogs } from "../testing/factories.js";
 import type {
   UserRequestType,
-  UserResponseTypeFromSequelize,
+  UserResponseTypeFromAPI,
   BlogResType,
 } from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
@@ -25,8 +25,8 @@ describe("GET users", () => {
   test("gets all users should get all users", async () => {
     const response = await supertest(app).get("/api/users");
     expect(response.status).toBe(200);
-    const users: UserResponseTypeFromSequelize[] = response.body;
-    users.forEach((u: UserResponseTypeFromSequelize) => {
+    const users: UserResponseTypeFromAPI[] = response.body;
+    users.forEach((u: UserResponseTypeFromAPI) => {
       const { id, username, name, createdAt, updatedAt, blogs } = u;
       expect(id).toBeTypeOf("number");
       expect(username).toMatch(/[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/);
@@ -47,7 +47,7 @@ describe.only("GET users by id", () => {
     joe = usersWithData.find((u) => u.name === "joe") as UserWithData;
     blogs = await createBlogs(usersWithData);
   });
-  test("non-existent user should return 404", async () => {
+  test.only("non-existent user should return 404", async () => {
     const response = await supertest(app).get("/api/users/5");
     expect(response.status).toBe(404);
     console.log("response.error", JSON.stringify(response.error));
@@ -58,7 +58,7 @@ describe.only("GET users by id", () => {
       console.log("here");
     }
   });
-  test.only("get user by id should get user by id", async () => {
+  test("get user by id should get user by id", async () => {
     const response = await supertest(app).get(`/api/users/${joe.data.id}`);
     expect(response.status).toBe(200);
     const joesBlogIds: number[] = [];

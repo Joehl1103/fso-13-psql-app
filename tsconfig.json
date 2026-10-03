@@ -45,6 +45,9 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
 
+    //Types
+    "typeRoots": ["@types", "./node_modules/@types"],
+
     // Sequelize
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true

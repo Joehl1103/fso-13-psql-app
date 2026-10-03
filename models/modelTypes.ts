@@ -1,4 +1,9 @@
-interface UserResponseTypeFromSequelize extends UserNoPW {
+interface UserResponseTypeFromSequelize extends UserResponseTypeFromAPI {
+  createdAt: string;
+  updatedAt: string;
+  password: string;
+}
+interface UserResponseTypeFromAPI extends UserNoPW {
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +47,7 @@ export type {
   BlogReqType,
   BlogResType,
   UserFromToken,
+  UserResponseTypeFromAPI,
   UserResponseTypeFromSequelize,
   UserNoPW,
 };

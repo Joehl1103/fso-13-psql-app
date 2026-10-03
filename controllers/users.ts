@@ -1,55 +1,19 @@
 import bcrypt from "bcrypt";
 import express from "express";
-
+import type { Request, Response, NextFunction } from "express";
 import { User, Blog } from "../models/index.js";
 import type {
   UserNoPW,
   UserRequestType,
   BlogResType,
+  UserResponseTypeFromSequelize,
 } from "../models/modelTypes.ts";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
+import { parseUser, buildUserIdToBlogIdMap } from "./userHelpers.ts";
 import config from "../util/config.ts";
 const { SALT_ROUNDS } = config;
 
 const router = express.Router();
-
-function parsePassword(password: string) {
-  const errorMessages = [];
-  const pwLen = password.length;
-  if (pwLen < 8) {
-    errorMessages.push("pw too short. Minimum 8 characters.");
-    return errorMessages;
-  }
-  const hasUC = /[A-Z]/.test(password);
-  const hasLC = /[a-z]/.test(password);
-  const hasNum = /[\d]/.test(password);
-  const hasSC = /[^A-Za-z0-9\s]/.test(password);
-  if (!hasUC || !hasLC || !hasNum || !hasSC) {
-    errorMessages.push(
-      "Password must contain at least one upper case letter, one lower case letter, one number and onespecialCharacter.",
-    );
-  }
-  return errorMessages;
-}
-
-function parseUser(username: string, name: string, password: string) {
-  const errorMessages = [];
-  if (!username) {
-    errorMessages.push("no username.");
-  }
-  if (!name) {
-    errorMessages.push("no name.");
-  }
-  if (!password) {
-    errorMessages.push("no password");
-  } else {
-    const pwAnalysis = parsePassword(password);
-    if (pwAnalysis.length > 0) {
-      errorMessages.push(pwAnalysis);
-    }
-  }
-  return errorMessages;
-}
 
 router.post("/", async (req, res, next) => {
   const body: UserRequestType = req.body;
@@ -57,7 +21,7 @@ router.post("/", async (req, res, next) => {
   try {
     const userParse = parseUser(username, name, password);
     if (userParse.length > 0) {
-      let errorMessage;
+      let errorMessage: string;
       if (userParse.length > 1) {
         errorMessage = userParse.join(", ");
       } else {
@@ -85,86 +49,85 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-type UserIdToBlogMap = Map<number, number[] | any[]>;
+interface GetUserIdRequest extends Request {}
 
-function buildUserIdToBlogIdMap(
-  userIds: number[],
-  blogs: BlogResType[],
-): Map<number, number[]> {
-  const userIdToBlogIdMap: UserIdToBlogMap = new Map(
-    userIds.map((id) => [id, []]),
+async function getUserIdToBlogMap(
+  req: GetUserIdRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  const users: User[] = await User.findAll();
+  const usersJson: UserResponseTypeFromSequelize[] = users.map((u) =>
+    u.toJSON(),
   );
-  console.group("forEach");
-  blogs.forEach((b) => {
-    console.log("A");
-    const userIdExists: boolean = userIdToBlogIdMap.has(b.userId);
-    console.log("B");
-    if (userIdExists) {
-      //NOTE: I do not know why this could be undefined, since I am initializing the [userId,[]] and then checking whether or not the userId exists
-      const blogIdArray: number[] | any[] | undefined = userIdToBlogIdMap.get(
-        b.userId,
-      );
-      if (blogIdArray !== undefined && !blogIdArray.includes(b.id)) {
-        const newBlogIdArray: number[] = [...blogIdArray, b.id];
-        userIdToBlogIdMap.set(b.userId, newBlogIdArray);
-      } else {
-        userIdToBlogIdMap.set(b.userId, [b.id]);
-      }
-    } else {
-      throw Error(`User id ${b.userId} does not exists`);
-    }
-  });
-  console.groupEnd();
-  return userIdToBlogIdMap;
+  const userIds: number[] = usersJson.map(
+    (u: UserResponseTypeFromSequelize) => u.id,
+  );
+  const allBlogs = await Blog.findAll();
+  const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
+  const userIdToBlogMap: Map<number, number[] | any[]> = buildUserIdToBlogIdMap(
+    userIds,
+    allBlogsJson,
+  );
+  console.log("userIdToBlogMap", userIdToBlogMap);
+  //NOTE: here
+  req.userIdToBlogMap = userIdToBlogMap as any;
+  next();
 }
 
-router.get("/", async (req, res, next) => {
-  console.log("here");
-  try {
-    const response = await User.findAll();
-    console.log("here-1");
-    const returnedUsersWithoutPassword: UserNoPW[] = response
-      .map((u) => u.toJSON())
-      .map((u) => {
-        const { password, ...rest } = u;
-        return { ...rest, blogs: [] };
-      });
-    const userIds: number[] = response.map((u) => u.toJSON()).map((u) => u.id);
-    console.log("here-2");
-    const allBlogs = await Blog.findAll();
-    console.log("here-3");
-    const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
-    console.log("here-4");
-    const userIdToBlogIdMap: Map<number, number[]> = buildUserIdToBlogIdMap(
-      userIds,
-      allBlogsJson,
-    );
-    const usersWithBlogs: UserNoPW[] = returnedUsersWithoutPassword.map((u) => {
-      const blogIdArray: number[] | undefined = userIdToBlogIdMap.get(u.id);
-      if (blogIdArray === undefined) {
-        return { ...u, blogs: [] };
-      }
-      return { ...u, blogs: blogIdArray };
-    });
-    res.status(200).json(usersWithBlogs);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/:id", async (req, res, next) => {
-  const id = req.params.id;
-  try {
-    const user = await User.findByPk(id);
-    if (!user) {
-      throw new ErrorWithCustomStatus(404, "Unable to find user with that id.");
+router.get(
+  "/",
+  getUserIdToBlogMap,
+  async (req: GetUserIdRequest, res, next) => {
+    const userIdToBlogMap: Map<number, number[] | any[]> =
+      req.body.userIdToBlogMap;
+    try {
+      const response = await User.findAll();
+      const returnedUsersWithoutPassword: UserNoPW[] = response
+        .map((u) => u.toJSON())
+        .map((u) => {
+          const { password, ...rest } = u;
+          return { ...rest, blogs: [] };
+        });
+      const usersWithBlogs: UserNoPW[] = returnedUsersWithoutPassword.map(
+        (u) => {
+          const blogIdArray: number[] | undefined = userIdToBlogMap.get(u.id);
+          if (blogIdArray === undefined) {
+            return { ...u, blogs: [] };
+          }
+          return { ...u, blogs: blogIdArray };
+        },
+      );
+      res.status(200).json(usersWithBlogs);
+    } catch (error) {
+      next(error);
     }
-    const { password, ...rest } = user.dataValues;
-    res.status(200).json(rest);
-  } catch (error) {
-    next(error);
-  }
-});
+  },
+);
+
+router.get(
+  "/:id",
+  getUserIdToBlogMap,
+  async (req: GetUserIdRequest, res, next) => {
+    if (!req.params.id) {
+      throw new Error("No id.");
+    }
+    const id: number = Number(req.params.id);
+    try {
+      const user = await User.findByPk(id);
+      if (!user) {
+        throw new ErrorWithCustomStatus(
+          404,
+          "Unable to find user with that id.",
+        );
+      }
+      const { password, ...rest } = user.dataValues;
+      res.status(200).json(rest);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 router.put("/:username", async (req, res, next) => {
   const username = req.params.username;
