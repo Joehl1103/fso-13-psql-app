@@ -20,7 +20,7 @@ import app from "../app.js";
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
-describe.only("GET users", () => {
+describe("GET users", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData | undefined, joey: UserWithData | undefined;
   beforeAll(async () => {
@@ -49,7 +49,7 @@ describe.only("GET users", () => {
   });
 });
 
-describe.only("GET users by id", () => {
+describe("GET users by id", () => {
   let usersWithData: UserWithData[];
   let joe: UserWithData;
   let blogs: BlogResType[];
@@ -162,16 +162,18 @@ describe("POST user", () => {
 });
 
 describe("PUT", () => {
-  //  beforeEach(async () => {
-  //   await createUsers();
-  //});
-  test("PUT for non-existing user returns 404", async () => {
+  beforeAll(async () => {
+    await createUsers();
+  });
+  test.only("PUT for non-existing user returns 404", async () => {
     const response = await supertest(app)
       .put("/api/users/henrietta@h.com")
       .set("Content-Type", "application/json")
-      .send('{"name": "diffJoe"}');
+      .send({ name: "diffJoe" });
 
+    console.log("response.text", response.text);
     expect(response.status).toBe(404);
+    console.log("response.text", response.text);
     expect(response.text).toBe("unable to find a user by that username");
   });
 

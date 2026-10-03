@@ -76,14 +76,11 @@ router.get(
   "/:id",
   getUserIdToBlogMap,
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("in GET :/id");
     if (!req.params.id) {
       throw new Error("No id.");
     }
     const id: number = Number(req.params.id);
-    console.log("id", id);
     const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
-    console.log("userIdToBlogMap", userIdToBlogMap);
     try {
       const user = await User.findByPk(id);
       if (!user) {
@@ -93,11 +90,7 @@ router.get(
         );
       }
       const { password, ...rest } = user.dataValues;
-      console.log("id", id);
-      console.log("userIdToBlogMap", userIdToBlogMap);
-      console.log("userIdToBlogMap.get(id)", userIdToBlogMap.get(id));
       const output: UserNoPW = { ...rest, blogs: userIdToBlogMap.get(id) };
-      console.log("THIS output", output);
       res.status(200).json(output);
     } catch (error) {
       next(error);
@@ -109,9 +102,7 @@ router.put("/:username", async (req, res, next) => {
   const username = req.params.username;
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
-      throw Object.assign(new Error("no update content"), {
-        status: 400,
-      });
+      throw new ErrorWithCustomStatus(400, "no update content");
     }
     const user = await User.findOne({
       where: {
@@ -119,10 +110,10 @@ router.put("/:username", async (req, res, next) => {
       },
     });
     if (!user) {
-      throw Object.assign(new Error("unable to find a user by that username"), {
-        status: 404,
-        code: "NOT_FOUND",
-      });
+      throw new ErrorWithCustomStatus(
+        404,
+        "unable to find a user by that username",
+      );
     }
     const response = await User.update(req.body, {
       where: { username: username },
