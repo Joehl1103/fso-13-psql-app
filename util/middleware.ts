@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { ValidationError } from "sequelize";
 import type { DownstreamError } from "./errorTypes.ts";
+import { ErrorWithCustomStatus } from "./errorTypes.ts";
 import colors from "picocolors";
 // function printInfo(message, req, res, next) {
 //   console.log(`${message} ${res.statusCode} ${req.method} ${res.originalUrl}`);
@@ -47,8 +48,14 @@ function downstreamErrorHandler(
             "could not find errors object on SequelizeValidationError");
     }
   }
+  let code: number;
+  if (err instanceof ErrorWithCustomStatus) {
+    code = err.status;
+  } else {
+    code = 500;
+  }
 
-  res.status(500).end(err.message);
+  res.status(code).end(err.message);
 }
 
 // function requestLog(req, res, next) {
