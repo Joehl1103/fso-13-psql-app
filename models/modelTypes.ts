@@ -38,6 +38,7 @@ interface BlogType {
 
 export type {
   UserRequestType,
+  BlogType,
   BlogReqType,
   BlogResType,
   UserFromToken,

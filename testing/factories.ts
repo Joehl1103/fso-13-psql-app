@@ -1,11 +1,7 @@
 import type { UserWithData, User } from "./testing.types.ts";
 import supertest from "supertest";
 import app from "../app.js";
-import type {
-  UserRequestType,
-  BlogType,
-  UserResponseTypeFromSequelize,
-} from "../models/modelTypes.js";
+import type { UserRequestType, BlogResType } from "../models/modelTypes.js";
 
 const user: UserWithData = {
   name: "",
@@ -69,7 +65,7 @@ async function createUsers(): Promise<UserWithData[]> {
   return usersWithTokensAndData;
 }
 
-async function createBlogs(users: UserWithData[]): Promise<BlogType[]> {
+async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
   const joe = users.filter((u) => u.name === "joe")[0];
   const joey = users.filter((u) => u.name === "joey")[0];
   if (!joe || !joey) {
@@ -95,6 +91,7 @@ async function createBlogs(users: UserWithData[]): Promise<BlogType[]> {
         .post("/api/blogs")
         .set("Content-Type", "application/json")
         .send(b);
+      console.log("res.body", res.body);
       return res.body;
     }),
   );

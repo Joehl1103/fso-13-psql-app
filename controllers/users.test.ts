@@ -4,6 +4,7 @@ import { createUsers, createBlogs } from "../testing/factories.js";
 import type {
   UserRequestType,
   UserResponseTypeFromSequelize,
+  BlogResType,
 } from "../models/modelTypes.ts";
 import type { UserWithData } from "../testing/testing.types.ts";
 
@@ -39,10 +40,14 @@ describe("GET users", () => {
 
 describe.only("GET users by id", () => {
   let usersWithData: UserWithData[];
-  beforeEach(async () => {
+  let joe: UserWithData;
+  let blogs: BlogResType[];
+  beforeAll(async () => {
     usersWithData = await createUsers();
+    joe = usersWithData.find((u) => u.name === "joe") as UserWithData;
+    blogs = await createBlogs(usersWithData);
   });
-  test.only("non-existent user should return 404", async () => {
+  test("non-existent user should return 404", async () => {
     const response = await supertest(app).get("/api/users/5");
     expect(response.status).toBe(404);
     console.log("response.error", JSON.stringify(response.error));
@@ -53,16 +58,23 @@ describe.only("GET users by id", () => {
       console.log("here");
     }
   });
-  test("get user by id should get user by id", async () => {
-    //    await createUsers();
-    const response = await supertest(app).get("/api/users/1");
+  test.only("get user by id should get user by id", async () => {
+    const response = await supertest(app).get(`/api/users/${joe.data.id}`);
     expect(response.status).toBe(200);
+    const joesBlogIds: number[] = [];
+    blogs.forEach((b: BlogResType) => {
+      if (b.userId === joe.data.id) {
+        joesBlogIds.push(b.id);
+      }
+    });
+    console.log("response.body", response.body);
     expect(response.body).toStrictEqual({
-      id: 1,
-      username: "joe@joe.com",
-      name: "joe",
+      id: joe.data.id,
+      username: `${joe.data.username}`,
+      name: `${joe.data.name}`,
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
+      blogs: joesBlogIds,
     });
   });
 });
