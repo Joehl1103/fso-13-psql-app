@@ -7,6 +7,7 @@ import type {
   UserRequestType,
   BlogResType,
   UserResponseTypeFromSequelize,
+  UserPOSTResponseTypeFromAPI,
 } from "../models/modelTypes.ts";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import { parseUser, buildUserIdToBlogIdMap } from "./userHelpers.ts";
@@ -38,7 +39,7 @@ router.post("/", async (req, res, next) => {
       name: returnedName,
       ...rest
     } = result.toJSON();
-    const payload: UserResponseType = {
+    const payload: UserPOSTResponseTypeFromAPI = {
       id,
       username: returnedUsername,
       name: returnedName,
@@ -70,7 +71,6 @@ async function getUserIdToBlogMap(
     allBlogsJson,
   );
   console.log("userIdToBlogMap", userIdToBlogMap);
-  //NOTE: here
   req.userIdToBlogMap = userIdToBlogMap as any;
   next();
 }

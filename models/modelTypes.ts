@@ -3,10 +3,13 @@ interface UserResponseTypeFromSequelize extends UserResponseTypeFromAPI {
   updatedAt: string;
   password: string;
 }
+
 interface UserResponseTypeFromAPI extends UserNoPW {
   createdAt: string;
   updatedAt: string;
 }
+
+type UserPOSTResponseTypeFromAPI = Omit<UserNoPW, "blogs">;
 
 type UserNoPW = Omit<UserType, "password">;
 
@@ -50,4 +53,5 @@ export type {
   UserResponseTypeFromAPI,
   UserResponseTypeFromSequelize,
   UserNoPW,
+  UserPOSTResponseTypeFromAPI,
 };
