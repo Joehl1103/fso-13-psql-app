@@ -79,11 +79,11 @@ async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
     {
       author: joe.name,
       url: "http://joes-blog.com",
-      title: "Talkin' about my blog",
+      title: "Talkin' about josue's blog",
       token: joe.data.token,
     },
     {
-      author: joe.name,
+      author: "josue",
       url: "http://joes-blog.com",
       title: "a blog about react",
       token: joe.data.token,

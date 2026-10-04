@@ -31,14 +31,25 @@ router.get(
     res: Response,
   ) => {
     const searchParam: string = req.query.search ?? "";
-    const where: WhereOptions = {};
+    let where: WhereOptions = {};
     if (searchParam) {
-      where.title = { [Op.substring]: searchParam };
+      const subStringSearchParam = { [Op.substring]: searchParam };
+      where = {
+        [Op.or]: [
+          { title: subStringSearchParam },
+          { author: subStringSearchParam },
+        ],
+      };
     }
+    console.log("where", where);
     try {
       const results = await Blog.findAll({
         where,
       });
+      console.log(
+        "results",
+        results.map((r) => r.toJSON()),
+      );
       res.status(200).json(results);
     } catch (error) {
       res.status(404).end();

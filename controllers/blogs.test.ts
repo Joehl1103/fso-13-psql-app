@@ -42,6 +42,13 @@ describe("GET", () => {
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(1);
   });
+  test.only("specifying a substring query should return two blogs, where substring appears in title of one and author in other", async () => {
+    const response = await supertest(app)
+      .get("/api/blogs")
+      .query({ search: "josue" });
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(2);
+  });
 });
 
 describe("POST", () => {
@@ -86,7 +93,7 @@ describe("POST", () => {
   });
 });
 
-describe.only("DELETE", () => {
+describe("DELETE", () => {
   let blogId: number;
 
   beforeEach(async () => {
