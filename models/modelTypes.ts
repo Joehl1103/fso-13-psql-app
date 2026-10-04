@@ -1,3 +1,4 @@
+import { User } from "./index.js";
 interface UserResponseTypeFromSequelize extends UserResponseTypeFromAPI {
   createdAt: string;
   updatedAt: string;
@@ -27,6 +28,11 @@ interface UserType {
   password: string;
   blogs: number[] | any[];
 }
+type SequelizeUserUpdateResult = Promise<
+  [affectedCount: number, affectedRows: User[]]
+>;
+
+type FindASingleUserResponse = User | null;
 
 interface BlogResType extends BlogType {
   id: number;
@@ -54,4 +60,6 @@ export type {
   UserResponseTypeFromSequelize,
   UserNoPW,
   UserPOSTResponseTypeFromAPI,
+  FindASingleUserResponse,
+  SequelizeUserUpdateResult,
 };

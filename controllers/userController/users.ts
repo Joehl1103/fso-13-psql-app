@@ -6,6 +6,8 @@ import type {
   UserNoPW,
   UserRequestType,
   UserPOSTResponseTypeFromAPI,
+  FindASingleUserResponse,
+  SequelizeUserUpdateResult,
 } from "../../models/modelTypes.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
@@ -50,6 +52,7 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
+  console.log("here");
   const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
   try {
     const response = await User.findAll();
@@ -139,9 +142,15 @@ router.put("/:username", async (req, res, next) => {
 });
 
 router.delete("/:id", async (req, res, next) => {
-  const id = req.params.id;
+  const id: string | null = req.params.id;
+  if (!id) {
+    throw new ErrorWithCustomStatus(500, `No id in params`);
+  }
   try {
-    const findByPkRes = await User.findByPk(id);
+    const findByPkRes: FindASingleUserResponse = await User.findByPk(id);
+    if (!findByPkRes) {
+      throw new ErrorWithCustomStatus(500, `No user with id: ${id}`);
+    }
     console.log(findByPkRes.toJSON());
     if (!findByPkRes) {
       throw new ErrorWithCustomStatus(500, "No user by that id.");

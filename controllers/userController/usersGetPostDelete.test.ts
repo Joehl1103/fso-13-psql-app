@@ -8,6 +8,7 @@ import type {
 import type { UserWithData } from "../../testing/testing.types.ts";
 import { sequelize } from "../../util/db.js";
 import { User } from "../../models/index.js";
+import type { Response, Request } from "express";
 
 import app from "../../app.js";
 
@@ -117,7 +118,7 @@ describe("PUT", () => {
 });
 
 describe.only("DELETE", () => {
-  test.only("DELETE returns 204", async () => {
+  test.only("DELETE returns 204 and user is no longer available", async () => {
     if (!joe) {
       throw new Error("joe is undefined");
     }
@@ -125,7 +126,9 @@ describe.only("DELETE", () => {
     const response = await supertest(app)
       .delete(`/api/users/${joe.data.id}`)
       .set("Content-Type", "application/json");
+    console.log("response.body", response.body);
     expect(response.status).toBe(204);
+    expect(response.body).toStrictEqual({});
     const allRows = await supertest(app).get("/api/users");
     console.log("allRows", allRows.body);
     expect(allRows.status).toBe(200);
