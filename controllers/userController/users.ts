@@ -1,15 +1,15 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
-import { User } from "../models/index.js";
+import { User } from "../../models/index.js";
 import type {
   UserNoPW,
   UserRequestType,
   UserPOSTResponseTypeFromAPI,
-} from "../models/modelTypes.ts";
-import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
+} from "../../models/modelTypes.ts";
+import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
-import config from "../util/config.ts";
+import config from "../../util/config.ts";
 import type { UserIdToBlogMap } from "./userTypes.ts";
 const { SALT_ROUNDS } = config;
 
@@ -53,6 +53,7 @@ router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
   const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
   try {
     const response = await User.findAll();
+    console.log("response", response);
     const returnedUsersWithoutPassword: UserNoPW[] = response
       .map((u) => u.toJSON())
       .map((u) => {
@@ -99,12 +100,12 @@ router.get(
 );
 
 router.put("/:username", async (req, res, next) => {
-  const username = req.params.username;
+  const username: string = req.params.username;
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
       throw new ErrorWithCustomStatus(400, "no update content");
     }
-    const user = await User.findOne({
+    const user: User | null = await User.findOne({
       where: {
         username: username,
       },
@@ -115,7 +116,7 @@ router.put("/:username", async (req, res, next) => {
         "unable to find a user by that username",
       );
     }
-    const response = await User.update(req.body, {
+    const response: SequelizeUserUpdateResult = await User.update(req.body, {
       where: { username: username },
       returning: true,
     });
@@ -140,15 +141,17 @@ router.put("/:username", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   const id = req.params.id;
   try {
-    const response = await User.destroy({ where: { id: id } });
-    if (response !== 1) {
-      throw Object.assign(
-        new Error(
-          `number of destroyed rows greater than or less than expected (1): ${response}`,
-        ),
-        {
-          status: 500,
-        },
+    const findByPkRes = await User.findByPk(id);
+    console.log(findByPkRes.toJSON());
+    if (!findByPkRes) {
+      throw new ErrorWithCustomStatus(500, "No user by that id.");
+    }
+    const destroyRes = await User.destroy({ where: { id: id } });
+    console.log("destoryRes", destroyRes);
+    if (destroyRes !== 1) {
+      throw new ErrorWithCustomStatus(
+        500,
+        `number of destroyed rows greater than or less than expected (1): ${destroyRes}`,
       );
     }
     res.status(204).end();

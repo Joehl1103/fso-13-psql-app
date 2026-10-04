@@ -4,7 +4,6 @@ import app from "../app.js";
 import type {
   UserRequestType,
   BlogResType,
-  UserResponseTypeFromSequelize,
   UserPOSTResponseTypeFromAPI,
 } from "../models/modelTypes.js";
 
@@ -56,21 +55,16 @@ async function createUsers(): Promise<UserWithData[]> {
         .post("/api/users")
         .set("Content-Type", "application/json")
         .send(payload);
-      const createdUser: UserPOSTResponseTypeFromAPI = res.body;
-      console.log("res.body", res.body);
       const { id } = res.body;
-      console.log("id in createUsers", id);
       return { ...u, data: { ...u.data, id: id } };
     }),
   );
-  console.log("usersWithId", usersWithId);
   const usersWithTokensAndData = await Promise.all(
     usersWithId.map(async (u: UserWithData) => {
       const token = await getToken(u.data.username, u.data.password);
       return { ...u, data: { ...u.data, token: token } };
     }),
   );
-  console.log("usersWithTokensAndData", usersWithTokensAndData);
   return usersWithTokensAndData;
 }
 
