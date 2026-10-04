@@ -52,16 +52,11 @@ function buildUserIdToBlogIdMap(
   userIds: number[],
   blogs: BlogResType[],
 ): Map<number, number[]> {
-  console.group("buildUserIdToBlogIdMap");
-  console.log("userIds", userIds);
   const userIdToBlogIdMap: UserIdToBlogMap = new Map(
     userIds.map((id) => [id, []]),
   );
-  console.log("A");
   blogs.forEach((b: BlogResType, i: number) => {
-    console.log(`b ${i + 1}`, b);
     const userIdExists: boolean = userIdToBlogIdMap.has(b.userId);
-    console.log("A.1");
     if (userIdExists) {
       //NOTE: I do not know why this could be undefined, since I am initializing the [userId,[]] and then checking whether or not the userId exists
       const blogIdArray: number[] | any[] | undefined = userIdToBlogIdMap.get(
@@ -75,8 +70,6 @@ function buildUserIdToBlogIdMap(
       }
     }
   });
-  console.log("userIdToBlogIdMap", userIdToBlogIdMap);
-  console.groupEnd();
   return userIdToBlogIdMap;
 }
 
@@ -85,7 +78,6 @@ async function getUserIdToBlogMap(
   res: Response,
   next: NextFunction,
 ) {
-  console.log("here in getUserIdToBlogMap");
   const users: User[] = await User.findAll();
   const usersJson: UserResponseTypeFromSequelize[] = users.map((u) =>
     u.toJSON(),
@@ -95,12 +87,10 @@ async function getUserIdToBlogMap(
   );
   const allBlogs = await Blog.findAll();
   const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
-  console.log("A");
   const userIdToBlogMap: Map<number, number[] | any[]> = buildUserIdToBlogIdMap(
     userIds,
     allBlogsJson,
   );
-  console.log("B");
   req.userIdToBlogMap = userIdToBlogMap;
   next();
 }

@@ -52,11 +52,9 @@ router.post("/", async (req, res, next) => {
 });
 
 router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
-  console.log("here");
   const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
   try {
     const response = await User.findAll();
-    console.log("response", response);
     const returnedUsersWithoutPassword: UserNoPW[] = response
       .map((u) => u.toJSON())
       .map((u) => {
@@ -146,17 +144,16 @@ router.delete("/:id", async (req, res, next) => {
   if (!id) {
     throw new ErrorWithCustomStatus(500, `No id in params`);
   }
+
   try {
     const findByPkRes: FindASingleUserResponse = await User.findByPk(id);
     if (!findByPkRes) {
       throw new ErrorWithCustomStatus(500, `No user with id: ${id}`);
     }
-    console.log(findByPkRes.toJSON());
     if (!findByPkRes) {
       throw new ErrorWithCustomStatus(500, "No user by that id.");
     }
     const destroyRes = await User.destroy({ where: { id: id } });
-    console.log("destoryRes", destroyRes);
     if (destroyRes !== 1) {
       throw new ErrorWithCustomStatus(
         500,

@@ -8,7 +8,6 @@ import type {
 import type { UserWithData } from "../../testing/testing.types.ts";
 import { sequelize } from "../../util/db.js";
 import { User } from "../../models/index.js";
-import type { Response, Request } from "express";
 
 import app from "../../app.js";
 
@@ -28,12 +27,10 @@ beforeEach(async () => {
     throw new Error("joey is undefined");
   }
   blogs = await createBlogs(usersWithData);
-  console.log("created users");
 });
 
 afterEach(async () => {
   sequelize.truncate({ cascade: true });
-  console.log("deleted all tables");
 });
 
 describe("GET users", () => {
@@ -117,32 +114,28 @@ describe("PUT", () => {
   });
 });
 
-describe.only("DELETE", () => {
-  test.only("DELETE returns 204 and user is no longer available", async () => {
+describe("DELETE", () => {
+  test("DELETE returns 204 and user is no longer available", async () => {
     if (!joe) {
       throw new Error("joe is undefined");
     }
-    console.log("joe.data.id", joe.data.id);
     const response = await supertest(app)
       .delete(`/api/users/${joe.data.id}`)
       .set("Content-Type", "application/json");
-    console.log("response.body", response.body);
     expect(response.status).toBe(204);
     expect(response.body).toStrictEqual({});
     const allRows = await supertest(app).get("/api/users");
-    console.log("allRows", allRows.body);
     expect(allRows.status).toBe(200);
     const usernames: string[] = allRows.body.map((u: User) => u.username);
     expect(usernames).not.toContain(joe.name);
   });
+
   test("DELETE non-existing id returns 500", async () => {
     const response = await supertest(app)
-      .delete("/api/users/3")
+      .delete("/api/users/100")
       .set("Content-Type", "application/json");
 
     expect(response.status).toBe(500);
-    expect(response.text).toStrictEqual(
-      "number of destroyed rows greater than or less than expected (1): 0",
-    );
+    expect(response.text).toStrictEqual("No user with id: 100");
   });
 });
