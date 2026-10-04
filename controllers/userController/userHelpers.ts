@@ -87,7 +87,7 @@ async function getUserIdToBlogMap(
   );
   const allBlogs = await Blog.findAll();
   const allBlogsJson = allBlogs.map((b) => b.toJSON()) as BlogResType[];
-  const userIdToBlogMap: Map<number, number[] | any[]> = buildUserIdToBlogIdMap(
+  const userIdToBlogMap: UserIdToBlogMap = buildUserIdToBlogIdMap(
     userIds,
     allBlogsJson,
   );

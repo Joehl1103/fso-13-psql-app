@@ -15,6 +15,7 @@ const user: UserWithData = {
 const data = [
   { name: "joe", username: "joe@joe.com", password: "ABcd12!&" },
   { name: "joey", username: "joey@joey.com", password: "ABcd12!&" },
+  { name: "johnny", username: "johnny@johnny.com", password: "ABcd12!&" },
 ];
 async function getToken(username: string, password: string): Promise<string> {
   const payload = {

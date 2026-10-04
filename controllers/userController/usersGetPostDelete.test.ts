@@ -14,7 +14,9 @@ import app from "../../app.js";
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 let usersWithData: UserWithData[];
-let joe: UserWithData | undefined, joey: UserWithData | undefined;
+let joe: UserWithData | undefined,
+  joey: UserWithData | undefined,
+  johnny: UserWithData | undefined;
 let blogs: BlogResType[];
 beforeEach(async () => {
   usersWithData = await createUsers();
@@ -26,6 +28,7 @@ beforeEach(async () => {
   if (!joey) {
     throw new Error("joey is undefined");
   }
+  johnny = usersWithData.filter((u) => u.name === "johnny")[0];
   blogs = await createBlogs(usersWithData);
 });
 
@@ -52,7 +55,7 @@ describe("GET users", () => {
 
 describe("GET users by id", () => {
   test("non-existent user should return 404", async () => {
-    const response = await supertest(app).get("/api/users/5");
+    const response = await supertest(app).get("/api/users/100");
     expect(response.status).toBe(404);
     if (response.error instanceof Error) {
       expect(response.error.text).toBe("Unable to find user with that id.");
@@ -78,6 +81,21 @@ describe("GET users by id", () => {
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
       blogs: joesBlogIds,
+    });
+  });
+  test("user without blogs should return empty blogs", async () => {
+    if (!johnny) {
+      throw new Error("johnny is undefined");
+    }
+    const response = await supertest(app).get(`/api/users/${johnny.data.id}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({
+      id: johnny.data.id,
+      username: `${johnny.data.username}`,
+      name: `${johnny.data.name}`,
+      createdAt: expect.stringMatching(timeStampRegex),
+      updatedAt: expect.stringMatching(timeStampRegex),
+      blogs: [],
     });
   });
 });

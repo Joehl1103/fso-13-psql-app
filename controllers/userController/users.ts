@@ -92,7 +92,9 @@ router.get(
         );
       }
       const { password, ...rest } = user.dataValues;
-      const output: UserNoPW = { ...rest, blogs: userIdToBlogMap.get(id) };
+      const blogIds: number[] | any[] | undefined | null =
+        userIdToBlogMap.get(id) ?? [];
+      const output: UserNoPW = { ...rest, blogs: blogIds };
       res.status(200).json(output);
     } catch (error) {
       next(error);
