@@ -1,37 +1,50 @@
 import supertest from "supertest";
-import { describe, test, expect, beforeEach, beforeAll } from "vitest";
+import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../app.js";
 import { createUsers, createBlogs } from "../testing/factories.js";
-import type {
-  User,
-  UserWithData,
-  BlogResType,
-} from "../testing/testing.types.ts";
-import type { BlogReqType } from "../models/modelTypes.js";
+import { User } from "../models/index.js";
+import type { UserWithData } from "../testing/testing.types.ts";
+import type { BlogReqType, BlogResType } from "../models/modelTypes.js";
+import { sequelize } from "../util/db.js";
 
 let usersWithData: UserWithData[];
 let joe: UserWithData | undefined, joey: UserWithData | undefined;
-beforeAll(async () => {
+beforeEach(async () => {
   usersWithData = await createUsers();
   joe = usersWithData.filter((u) => u.name === "joe")[0];
   joey = usersWithData.filter((u) => u.name === "joey")[0];
 });
 
+afterEach(async () => {
+  await sequelize.truncate({
+    cascade: true,
+  });
+});
+
 describe("GET", () => {
+  let blogLen: number;
   beforeEach(async () => {
-    await createBlogs(usersWithData);
+    const blogs: BlogResType[] = await createBlogs(usersWithData);
+    blogLen = blogs.length;
   });
   test("getting all blogs returns all blogs and their users", async () => {
     const response = await supertest(app).get("/api/blogs");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(2);
+    expect(response.body.length).toBe(blogLen);
     response.body.forEach((b: BlogResType) => {
       expect(b.userId).toBeTypeOf("number");
     });
   });
+  test("specifying a react substring search query should 1 blog from joe", async () => {
+    const response = await supertest(app)
+      .get("/api/blogs")
+      .query({ search: "react" });
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(1);
+  });
 });
 
-describe.only("POST", () => {
+describe("POST", () => {
   test("creating blog with token creates blog with user id", async () => {
     if (!joe || !joey) {
       throw Error("joe and joey are undefined");
@@ -56,6 +69,9 @@ describe.only("POST", () => {
   });
 
   test("no token produces error", async () => {
+    if (!joe) {
+      throw new Error("Joe is undefined");
+    }
     const blogsResponse = await supertest(app)
       .post("/api/blogs")
       .set("Content-Type", "application/json")
@@ -70,14 +86,18 @@ describe.only("POST", () => {
   });
 });
 
-describe("DELETE", () => {
-  let blogId;
+describe.only("DELETE", () => {
+  let blogId: number;
+
   beforeEach(async () => {
+    if (!joe) {
+      throw new Error("Joe is undefined");
+    }
     const payload = {
       author: joe.name,
       url: "http://joeys-blog.com",
       title: "Talkin' about my blog",
-      token: joe.token,
+      token: joe.data.token,
     };
     const response = await supertest(app)
       .post("/api/blogs")
@@ -93,10 +113,13 @@ describe("DELETE", () => {
   });
 
   test("deletion fails if token belongs to different user", async () => {
+    if (!joey) {
+      throw new Error("Joey is undefined");
+    }
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
-      .send({ token: joey.token });
+      .send({ token: joey.data.token });
     expect(response.status).toBe(500);
     expect(response.text).toBe(
       "Cannot fulfill request because token does not belong to owner.",
@@ -104,10 +127,13 @@ describe("DELETE", () => {
   });
 
   test("deletion if user id is same as blog id ", async () => {
+    if (!joe) {
+      throw new Error("Joe is undefined");
+    }
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
-      .send({ token: joe.token });
+      .send({ token: joe.data.token });
     expect(response.status).toBe(204);
   });
 });

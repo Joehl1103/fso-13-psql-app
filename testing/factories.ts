@@ -77,11 +77,18 @@ async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
   }
   const blogPayload = [
     {
-      author: "joe",
+      author: joe.name,
       url: "http://joes-blog.com",
       title: "Talkin' about my blog",
       token: joe.data.token,
     },
+    {
+      author: joe.name,
+      url: "http://joes-blog.com",
+      title: "a blog about react",
+      token: joe.data.token,
+    },
+
     {
       author: joey.name,
       url: "http://joeys-blog.com",

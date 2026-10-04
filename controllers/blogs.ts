@@ -4,6 +4,9 @@ import config from "../util/config.ts";
 const { SECRET } = config;
 import type { BlogReqType } from "../models/modelTypes.js";
 import { Blog, User } from "../models/index.js";
+import type { Request, Response } from "express";
+import { Op } from "sequelize";
+import type { WhereOptions } from "sequelize";
 
 const router = express.Router();
 
@@ -11,14 +14,37 @@ if (!SECRET) {
   throw new Error("SECRET is undefined");
 }
 
-router.get("/", async (req, res) => {
-  try {
-    const results = await Blog.findAll();
-    res.status(200).json(results);
-  } catch (error) {
-    res.status(404).end();
-  }
-});
+interface RequestParams {}
+
+interface ResponseBody {}
+
+interface RequestBody {}
+
+interface RequestQuery {
+  search: string;
+}
+
+router.get(
+  "/",
+  async (
+    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery>,
+    res: Response,
+  ) => {
+    const searchParam: string = req.query.search ?? "";
+    const where: WhereOptions = {};
+    if (searchParam) {
+      where.title = { [Op.substring]: searchParam };
+    }
+    try {
+      const results = await Blog.findAll({
+        where,
+      });
+      res.status(200).json(results);
+    } catch (error) {
+      res.status(404).end();
+    }
+  },
+);
 
 interface JwtPayload {
   username: string;
