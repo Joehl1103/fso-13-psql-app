@@ -123,18 +123,19 @@ router.put("/:username", async (req, res, next) => {
       where: { username: username },
       returning: true,
     });
-    const [numAffectedRows, rowRes] = response;
-    if (numAffectedRows !== 1) {
+    const [affectedCount, affectedRows] = response;
+    if (affectedCount !== 1 || !affectedRows) {
       throw Object.assign(
         new Error(
-          `Affected rows greater than or less than original. Affected rows: ${numAffectedRows}`,
+          `Affected rows greater than or less than original. Affected rows: ${affectedCount}`,
         ),
         {
           status: 500,
         },
       );
     }
-    const { name: returnedName, username: returnedUsername } = rowRes[0];
+    const { name: returnedName, username: returnedUsername } =
+      affectedRows[0] as User;
     res.status(200).json({ username: returnedUsername, name: returnedName });
   } catch (error) {
     next(error);
