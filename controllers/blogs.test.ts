@@ -42,7 +42,7 @@ describe("GET", () => {
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(1);
   });
-  test.only("specifying a substring query should return two blogs, where substring appears in title of one and author in other", async () => {
+  test("specifying a substring query should return two blogs, where substring appears in title of one and author in other", async () => {
     const response = await supertest(app)
       .get("/api/blogs")
       .query({ search: "josue" });
@@ -142,5 +142,17 @@ describe("DELETE", () => {
       .set("Content-Type", "application/json")
       .send({ token: joe.data.token });
     expect(response.status).toBe(204);
+  });
+
+  test("deletion fails with 404 if userId does not exist", async () => {
+    if (!joe) {
+      throw new Error("Joe is undefined");
+    }
+    const response = await supertest(app)
+      .delete(`/api/blogs/100`)
+      .set("Content-Type", "application/json")
+      .send({ token: joe.data.token });
+    expect(response.status).toBe(404);
+    expect(response.text).toBe("Unable to find a blog with id 100");
   });
 });

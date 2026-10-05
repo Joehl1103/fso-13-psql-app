@@ -1,12 +1,14 @@
 import express from "express";
 import jwt from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
 import config from "../util/config.ts";
 const { SECRET } = config;
-import type { BlogReqType } from "../models/modelTypes.js";
+import type { BlogReqType, BlogResType } from "../models/modelTypes.js";
 import { Blog, User } from "../models/index.js";
 import type { Request, Response } from "express";
 import { Op } from "sequelize";
 import type { WhereOptions } from "sequelize";
+import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 
 const router = express.Router();
 
@@ -57,10 +59,9 @@ router.get(
   },
 );
 
-interface JwtPayload {
+interface JwtUserPayload extends JwtPayload {
   username: string;
   id: number;
-  iat: number;
 }
 
 router.post("/", async (req, res) => {
@@ -119,7 +120,10 @@ router.delete("/:id", async (req, res, next) => {
       status: 500,
     });
   }
-  const user = jwt.verify(req.body.token, SECRET);
+  const user: JwtUserPayload = jwt.verify(
+    req.body.token,
+    SECRET,
+  ) as JwtUserPayload;
   if (!user) {
     throw Object.assign(
       new Error(
@@ -130,9 +134,18 @@ router.delete("/:id", async (req, res, next) => {
       },
     );
   }
-  const paramId = req.params.id;
+  const paramId: string = req.params.id;
   try {
-    const blog = await Blog.findByPk(paramId);
+    const blog: Blog | null = await Blog.findByPk(paramId);
+    if (!blog) {
+      throw new ErrorWithCustomStatus(
+        404,
+        `Unable to find a blog with id ${paramId}`,
+      );
+    }
+    if (!blog.toJSON().userId) {
+      throw new Error("Cannot find a userId on blog");
+    }
     const { userId: blogUserId } = blog.toJSON();
     if (blogUserId !== user.id) {
       throw Object.assign(

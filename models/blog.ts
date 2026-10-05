@@ -9,6 +9,7 @@ class Blog extends Model<InferAttributes<Blog>, InferCreationAttributes<Blog>> {
   declare url: string;
   declare title: string;
   declare likes: number;
+  declare userId: number;
 }
 
 Blog.init(
@@ -33,6 +34,10 @@ Blog.init(
     likes: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      references: { model: "User", key: "id" },
     },
   },
   {
