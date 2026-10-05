@@ -43,15 +43,10 @@ router.get(
         ],
       };
     }
-    console.log("where", where);
     try {
       const results = await Blog.findAll({
         where,
       });
-      console.log(
-        "results",
-        results.map((r) => r.toJSON()),
-      );
       res.status(200).json(results);
     } catch (error) {
       res.status(404).end();
@@ -64,7 +59,7 @@ interface JwtUserPayload extends JwtPayload {
   id: number;
 }
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   const body: BlogReqType = req.body;
   const { author, url, title, token } = body;
   if (!token) {

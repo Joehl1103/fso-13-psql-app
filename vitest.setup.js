@@ -72,9 +72,9 @@ beforeAll(async () => {
 // beforeEach(async () => {});
 
 afterAll(async () => {
-  await sequelize.truncate({
-    cascade: true,
-    restartIdentity: true,
-  });
+  // await sequelize.truncate({
+  //   cascade: true,
+  //   restartIdentity: true,
+  // });
   await sequelize.close();
 });

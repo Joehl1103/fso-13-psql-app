@@ -2,7 +2,6 @@ import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../app.js";
 import { createUsers, createBlogs } from "../testing/factories.js";
-import { User } from "../models/index.js";
 import type { UserWithData } from "../testing/testing.types.ts";
 import type { BlogReqType, BlogResType } from "../models/modelTypes.js";
 import { sequelize } from "../util/db.js";
@@ -23,8 +22,9 @@ afterEach(async () => {
 
 describe("GET", () => {
   let blogLen: number;
+  let blogs: BlogResType[];
   beforeEach(async () => {
-    const blogs: BlogResType[] = await createBlogs(usersWithData);
+    blogs = await createBlogs(usersWithData);
     blogLen = blogs.length;
   });
   test("getting all blogs returns all blogs and their users", async () => {
@@ -48,6 +48,30 @@ describe("GET", () => {
       .query({ search: "josue" });
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(2);
+  });
+  test.only("returning blogs returns them with likes in descending order", async () => {
+    if (!blogs || blogs.length === 0) {
+      throw new Error("no blogs");
+    }
+    let likeNum: number = 1;
+    let likeNumArray: number[] = [];
+    for (let i: number = 0; i < blogLen; i++) {
+      const blog: BlogResType | undefined = blogs[i];
+      if (!blog) {
+        throw new Error("No blog");
+      }
+      const blogId: number = blog.id;
+      await supertest(app)
+        .patch(`/api/blogs/${blogId}`)
+        .set("Content-Type", "application/json")
+        .send({ likes: likeNum });
+      likeNumArray.push(likeNum);
+      likeNum++;
+    }
+    const response = await supertest(app).get("/api/blogs");
+    expect(response.status).toBe(200);
+    const likes: number[] = response.body.map((b: BlogResType) => b.likes);
+    expect(likes).toStrictEqual(likeNumArray.reverse());
   });
 });
 

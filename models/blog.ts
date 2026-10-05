@@ -41,7 +41,8 @@ Blog.init(
     },
     userId: {
       type: DataTypes.INTEGER,
-      references: { model: "User", key: "id" },
+      //NOTE: 20261004: I removed this because I was getting a `SequelizeDatabaseError: relation "User" does not exist` which was preventing my tests from running
+      // references: { model: "User", key: "id" },
     },
   },
   {
