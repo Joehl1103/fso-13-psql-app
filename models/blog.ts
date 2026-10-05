@@ -1,10 +1,14 @@
 import { DataTypes, Model } from "sequelize";
-import type { InferAttributes, InferCreationAttributes } from "sequelize";
+import type {
+  CreationOptional,
+  InferAttributes,
+  InferCreationAttributes,
+} from "sequelize";
 
 import { sequelize } from "../util/db.js";
 
 class Blog extends Model<InferAttributes<Blog>, InferCreationAttributes<Blog>> {
-  declare id: number;
+  declare id: CreationOptional<number>;
   declare author: string;
   declare url: string;
   declare title: string;

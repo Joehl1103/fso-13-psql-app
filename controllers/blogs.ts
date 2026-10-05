@@ -78,12 +78,9 @@ router.post("/", async (req, res) => {
       where: { username: jwtPayload.username },
     });
     if (!user) {
-      throw Object.assign(
-        new Error(`No user found with id ${userFromDecodedToken.id}`),
-        {
-          status: 500,
-        },
-      );
+      throw Object.assign(new Error(`No user found with id ${jwtPayload.id}`), {
+        status: 500,
+      });
     }
     const payload = {
       author,
@@ -151,16 +148,6 @@ router.delete("/:id", async (req, res, next) => {
       throw Object.assign(
         new Error(
           "Cannot fulfill request because token does not belong to owner.",
-        ),
-        {
-          status: 500,
-        },
-      );
-    }
-    if (!blog || blog.length === 0) {
-      throw Object.assign(
-        new Error(
-          "Something went wrong because there is no blog with that id.",
         ),
         {
           status: 500,
