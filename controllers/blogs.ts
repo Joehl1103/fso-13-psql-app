@@ -46,6 +46,7 @@ router.get(
     try {
       const results = await Blog.findAll({
         where,
+        order: [["likes", "DESC"]],
       });
       res.status(200).json(results);
     } catch (error) {
