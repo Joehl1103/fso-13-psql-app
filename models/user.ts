@@ -1,10 +1,14 @@
 import { DataTypes, Model } from "sequelize";
-import type { InferAttributes, InferCreationAttributes } from "sequelize";
+import type {
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from "sequelize";
 
 import { sequelize } from "../util/db.js";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: number;
+  declare id: CreationOptional<number>;
   declare username: string;
   declare name: string;
   declare password: string;

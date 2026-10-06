@@ -1,18 +1,18 @@
 import fs from "node:fs";
-import Sequelize from "sequelize";
+import { Sequelize } from "sequelize";
 import path from "node:path";
-
+import type { DatabaseOptions } from "./db.d.ts";
 import config from "./config.ts";
 const DATABASE_URL = config.DATABASE_URL;
 const DATABASE_SSL = config.DATABASE_SSL;
 import { logSql } from "./sql.js";
 const filename = path.basename(import.meta.filename);
 
-const databaseOptions = {
+const databaseOptions: DatabaseOptions = {
   dialect: "postgres",
   logging: false,
+  dialectOptions: {},
 };
-
 if (DATABASE_SSL) {
   const cert = fs
     .readFileSync(
@@ -41,9 +41,11 @@ const connectToDatabase = async () => {
     await sequelize.authenticate();
     console.log(`${filename} || Connected to database`);
   } catch (error) {
-    console.error(
-      `${filename} || Failed to connect to the database: ${error.message}`,
-    );
+    if (error instanceof Error) {
+      console.error(
+        `${filename} || Failed to connect to the database: ${error.message}`,
+      );
+    }
     return process.exit(1);
   }
   return null;

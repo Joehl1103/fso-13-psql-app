@@ -1,6 +1,6 @@
 import app from "./app.js";
 import { connectToDatabase } from "./util/db.js";
-import { syncModels } from "./models/index.js";
+import { syncModels, testModelInitialization } from "./models/index.js";
 import path from "path";
 const filename = path.basename(import.meta.filename);
 import colors from "picocolors";
@@ -44,6 +44,7 @@ async function listenOrIncrement(app, port, i) {
 async function start(PORT) {
   await connectToDatabase();
   await syncModels();
+  await testModelInitialization();
   await listenOrIncrement(app, PORT, 1);
 }
 
