@@ -71,8 +71,14 @@ router.get("/", async (req, res, next) => {
     );
     // TODO: the return values appears to be an array of arrays
     console.log("aggregateBlogResponse", blogRes2);
-    const aggBlogs: unknown[][] = blogRes2.map((arr: unknown[]): unknown[] => {
-      const item = arr[0];
+    const aggBlogs: Blog[] = blogRes2.map((arr: Blog[]): Blog => {
+      if (arr.length > 1) {
+        throw new Error();
+      }
+      const item: Blog | undefined = arr[0];
+      if (!item) {
+        throw new Error();
+      }
       return item.toJSON();
     });
     console.log("aggregateBlogs", aggBlogs);
@@ -80,7 +86,6 @@ router.get("/", async (req, res, next) => {
       throw new Error("No blogs");
     }
     const authors: Author[] = buildAuthorObjects(aggBlogs);
-    // console.log("authors", authors);
     res.status(200).send(authors);
   } catch (e) {
     if (e instanceof Error || e instanceof ErrorWithCustomStatus) {
