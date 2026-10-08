@@ -3,10 +3,15 @@ import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../app.js";
 import { createUsers, createBlogs } from "../testing/factories.js";
 import type { UserWithData } from "../testing/testing.types.ts";
+import { Blog } from "../models/index.ts";
 import type { BlogReqType, BlogResType } from "../models/modelTypes.js";
 import { sequelize } from "../util/db.js";
 
 describe("GET", () => {
+  beforeEach(async () => {
+    const users: UserWithData[] = await createUsers();
+    await createBlogs(users);
+  });
   test("getting all authors returns author,blogs,likes", async () => {
     const response = await supertest(app).get("/api/authors");
     expect(response.status).toBe(200);

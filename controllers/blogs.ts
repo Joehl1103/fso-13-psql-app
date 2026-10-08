@@ -9,21 +9,17 @@ import type { Request, Response } from "express";
 import { Op } from "sequelize";
 import type { WhereOptions } from "sequelize";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
+import type {
+  RequestParams,
+  ResponseBody,
+  RequestBody,
+  RequestQuery,
+} from "./api.d.ts";
 
 const router = express.Router();
 
 if (!SECRET) {
   throw new Error("SECRET is undefined");
-}
-
-interface RequestParams {}
-
-interface ResponseBody {}
-
-interface RequestBody {}
-
-interface RequestQuery {
-  search: string;
 }
 
 router.get(
