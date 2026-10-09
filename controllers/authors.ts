@@ -6,13 +6,7 @@ import { sequelize } from "../util/db.ts";
 
 const router = express.Router();
 
-interface AuthorResponse {
-  author: string;
-  blogs: number;
-  likes: number;
-}
-
-class Author {
+export class Author {
   author: string;
   likes: number;
   blogs: number;

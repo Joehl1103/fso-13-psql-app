@@ -13,16 +13,15 @@ describe("createBlogs", () => {
     joey = joeyRes;
     users = await createUsers();
   });
-  test("createBlogs returns an array of created blogs", async () => {
+  test("createBlogs returns an array of created blogs with 0 likes", async () => {
     const blogs: BlogResType[] = await createBlogs(users);
-    //TODO: from blog res type determine the strict equality of the results
     blogs.forEach((b) => {
       const { author, url, title, id, likes, userId } = b;
       expect(author).toBeTypeOf("string");
       expect(url).toMatch(urlRegex);
       expect(title).toBeTypeOf("string");
       expect(id).toBeTypeOf("number");
-      expect(likes).toBeTypeOf("number");
+      expect(likes).toEqual(0);
       expect(userId).toBeTypeOf("number");
     });
   });
