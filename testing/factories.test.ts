@@ -1,18 +1,29 @@
-import { describe, test, beforeEach } from "vitest";
+import { expect, describe, test, beforeEach } from "vitest";
 import { createBlogs, createUsers } from "./factories.ts";
 import type { BlogResType } from "../models/modelTypes.ts";
-import { returnJoeAndJoey } from "./testingHelpers.ts";
+import { returnJoeAndJoey, jwtRegex, urlRegex } from "./testingHelpers.ts";
 import type { UserWithData } from "./testing.types.ts";
 
 describe("createBlogs", () => {
   let joe: UserWithData, joey: UserWithData;
+  let users: UserWithData[];
   beforeEach(async () => {
     const { joe: joeRes, joey: joeyRes } = await returnJoeAndJoey();
     joe = joeRes;
     joey = joeyRes;
-    const users: UserWithData[] = await createUsers();
+    users = await createUsers();
   });
   test("createBlogs returns an array of created blogs", async () => {
     const blogs: BlogResType[] = await createBlogs(users);
+    //TODO: from blog res type determine the strict equality of the results
+    blogs.forEach((b) => {
+      const { author, url, title, id, likes, userId } = b;
+      expect(author).toBeTypeOf("string");
+      expect(url).toMatch(urlRegex);
+      expect(title).toBeTypeOf("string");
+      expect(id).toBeTypeOf("number");
+      expect(likes).toBeTypeOf("number");
+      expect(userId).toBeTypeOf("number");
+    });
   });
 });

@@ -79,7 +79,7 @@ async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
     {
       author: joe.name,
       url: "http://joes-blog.com",
-      title: "Talkin' about josue's blog",
+      title: "talkin' about josue's blog",
       token: joe.data.token,
     },
     {
@@ -92,7 +92,7 @@ async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
     {
       author: joey.name,
       url: "http://joeys-blog.com",
-      title: "Talkin' about my blog",
+      title: "talkin' about my blog",
       token: joey.data.token,
     },
   ];

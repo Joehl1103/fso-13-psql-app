@@ -74,14 +74,14 @@ router.post("/", async (req, res, next) => {
         status: 500,
       });
     }
-    const payload = {
+    const payload: Omit<BlogResType, "id"> = {
       author,
       url,
       title,
       userId: user.id,
       likes: 0,
     };
-    const result = await Blog.create(payload);
+    const result: Blog = await Blog.create(payload);
     res.status(200).json(result.toJSON());
   } catch (error) {
     next(error);

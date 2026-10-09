@@ -16,3 +16,7 @@ export async function returnJoeAndJoey() {
   joey = joeyRes;
   return { joe, joey };
 }
+
+export const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+export const urlRegex =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}/;

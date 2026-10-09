@@ -10,6 +10,8 @@ import { sequelize } from "../util/db.js";
 describe("GET", () => {
   beforeEach(async () => {
     const users: UserWithData[] = await createUsers();
+    //TODO: 1: I need the blogs in the response to have likes, which means I have to patch them after creation
+    //TODO: 2. I need to create blogs with optional likes. To do this I need to write a test for creating blogs
     await createBlogs(users);
   });
   test("getting all authors returns author,blogs,likes", async () => {
