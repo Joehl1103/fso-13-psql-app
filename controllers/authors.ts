@@ -3,19 +3,9 @@ import { Blog } from "../models/index.js";
 import { Op } from "sequelize";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import { sequelize } from "../util/db.ts";
+import { Author } from "../models/types/author.types.ts";
 
 const router = express.Router();
-
-export class Author {
-  author: string;
-  likes: number;
-  blogs: number;
-  constructor(author: string, likes: number, blogs: number) {
-    this.author = author;
-    this.likes = likes;
-    this.blogs = blogs;
-  }
-}
 
 const RES_KEY_LEN: number = 3;
 

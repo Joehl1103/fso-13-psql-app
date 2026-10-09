@@ -3,7 +3,7 @@ import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../app.js";
 import { createUsers, createBlogs } from "../testing/factories.js";
 import type { UserWithData } from "../testing/testing.types.ts";
-import type { BlogReqType, BlogResType } from "../models/modelTypes.js";
+import type { BlogReqType, BlogResType } from "../models/types/blog.d.ts";
 import { sequelize } from "../util/db.js";
 
 let usersWithData: UserWithData[];

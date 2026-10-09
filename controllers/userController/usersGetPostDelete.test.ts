@@ -1,10 +1,8 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createUsers, createBlogs } from "../../testing/factories.ts";
-import type {
-  UserResponseTypeFromAPI,
-  BlogResType,
-} from "../../models/modelTypes.ts";
+import type { BlogResType } from "../../models/types/blog.d.ts";
+import type { UserResponseTypeFromAPI } from "../../models/types/user.d.ts";
 import type { UserWithData } from "../../testing/testing.types.ts";
 import { sequelize } from "../../util/db.js";
 import { User } from "../../models/index.js";

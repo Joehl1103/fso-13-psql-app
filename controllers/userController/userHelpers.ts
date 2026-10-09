@@ -1,8 +1,6 @@
 import type { UserIdToBlogMap } from "./userTypes.ts";
-import type {
-  BlogResType,
-  UserResponseTypeFromSequelize,
-} from "../../models/modelTypes.ts";
+import type { BlogResType } from "../../models/types/blog.d.ts";
+import type { UserResponseTypeFromSequelize } from "../../models/types/user.d.ts";
 import { User, Blog } from "../../models/index.js";
 import type { Request, Response, NextFunction } from "express";
 

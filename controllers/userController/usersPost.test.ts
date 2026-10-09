@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { describe, test, expect, afterEach } from "vitest";
-import type { UserRequestType } from "../../models/modelTypes.ts";
+import type { UserRequestType } from "../../models/types/user.d.ts";
 import { sequelize } from "../../util/db.js";
 
 import app from "../../app.js";

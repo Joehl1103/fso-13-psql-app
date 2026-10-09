@@ -32,27 +32,8 @@ type SequelizeUserUpdateResult = [affectedCount: number, affectedRows: User[]];
 
 type FindASingleUserResponse = User | null;
 
-interface BlogResType extends BlogType {
-  id: number;
-  likes: number;
-  userId: number;
-}
-
-interface BlogReqType extends BlogType {
-  token: string;
-}
-
-interface BlogType {
-  author: string;
-  url: string;
-  title: string;
-}
-
 export type {
   UserRequestType,
-  BlogType,
-  BlogReqType,
-  BlogResType,
   UserFromToken,
   UserResponseTypeFromAPI,
   UserResponseTypeFromSequelize,

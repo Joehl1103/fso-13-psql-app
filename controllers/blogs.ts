@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import type { JwtPayload } from "jsonwebtoken";
 import config from "../util/config.ts";
 const { SECRET } = config;
-import type { BlogReqType, BlogResType } from "../models/modelTypes.js";
+import type { BlogReqType, BlogResType } from "../models/types/blog.d.ts";
 import { Blog, User } from "../models/index.js";
 import type { Request, Response } from "express";
 import { Op } from "sequelize";
