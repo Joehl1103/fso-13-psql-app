@@ -21,7 +21,6 @@ const RES_KEY_LEN: number = 3;
 
 function buildAuthorObjects(blogResponse: Blog[]): Author[] {
   return blogResponse.map((b: Blog) => {
-    console.log("b", b);
     const keys: string[] = Object.keys(b);
     if (!b || keys.length === 0) {
       throw new Error();
@@ -63,8 +62,6 @@ router.get("/", async (req, res, next) => {
         return res;
       }),
     );
-    // TODO: the return values appears to be an array of arrays
-    console.log("aggregateBlogResponse", blogRes2);
     const aggBlogs: Blog[] = blogRes2.map((arr: Blog[]): Blog => {
       if (arr.length > 1) {
         throw new Error();
@@ -75,15 +72,16 @@ router.get("/", async (req, res, next) => {
       }
       return item.toJSON();
     });
-    console.log("aggregateBlogs", aggBlogs);
     if (!aggBlogs || aggBlogs.length === 0) {
       throw new Error("No blogs");
     }
     const authors: Author[] = buildAuthorObjects(aggBlogs);
-    res.status(200).send(authors);
+    const authorsSorted: Author[] = authors.sort(
+      (a: Author, b: Author) => b.likes - a.likes,
+    );
+    res.status(200).send(authorsSorted);
   } catch (e) {
     if (e instanceof Error || e instanceof ErrorWithCustomStatus) {
-      console.log(`Error: ${e.message}`);
       next(e);
     }
   }
