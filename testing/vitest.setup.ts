@@ -1,5 +1,5 @@
 import { afterAll, beforeAll } from "vitest";
-import { sequelize } from "../util/db.js";
+import { sequelize } from "../db/utils/db.ts";
 import path from "node:path";
 const filename: string = path.basename(import.meta.filename);
 

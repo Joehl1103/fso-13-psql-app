@@ -1,8 +1,8 @@
 import type { UserWithData, User } from "./testing.types.ts";
 import supertest from "supertest";
-import app from "../app.js";
-import type { BlogResType } from "../models/types/blog.d.ts";
-import type { UserRequestType } from "../models/types/user.d.ts";
+import app from "../src/app.js";
+import type { BlogResType } from "../src/models/types/blog.d.ts";
+import type { UserRequestType } from "../src/models/types/user.d.ts";
 
 const user: UserWithData = {
   name: "",

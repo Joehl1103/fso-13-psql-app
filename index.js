@@ -1,5 +1,5 @@
-import config from "./util/config.ts";
+import config from "./src/util/config.ts";
 const PORT = config.PORT;
-import { start } from "./server.js";
+import { start } from "./src/server.js";
 
 start(PORT);

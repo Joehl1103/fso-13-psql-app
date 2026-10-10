@@ -8,7 +8,7 @@ import path from "node:path";
    db.ts:7:15: 'DatabaseOptions' is declared here.
  */
 import type { DatabaseOptions } from "./db.d.ts";
-import config from "./config.ts";
+import config from "./../../src/util/config.ts";
 const DATABASE_URL = config.DATABASE_URL;
 const DATABASE_SSL = config.DATABASE_SSL;
 //NOTE: used for troubleshooting
