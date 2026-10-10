@@ -30,6 +30,4 @@ const config: Config = {
   SALT_ROUNDS: 10,
 };
 
-console.log(config);
-
 export default config;

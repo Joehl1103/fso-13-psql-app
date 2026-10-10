@@ -20,11 +20,13 @@ function listen(app, PORT) {
 async function listenOrIncrement(app, port, i) {
   try {
     console.log(
-      `${filename} || attempt ${i} || attempting to connect at port: ${port}`,
+      colors.yellow(
+        `${filename} || attempt ${i} || attempting to connect at port: ${port}`,
+      ),
     );
     const server = await listen(app, port);
     console.log(
-      colors.yellow(
+      colors.green(
         `${filename} || attempt ${i} || server listening at http://localhost:${port}`,
       ),
     );
@@ -32,7 +34,9 @@ async function listenOrIncrement(app, port, i) {
   } catch (error) {
     if (error.code === "EADDRINUSE") {
       console.warn(
-        `${filename} || err || attempt ${i} || port ${port} already in use.`,
+        colors.red(
+          `${filename} || err || attempt ${i} || port ${port} already in use.`,
+        ),
       );
       return await listenOrIncrement(app, port + 1, i + 1);
     }
