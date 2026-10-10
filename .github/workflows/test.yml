@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Install dependencies
         run: npm ci
@@ -44,7 +44,7 @@ jobs:
           SECRET: test_secret
 
       - name: Wait for application to be ready
-        run: npx wait-on http://localhost:3001 -t 60000
+        run: npx wait-on http://127.0.0.1:3001 -t 60000 -lv
 
       - name: Run tests
         run: npm course:test
