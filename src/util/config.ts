@@ -1,9 +1,17 @@
 import dotenv from "dotenv";
 
 const CI_TESTING = Boolean(process.env.CI_TESTING);
-if (!Boolean(process.env.CI_TESTING)) {
+let databaseUrl: string | undefined;
+if (!Boolean(CI_TESTING)) {
   const envFile = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
   dotenv.config({ path: envFile });
+  databaseUrl = process.env.DATABASE_URL ?? "";
+} else {
+  databaseUrl = process.env.TESTING_DATABASE_URL ?? "";
+}
+
+if (!databaseUrl) {
+  throw new Error(`databaseUrl is empty or undefined ${databaseUrl}`);
 }
 
 interface Config {
@@ -15,9 +23,7 @@ interface Config {
 }
 
 const config: Config = {
-  DATABASE_URL: CI_TESTING
-    ? (process.env.TESTING_DATABASE_URL ?? "")
-    : (process.env.DATABASE_URL ?? ""),
+  DATABASE_URL: databaseUrl,
   DATABASE_SSL: process.env.DATABASE_SSL === "true" || "",
   PORT: Number(process.env.PORT) || 3001,
   SECRET: process.env.SECRET || "",
