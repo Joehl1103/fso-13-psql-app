@@ -1,9 +1,5 @@
 import express from "express";
-import {
-  // requestLog,
-  // upstreamMiddleware,
-  downstreamErrorHandler,
-} from "./util/middleware.js";
+import { downstreamErrorHandler } from "./util/middleware.ts";
 
 import blogsRouter from "./controllers/blogs.ts";
 import usersRouter from "./controllers/userController/users.ts";

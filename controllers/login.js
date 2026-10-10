@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import config from "../util/config.ts";
 const SECRET = config.SECRET;
-import { User } from "../models/index.js";
+import { User } from "../models/index.ts";
 const router = express.Router();
 
 if (!SECRET) {

@@ -1,11 +1,18 @@
 import fs from "node:fs";
 import { Sequelize } from "sequelize";
 import path from "node:path";
+/* NOTE: I don't know why I am getting:
+ *Diagnostics:
+1. Circular definition of import alias 'DatabaseOptions'. [2303]
+2. Module '"./db.d.ts"' declares 'DatabaseOptions' locally, but it is not exported. [2459]
+   db.ts:7:15: 'DatabaseOptions' is declared here.
+ */
 import type { DatabaseOptions } from "./db.d.ts";
 import config from "./config.ts";
 const DATABASE_URL = config.DATABASE_URL;
 const DATABASE_SSL = config.DATABASE_SSL;
-import { logSql } from "./sql.js";
+//NOTE: used for troubleshooting
+// import { logSql } from "./sql.js";
 const filename = path.basename(import.meta.filename);
 
 const databaseOptions: DatabaseOptions = {

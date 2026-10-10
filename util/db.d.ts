@@ -7,10 +7,8 @@ interface DialectOptions {
   ssl: SslOptions;
 }
 
-interface DatabaseOptions {
+export interface DatabaseOptions {
   dialect: string;
   logging: boolean;
   dialectOptions: DialectOptions | {};
 }
-
-export type { DatabaseOptions };

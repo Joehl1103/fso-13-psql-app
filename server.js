@@ -1,6 +1,6 @@
 import app from "./app.js";
-import { connectToDatabase } from "./util/db.js";
-import { syncModels, testModelInitialization } from "./models/index.js";
+import { connectToDatabase } from "./util/db.ts";
+import { syncModels } from "./models/index.ts";
 import path from "path";
 const filename = path.basename(import.meta.filename);
 import colors from "picocolors";

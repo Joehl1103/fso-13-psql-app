@@ -4,7 +4,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import config from "../util/config.ts";
 const { SECRET } = config;
 import type { BlogReqType, BlogResType } from "../models/types/blog.d.ts";
-import { Blog, User } from "../models/index.js";
+import { Blog, User } from "../models/index.ts";
 import type { Request, Response } from "express";
 import { Op } from "sequelize";
 import type { WhereOptions } from "sequelize";

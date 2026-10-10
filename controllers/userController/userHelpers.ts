@@ -1,7 +1,7 @@
 import type { UserIdToBlogMap } from "./userTypes.ts";
 import type { BlogResType } from "../../models/types/blog.d.ts";
 import type { UserResponseTypeFromSequelize } from "../../models/types/user.d.ts";
-import { User, Blog } from "../../models/index.js";
+import { User, Blog } from "../../models/index.ts";
 import type { Request, Response, NextFunction } from "express";
 
 function parsePassword(password: string): string[] | any[] {

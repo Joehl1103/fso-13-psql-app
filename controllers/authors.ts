@@ -1,5 +1,5 @@
 import express from "express";
-import { Blog } from "../models/index.js";
+import { Blog } from "../models/index.ts";
 import { Op } from "sequelize";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import { sequelize } from "../util/db.ts";

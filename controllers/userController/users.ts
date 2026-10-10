@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
-import { User } from "../../models/index.js";
+import { User } from "../../models/index.ts";
 import type {
   UserNoPW,
   UserRequestType,
