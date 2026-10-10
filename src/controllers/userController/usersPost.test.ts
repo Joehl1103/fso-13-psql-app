@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { describe, test, expect, afterEach } from "vitest";
 import type { UserRequestType } from "../../models/types/user.d.ts";
-import { sequelize } from "../../util/db.ts";
+import { sequelize } from "../../../db/utils/db.ts";
 
 import app from "../../app.js";
 describe("POST user", () => {

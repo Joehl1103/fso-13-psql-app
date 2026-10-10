@@ -2,7 +2,7 @@ import express from "express";
 import { Blog } from "../models/index.ts";
 import { Op } from "sequelize";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
-import { sequelize } from "../util/db.ts";
+import { sequelize } from "../../db/utils/db.ts";
 import { Author } from "../models/types/author.types.ts";
 
 const router = express.Router();

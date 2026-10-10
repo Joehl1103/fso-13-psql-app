@@ -1,5 +1,5 @@
 import app from "./app.js";
-import { connectToDatabase } from "./util/db.ts";
+import { connectToDatabase } from "../db/utils/db.ts";
 import { syncModels } from "./models/index.ts";
 import path from "path";
 const filename = path.basename(import.meta.filename);
@@ -44,7 +44,6 @@ async function listenOrIncrement(app, port, i) {
 async function start(PORT) {
   await connectToDatabase();
   await syncModels();
-  await testModelInitialization();
   await listenOrIncrement(app, PORT, 1);
 }
 

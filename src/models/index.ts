@@ -1,4 +1,4 @@
-import { sequelize } from "../util/db.ts";
+import { sequelize } from "../../db/utils/db.ts";
 import Blog from "./blog.ts";
 import User from "./user.ts";
 import path from "node:path";
