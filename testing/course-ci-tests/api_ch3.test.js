@@ -1,4 +1,4 @@
-const { describe, it, before } = require("node:test");
+const { describe, test, beforeAll } = require("vitest");
 const assert = require("node:assert");
 const axios = require("axios");
 const { baseUrl, resetAndSeed } = require("./helper");
