@@ -44,7 +44,7 @@ jobs:
           SECRET: test_secret
 
       - name: Wait for application to be ready
-        run: npx wait-on http://localhost:3001 -t 30000
+        run: npx wait-on http://localhost:3001 -t 60000
 
       - name: Run tests
         run: npm course:test
