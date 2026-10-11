@@ -15,6 +15,7 @@ import type {
   RequestBody,
   RequestQuery,
 } from "./api.d.ts";
+import { jwtRegex } from "../../testing/testingHelpers.ts";
 
 const router = express.Router();
 
@@ -56,9 +57,25 @@ interface JwtUserPayload extends JwtPayload {
   id: number;
 }
 
+function parseAuth(auth: string | undefined): string {
+  if (!auth) {
+    throw new ErrorWithCustomStatus(500, "No auth provided");
+  }
+  const authHasRightFormat =
+    /Bearer\s{1}[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]/.test(auth);
+  if (!authHasRightFormat) {
+  }
+  return "hello";
+}
+
 router.post("/", async (req, res, next) => {
   const body: BlogReqType = req.body;
-  const { author, url, title, token } = body;
+  const auth: string | undefined = req.get("Authorization");
+  const token: string = parseAuth(auth);
+  if (!auth) {
+  }
+  console.log("auth", auth);
+  const { author, url, title } = body;
   if (!token) {
     throw Object.assign(new Error(`No token present`), {
       status: 500,

@@ -7,6 +7,7 @@ const resetDatabase = async () => {
 };
 
 const createUser = async (username, name, password) => {
+  console.log("baseUrl", baseUrl);
   try {
     const response = await axios.post(`${baseUrl}/users`, {
       username,
@@ -43,20 +44,19 @@ const login = async (username, password) => {
 
 const resetAndSeed = async () => {
   await resetDatabase();
-
   const user1 = await createUser(
     "test1@example.com",
     "Test User 1",
-    "password123",
+    "Password123!",
   );
   const user2 = await createUser(
     "test2@example.com",
     "Test User 2",
-    "password456",
+    "Password456!",
   );
 
-  const token1 = await login("test1@example.com", "password123");
-  const token2 = await login("test2@example.com", "password456");
+  const token1 = await login("test1@example.com", "Password123!");
+  const token2 = await login("test2@example.com", "Password456!");
 
   return {
     users: [user1, user2],

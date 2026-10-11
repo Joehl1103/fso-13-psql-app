@@ -3,13 +3,13 @@ import assert from "node:assert";
 import axios from "axios";
 import { baseUrl, resetAndSeed, createUser, login } from "./helper.js";
 
+let testData;
 before(async () => {
   testData = await resetAndSeed();
-  console.log("testData", testData);
 });
 
 describe("Blogs API", () => {
-  test.only("blogs are returned as json and initially empty", async () => {
+  test("blogs are returned as json and initially empty", async () => {
     const response = await axios.get(`${baseUrl}/blogs`);
     assert.ok([200, 201].includes(response.status));
     assert.strictEqual(
@@ -20,7 +20,7 @@ describe("Blogs API", () => {
     assert.strictEqual(response.data.length, 0);
   });
 
-  test("a valid blog can be added with authentication", async () => {
+  test.only("a valid blog can be added with authentication", async () => {
     const newBlog = {
       title: "Test Blog Post",
       author: "Test Author",

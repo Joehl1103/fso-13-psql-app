@@ -1,10 +1,10 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
-import app from "../app.js";
-import { createUsers, createBlogs } from "../../testing/factories.js";
-import type { UserWithData } from "../../testing/testing.types.ts";
-import type { BlogReqType, BlogResType } from "../models/types/blog.d.ts";
-import { sequelize } from "../../db/utils/db.js";
+import app from "../../app.js";
+import { createUsers, createBlogs } from "../../../testing/factories.js";
+import type { UserWithData } from "../../../testing/testing.types.ts";
+import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
+import { sequelize } from "../../../db/utils/db.js";
 
 let usersWithData: UserWithData[];
 let joe: UserWithData | undefined, joey: UserWithData | undefined;
