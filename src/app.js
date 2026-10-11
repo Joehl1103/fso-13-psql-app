@@ -5,6 +5,7 @@ import blogsRouter from "./controllers/blogs.ts";
 import usersRouter from "./controllers/userController/users.ts";
 import loginRouter from "./controllers/login.js";
 import authorRouter from "./controllers/authors.ts";
+import healthRouter from "./controllers/health.ts";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use("/api/login", loginRouter);
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/authors", authorRouter);
+app.use("/api", healthRouter);
 
 app.use(downstreamErrorHandler);
 
