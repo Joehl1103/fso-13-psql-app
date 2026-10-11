@@ -1,4 +1,4 @@
-import type { UserWithData, User } from "./testing.types.ts";
+import type { UserWithData } from "./testing.types.ts";
 import supertest from "supertest";
 import app from "../src/app.js";
 import type { BlogResType } from "../src/models/types/blog.d.ts";

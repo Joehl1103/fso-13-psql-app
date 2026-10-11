@@ -38,8 +38,6 @@ if (DATABASE_SSL) {
   };
 }
 
-console.log("DATABASE_URL", DATABASE_URL);
-
 const sequelize = new Sequelize(DATABASE_URL, databaseOptions);
 
 const connectToDatabase = async () => {

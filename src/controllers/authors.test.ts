@@ -1,9 +1,9 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../app.js";
-import { createUsers, createBlogs } from "../testing/factories.js";
-import type { UserWithData } from "../testing/testing.types.ts";
-import { Author } from "./authors.ts";
+import { createUsers, createBlogs } from "../../testing/factories.js";
+import type { UserWithData } from "../../testing/testing.types.ts";
+import { Author } from "../models/types/author.types.ts";
 
 describe("GET", () => {
   beforeEach(async () => {
