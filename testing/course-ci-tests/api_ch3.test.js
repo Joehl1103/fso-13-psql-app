@@ -1,16 +1,15 @@
-const { describe, test, beforeAll } = require("vitest");
-const assert = require("node:assert");
-const axios = require("axios");
-const { baseUrl, resetAndSeed } = require("./helper");
-
-let testData;
+import { describe, test, it, before, after } from "node:test";
+import assert from "node:assert";
+import axios from "axios";
+import { baseUrl, resetAndSeed, createUser, login } from "./helper.js";
 
 before(async () => {
   testData = await resetAndSeed();
+  console.log("testData", testData);
 });
 
 describe("Blogs API", () => {
-  it("blogs are returned as json and initially empty", async () => {
+  test.only("blogs are returned as json and initially empty", async () => {
     const response = await axios.get(`${baseUrl}/blogs`);
     assert.ok([200, 201].includes(response.status));
     assert.strictEqual(
@@ -21,7 +20,7 @@ describe("Blogs API", () => {
     assert.strictEqual(response.data.length, 0);
   });
 
-  it("a valid blog can be added with authentication", async () => {
+  test("a valid blog can be added with authentication", async () => {
     const newBlog = {
       title: "Test Blog Post",
       author: "Test Author",
@@ -39,13 +38,13 @@ describe("Blogs API", () => {
     assert.strictEqual(response.data.likes, 0);
   });
 
-  it("created blog appears in blogs list", async () => {
+  test("created blog appears in blogs list", async () => {
     const response = await axios.get(`${baseUrl}/blogs`);
     assert.strictEqual(response.data.length, 1);
     assert.strictEqual(response.data[0].title, "Test Blog Post");
   });
 
-  it("blog can be updated", async () => {
+  test("blog can be updated", async () => {
     const blogsResponse = await axios.get(`${baseUrl}/blogs`);
     const blogId = blogsResponse.data[0].id;
 
@@ -59,14 +58,14 @@ describe("Blogs API", () => {
 });
 
 describe("Users API", () => {
-  it("all users are returned", async () => {
+  test("all users are returned", async () => {
     const response = await axios.get(`${baseUrl}/users`);
     assert.ok([200, 201].includes(response.status));
     assert.strictEqual(Array.isArray(response.data), true);
     assert.strictEqual(response.data.length, 2);
   });
 
-  it("users have correct properties", async () => {
+  test("users have correct properties", async () => {
     const response = await axios.get(`${baseUrl}/users`);
     const user = response.data[0];
 
@@ -78,13 +77,13 @@ describe("Users API", () => {
 });
 
 describe("Authors API", () => {
-  it("returns author statistics", async () => {
+  test("returns author statistics", async () => {
     const response = await axios.get(`${baseUrl}/authors`);
     assert.ok([200, 201].includes(response.status));
     assert.strictEqual(Array.isArray(response.data), true);
   });
 
-  it("author stats have correct structure", async () => {
+  test("author stats have correct structure", async () => {
     const response = await axios.get(`${baseUrl}/authors`);
 
     if (response.data.length > 0) {

@@ -1,0 +1,11 @@
+name: ci_database
+services:
+  db:
+    image: postgres
+    container_name: postgres_app_ci_db
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
