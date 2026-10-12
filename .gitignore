@@ -3,3 +3,4 @@ node_modules
 *.csv
 *.xlsx
 .worktrees/
+package.json.ci.bak
