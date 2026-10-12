@@ -47,7 +47,7 @@ jobs:
         run: npx wait-on http://127.0.0.1:3001 -t 30000 -lv
 
       - name: Run tests
-        run: npm course:test
+        run: npm run course:test
 
       - name: Print application logs on failure
         if: failure()
