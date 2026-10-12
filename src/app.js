@@ -19,7 +19,7 @@ app.use("/api/login", loginRouter);
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/authors", authorRouter);
-app.use("/api", healthRouter);
+app.use("/", healthRouter);
 app.use("/api/reset", resetRouter);
 
 app.use(downstreamErrorHandler);

@@ -37,17 +37,14 @@ jobs:
         run: npm ci
 
       - name: Start application
-        run: >-
-          npm run course:start:test
-          > app.log
-          2>&1
+        run: npm run course:start:test > app.log 2>&1 &
         env:
           TESTING_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db?sslmode=disable
           PORT: 3001
           SECRET: test_secret
 
       - name: Wait for application to be ready
-        run: npx wait-on http://127.0.0.1:3001/api -t 30000 -lv
+        run: npx wait-on http://127.0.0.1:3001 -t 30000 -lv
 
       - name: Run tests
         run: npm course:test
