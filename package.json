@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "test": "NODE_ENV=test vitest --config vitest.config.js --no-file-parallelism",
-    "course:start:test": "CI_TESTING=true TESTING_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db?sslmode=disable DATABASE_SSL=false SECRET='secret' node index.js",
+    "course:start:test": "CI_TESTING=true TESTING_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db?sslmode=disable DATABASE_SSL=false SECRET='secret' nodemon index.js",
     "course:test": "CI_TESTING=true TESTING_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db?sslmode=disable DATABASE_SSL=false SECRET='secret' node --test-only testing/course-ci-tests/api_ch3.test.js",
     "test-note": "to avoid running out of connections"
   },

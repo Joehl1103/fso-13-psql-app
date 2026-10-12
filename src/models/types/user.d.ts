@@ -28,7 +28,6 @@ interface UserType {
   password: string;
   blogs: number[] | any[];
 }
-type SequelizeUserUpdateResult = [affectedCount: number, affectedRows: User[]];
 
 type FindASingleUserResponse = User | null;
 

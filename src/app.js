@@ -1,7 +1,7 @@
 import express from "express";
 import { downstreamErrorHandler } from "./util/middleware.ts";
 
-import blogsRouter from "./controllers/blogs.ts";
+import blogsRouter from "./controllers/blogController/blogs.ts";
 import usersRouter from "./controllers/userController/users.ts";
 import loginRouter from "./controllers/login.js";
 import authorRouter from "./controllers/authors.ts";

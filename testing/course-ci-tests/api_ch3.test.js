@@ -20,7 +20,7 @@ describe("Blogs API", () => {
     assert.strictEqual(response.data.length, 0);
   });
 
-  test.only("a valid blog can be added with authentication", async () => {
+  test("a valid blog can be added with authentication", async () => {
     const newBlog = {
       title: "Test Blog Post",
       author: "Test Author",
@@ -44,7 +44,7 @@ describe("Blogs API", () => {
     assert.strictEqual(response.data[0].title, "Test Blog Post");
   });
 
-  test("blog can be updated", async () => {
+  test.only("blog can be updated", async () => {
     const blogsResponse = await axios.get(`${baseUrl}/blogs`);
     const blogId = blogsResponse.data[0].id;
 

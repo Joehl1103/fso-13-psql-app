@@ -15,6 +15,8 @@ import type {
   RequestBody,
   RequestQuery,
 } from "./../api.d.ts";
+import { parseAuth } from "./blogHelpers.ts";
+import type { SequelizeUpdateResult } from "../../../db/db.js";
 
 const router = express.Router();
 
@@ -46,7 +48,10 @@ router.get(
       });
       res.status(200).json(results);
     } catch (error) {
-      res.status(404).end();
+      if (error instanceof Error || error instanceof ErrorWithCustomStatus) {
+        console.log("error", error.message);
+        res.status(404).end();
+      }
     }
   },
 );
@@ -59,17 +64,16 @@ interface JwtUserPayload extends JwtPayload {
 router.post("/", async (req, res, next) => {
   const body: BlogReqType = req.body;
   const auth: string | undefined = req.get("Authorization");
-  const token: string = parseAuth(auth);
-  if (!auth) {
-  }
   console.log("auth", auth);
-  const { author, url, title } = body;
-  if (!token) {
-    throw Object.assign(new Error(`No token present`), {
-      status: 500,
-    });
-  }
   try {
+    const token: string = parseAuth(auth);
+    console.log("token", token);
+    const { author, url, title } = body;
+    if (!token) {
+      throw Object.assign(new Error(`No token present`), {
+        status: 500,
+      });
+    }
     const jwtPayload = jwt.verify(token, SECRET) as JwtPayload;
     const user = await User.findOne({
       where: { username: jwtPayload.username },
@@ -93,15 +97,38 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+interface BlogPatchBody {
+  likes: number;
+}
+
 router.patch("/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const body = req.body;
-    const response = await Blog.update(
+    const id: string = req.params.id;
+    if (!id) {
+      throw new ErrorWithCustomStatus(
+        500,
+        "Id not provided in request parameters",
+      );
+    }
+    const body: BlogPatchBody = req.body;
+    if (!body) {
+      throw new ErrorWithCustomStatus(
+        500,
+        "Body empty in blog patch. Should provide `likes: number`",
+      );
+    }
+    const response: SequelizeUpdateResult<Blog> = await Blog.update(
       { likes: body.likes },
       { returning: true, where: { id: id } },
     );
-    res.status(200).json(response[1]);
+    const [affectedCount, affectedRows] = response;
+    if (!(affectedCount === 1)) {
+      throw new ErrorWithCustomStatus(
+        500,
+        `Number of affectedRows during blog update is not equal to 1: ${affectedCount}`,
+      );
+    }
+    res.status(200).json(affectedRows);
   } catch (error) {
     res.status(404).end();
   }

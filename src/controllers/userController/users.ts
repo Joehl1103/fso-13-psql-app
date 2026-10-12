@@ -7,8 +7,8 @@ import type {
   UserRequestType,
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
-  SequelizeUserUpdateResult,
 } from "../../models/types/user.d.ts";
+import type { SequelizeUpdateResult } from "../../../db/db.js";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
@@ -119,7 +119,7 @@ router.put("/:username", async (req, res, next) => {
         "unable to find a user by that username",
       );
     }
-    const response: SequelizeUserUpdateResult = await User.update(req.body, {
+    const response: SequelizeUpdateResult<User> = await User.update(req.body, {
       where: { username: username },
       returning: true,
     });
