@@ -1,7 +1,5 @@
-import { afterAll, beforeAll, beforeEach } from "vitest";
-import supertest from "supertest";
-import app from "./app.js";
-import { sequelize } from "./util/db.js";
+import { afterAll, beforeAll } from "vitest";
+import { sequelize } from "./db/utils/db.ts";
 import path from "node:path";
 const filename: string = path.basename(import.meta.filename);
 
@@ -11,18 +9,6 @@ if (process.env.NODE_ENV !== "test" || !databaseName.endsWith("test")) {
   throw new Error(
     `Tests refused to run against non-test database: ${databaseName}`,
   );
-}
-
-async function getToken(username: string, password: string): Promise<string> {
-  const payload = {
-    username: username,
-    password: password,
-  };
-  const res = await supertest(app)
-    .post("/api/login")
-    .set("Content-Type", "application/json")
-    .send(payload);
-  return res.body.token;
 }
 
 beforeAll(async () => {
@@ -38,5 +24,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await sequelize.truncate({
+    cascade: true,
+    restartIdentity: true,
+  });
   await sequelize.close();
 });

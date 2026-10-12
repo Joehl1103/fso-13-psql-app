@@ -1,6 +1,6 @@
 import { expect, describe, test, beforeEach } from "vitest";
 import { createBlogs, createUsers } from "./factories.ts";
-import type { BlogResType } from "../models/types/blog.d.ts";
+import type { BlogResType } from "../src/models/types/blog.d.ts";
 import { returnJoeAndJoey, urlRegex } from "./testingHelpers.ts";
 import type { UserWithData } from "./testing.types.ts";
 
