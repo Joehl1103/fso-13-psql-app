@@ -7,7 +7,6 @@ const resetDatabase = async () => {
 };
 
 const createUser = async (username, name, password) => {
-  console.log("baseUrl", baseUrl);
   try {
     const response = await axios.post(`${baseUrl}/users`, {
       username,

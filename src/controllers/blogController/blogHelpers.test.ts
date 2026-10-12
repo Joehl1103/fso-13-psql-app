@@ -19,7 +19,6 @@ describe("Parse auth", () => {
       "Bearer SomthingOrOther",
       "Bearer 098203801231.lasdlajdaljsd`3`212.098130`98202.",
     ].forEach((str: string) => {
-      console.log("str", str);
       expect(() => parseAuth(str)).toThrow(
         "Format of Bearer token is incorrect.",
       );

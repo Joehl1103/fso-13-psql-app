@@ -44,14 +44,12 @@ describe("Blogs API", () => {
     assert.strictEqual(response.data[0].title, "Test Blog Post");
   });
 
-  test.only("blog can be updated", async () => {
+  test("blog can be updated", async () => {
     const blogsResponse = await axios.get(`${baseUrl}/blogs`);
     const blogId = blogsResponse.data[0].id;
-
-    const response = await axios.put(`${baseUrl}/blogs/${blogId}`, {
+    const response = await axios.patch(`${baseUrl}/blogs/${blogId}`, {
       likes: 5,
     });
-
     assert.ok([200, 201].includes(response.status));
     assert.strictEqual(response.data.likes, 5);
   });

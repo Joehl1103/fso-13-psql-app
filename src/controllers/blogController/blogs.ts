@@ -42,14 +42,13 @@ router.get(
       };
     }
     try {
-      const results = await Blog.findAll({
+      const results: Blog[] = await Blog.findAll({
         where,
         order: [["likes", "DESC"]],
       });
       res.status(200).json(results);
     } catch (error) {
       if (error instanceof Error || error instanceof ErrorWithCustomStatus) {
-        console.log("error", error.message);
         res.status(404).end();
       }
     }
@@ -64,10 +63,8 @@ interface JwtUserPayload extends JwtPayload {
 router.post("/", async (req, res, next) => {
   const body: BlogReqType = req.body;
   const auth: string | undefined = req.get("Authorization");
-  console.log("auth", auth);
   try {
     const token: string = parseAuth(auth);
-    console.log("token", token);
     const { author, url, title } = body;
     if (!token) {
       throw Object.assign(new Error(`No token present`), {
@@ -128,9 +125,11 @@ router.patch("/:id", async (req, res) => {
         `Number of affectedRows during blog update is not equal to 1: ${affectedCount}`,
       );
     }
-    res.status(200).json(affectedRows);
+    res.status(200).json(affectedRows[0]);
   } catch (error) {
-    res.status(404).end();
+    if (error instanceof Error || error instanceof ErrorWithCustomStatus) {
+      res.status(404).end();
+    }
   }
 });
 
