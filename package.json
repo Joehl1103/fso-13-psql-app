@@ -8,7 +8,8 @@
     "test": "NODE_ENV=test vitest --config vitest.config.js --no-file-parallelism",
     "course:start:test": "CI_TESTING=true node index.js",
     "course:test": "CI_TESTING=true node --test testing/course-ci-tests/api_ch3.test.js",
-    "test-note": "to avoid running out of connections"
+    "test-note": "to avoid running out of connections",
+    "migrate:up": "node ./db/utils/migrate.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,7 +35,9 @@
     "sequelize-typescript": "^2.1.6",
     "sql-formatter": "^15.8.2",
     "supertest": "^7.2.2",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
+    "umzug": "^3.8.3",
     "vitest": "^5.0.1"
   },
   "devDependencies": {
