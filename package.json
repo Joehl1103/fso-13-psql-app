@@ -9,7 +9,8 @@
     "course:start:test": "CI_TESTING=true node index.js",
     "course:test": "CI_TESTING=true node --test testing/course-ci-tests/api_ch3.test.js",
     "test-note": "to avoid running out of connections",
-    "migrate:up": "node ./db/utils/migrate.ts"
+    "migrate:up": "node ./db/utils/migrate.ts",
+    "migrate:down": "node ./db/utils/rollback.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,11 +29,11 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "nodemon": "^3.1.14",
-    "pg": "^8.23.0",
+    "pg": "^8.23.1",
+    "pg-hstore": "^2.3.4",
     "picocolors": "^1.1.1",
     "reflect-metadata": "^0.2.2",
     "sequelize": "^6.37.8",
-    "sequelize-typescript": "^2.1.6",
     "sql-formatter": "^15.8.2",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
