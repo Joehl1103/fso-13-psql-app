@@ -8,7 +8,7 @@ import type {
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
 } from "../../models/types/user.d.ts";
-import type { SequelizeUpdateResult } from "../../../db/db.js";
+import type { SequelizeUpdateResult } from "../../../db/utils/db.types.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";

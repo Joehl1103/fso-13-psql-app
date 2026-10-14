@@ -14,9 +14,9 @@ import type {
   ResponseBody,
   RequestBody,
   RequestQuery,
-} from "./../api.d.ts";
+} from "../api.js";
+import type { SequelizeUpdateResult } from "../../../db/utils/db.types.ts";
 import { parseAuth } from "./blogHelpers.ts";
-import type { SequelizeUpdateResult } from "../../../db/db.js";
 
 const router = express.Router();
 

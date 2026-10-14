@@ -7,8 +7,12 @@ interface DialectOptions {
   ssl: SslOptions;
 }
 
-export interface DatabaseOptions {
+interface DatabaseOptions {
   dialect: string;
   logging: boolean;
   dialectOptions: DialectOptions | {};
 }
+
+type SequelizeUpdateResult<T> = [affectedCount: number, affectedRows: T[]];
+
+export type { DatabaseOptions, SequelizeUpdateResult };
