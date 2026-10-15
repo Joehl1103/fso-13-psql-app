@@ -118,7 +118,7 @@ describe("POST", () => {
   });
 
   describe("incorrect year throws error", () => {
-    test.only("sending without year produces no error and returns year as null", async () => {
+    test("sending without year produces no error and returns year as null", async () => {
       if (!joe || !joey) {
         throw Error("joe and joey are undefined");
       }
@@ -133,10 +133,9 @@ describe("POST", () => {
         .set("Authorization", `Bearer ${joe.data.token}`)
         .send(payload);
 
-      console.log("response.text", response.text);
       expect(response.status).toBe(200);
     });
-    test("year < 1991 throws error", async () => {
+    test.only("year < 1991 throws error", async () => {
       if (!joe || !joey) {
         throw Error("joe and joey are undefined");
       }
@@ -144,12 +143,12 @@ describe("POST", () => {
         author: joe.name,
         url: "http://joeys-blog.com",
         title: "Talkin' about my blog",
-        token: joe.data.token,
         year: 1990,
       };
       const response = await supertest(app)
         .post("/api/blogs")
         .set("Content-Type", "application/json")
+        .set("Authorization", `Bearer ${joe.data.token}`)
         .send(payload);
       expect(response.status).toBe(400);
       expect(response.text).toBe(
