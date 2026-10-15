@@ -5,6 +5,7 @@ import { createUsers, createBlogs } from "../../../testing/factories.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
 import { sequelize } from "../../../db/utils/db.js";
+import { MIN_YEAR } from "../../util/constants.ts";
 
 let usersWithData: UserWithData[];
 let joe: UserWithData | undefined, joey: UserWithData | undefined;
@@ -49,7 +50,7 @@ describe("GET", () => {
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(2);
   });
-  test.only("returning blogs returns them with likes in descending order", async () => {
+  test("returning blogs returns them with likes in descending order", async () => {
     if (!blogs || blogs.length === 0) {
       throw new Error("no blogs");
     }
@@ -114,6 +115,50 @@ describe("POST", () => {
       });
     expect(blogsResponse.status).toBe(500);
     expect(blogsResponse.text).toBe("No token present");
+  });
+
+  describe("incorrect year throws error", () => {
+    test.only("sending without year produces no error and returns year as null", async () => {
+      if (!joe || !joey) {
+        throw Error("joe and joey are undefined");
+      }
+      const payload: BlogReqType = {
+        author: joe.name,
+        url: "http://joeys-blog.com",
+        title: "Talkin' about my blog",
+      };
+      const response = await supertest(app)
+        .post("/api/blogs")
+        .set("Content-Type", "application/json")
+        .set("Authorization", `Bearer ${joe.data.token}`)
+        .send(payload);
+
+      console.log("response.text", response.text);
+      expect(response.status).toBe(200);
+    });
+    test("year < 1991 throws error", async () => {
+      if (!joe || !joey) {
+        throw Error("joe and joey are undefined");
+      }
+      const payload: BlogReqType = {
+        author: joe.name,
+        url: "http://joeys-blog.com",
+        title: "Talkin' about my blog",
+        token: joe.data.token,
+        year: 1990,
+      };
+      const response = await supertest(app)
+        .post("/api/blogs")
+        .set("Content-Type", "application/json")
+        .send(payload);
+      expect(response.status).toBe(400);
+      expect(response.text).toBe(
+        `Year must be greater than or equal to ${MIN_YEAR}.`,
+      );
+    });
+    test("year with non-4 digits throws error", () => {});
+
+    test("year with 4 digits and > 1991 is successful", () => {});
   });
 });
 

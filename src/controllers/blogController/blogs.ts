@@ -17,6 +17,7 @@ import type {
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../../db/utils/db.types.ts";
 import { parseAuth } from "./blogHelpers.ts";
+import { MIN_YEAR } from "../../util/constants.ts";
 
 const router = express.Router();
 
@@ -60,12 +61,27 @@ interface JwtUserPayload extends JwtPayload {
   id: number;
 }
 
+function validateYear(bodyYear: string | null): null {
+  if (!bodyYear) {
+    return null;
+  }
+  const numYear: number = Number(bodyYear);
+  if (numYear < MIN_YEAR) {
+    throw new ErrorWithCustomStatus(
+      400,
+      `Year must be greater than or equal to ${MIN_YEAR}.`,
+    );
+  }
+  return null;
+}
+
 router.post("/", async (req, res, next) => {
   const body: BlogReqType = req.body;
   const auth: string | undefined = req.get("Authorization");
   try {
     const token: string = parseAuth(auth);
-    const { author, url, title } = body;
+    const { author, url, title, year: bodyYear } = body;
+    const validatedYear: number | null = validateYear(bodyYear);
     if (!token) {
       throw Object.assign(new Error(`No token present`), {
         status: 500,
@@ -80,12 +96,14 @@ router.post("/", async (req, res, next) => {
         status: 500,
       });
     }
+    const year: number | null = bodyYear ? bodyYear : null;
     const payload: Omit<BlogResType, "id"> = {
       author,
       url,
       title,
       userId: user.id,
       likes: 0,
+      year,
     };
     const result: Blog = await Blog.create(payload);
     res.status(200).json(result.toJSON());

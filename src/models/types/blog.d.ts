@@ -2,10 +2,11 @@ interface BlogResType extends BlogType {
   id: number;
   likes: number;
   userId: number;
+  year: number | null;
 }
 
 interface BlogReqType extends BlogType {
-  token: string;
+  year?: number;
 }
 
 interface BlogType {

@@ -19,5 +19,6 @@ export function parseAuth(auth: string | undefined): string {
       "Something went wrong while trying to process this auth header.",
     );
   }
+
   return token;
 }
