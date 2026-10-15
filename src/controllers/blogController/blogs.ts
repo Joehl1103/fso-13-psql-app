@@ -81,7 +81,7 @@ router.post("/", async (req, res, next) => {
   try {
     const token: string = parseAuth(auth);
     const { author, url, title, year: bodyYear } = body;
-    const validatedYear: number | null = validateYear(bodyYear);
+    // const validatedYear: number | null = validateYear(bodyYear);
     if (!token) {
       throw Object.assign(new Error(`No token present`), {
         status: 500,
@@ -106,9 +106,13 @@ router.post("/", async (req, res, next) => {
       year,
     };
     const result: Blog = await Blog.create(payload);
+    console.log("result", result);
     res.status(200).json(result.toJSON());
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      console.log("error", error.message);
+      next(error);
+    }
   }
 });
 

@@ -7,7 +7,7 @@ import path from "node:path";
 2. Module '"./db.d.ts"' declares 'DatabaseOptions' locally, but it is not exported. [2459]
    db.ts:7:15: 'DatabaseOptions' is declared here.
  */
-import type { DatabaseOptions } from "./db.d.ts";
+import type { DatabaseOptions } from "./db.types.ts";
 import config from "./../../src/util/config.ts";
 const DATABASE_URL = config.DATABASE_URL;
 const DATABASE_SSL = config.DATABASE_SSL;
@@ -15,7 +15,7 @@ const DATABASE_SSL = config.DATABASE_SSL;
 // import { logSql } from "./sql.js";
 const filename = path.basename(import.meta.filename);
 
-const databaseOptions: DatabaseOptions = {
+export const databaseOptions: DatabaseOptions = {
   dialect: "postgres",
   logging: false,
   dialectOptions: {},

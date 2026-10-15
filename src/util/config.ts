@@ -21,6 +21,7 @@ interface Config {
   SECRET: string;
   SALT_ROUNDS: number;
 }
+
 const config: Config = {
   DATABASE_URL: databaseUrl,
   DATABASE_SSL: process.env.DATABASE_SSL === "true" || "",

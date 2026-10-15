@@ -2,5 +2,7 @@
 node_modules
 *.csv
 *.xlsx
+input/
+output/
 .worktrees/
 package.json.ci.bak

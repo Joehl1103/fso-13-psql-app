@@ -1,6 +1,9 @@
 import { afterAll, beforeAll } from "vitest";
 import { sequelize } from "./db/utils/db.ts";
 import path from "node:path";
+import { Blog } from "./src/models/index.ts";
+import { umzug } from "./db/utils/umzug.ts";
+
 const filename: string = path.basename(import.meta.filename);
 
 const databaseName: string = sequelize.getDatabaseName();
@@ -15,12 +18,13 @@ beforeAll(async () => {
   console.log(`${filename} || Authenticating test database ${databaseName}.`);
   await sequelize.authenticate();
   console.log(`${filename} || Test database '${databaseName}' authenticated.`);
-  console.log(`${filename} || Syncing TEST models.`);
-  await sequelize.sync({
-    force: true,
-    match: /_test$/,
+  console.log(`${filename} || Running any migrations`);
+  const migrations = await umzug.up();
+  console.log("Migrations up to date", {
+    files: migrations.map((mig) => mig.name),
   });
-  console.log(`${filename} || TEST models synced.`);
+  const description = await Blog.describe();
+  console.log("blog description", description);
 });
 
 afterAll(async () => {
