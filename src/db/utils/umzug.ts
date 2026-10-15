@@ -1,8 +1,11 @@
 import { Umzug, SequelizeStorage } from "umzug";
 import { Sequelize } from "sequelize";
-import config from "../../src/util/config.ts";
-import { databaseOptions } from "./db.ts";
+import config from "../../util/config.ts";
+import { databaseOptions } from "./dbConfig.ts";
 
+console.log(
+  `Building sequelize object with DATABASE_URL=${config.DATABASE_URL}`,
+);
 const sequelize = new Sequelize(config.DATABASE_URL, databaseOptions);
 
 const umzug = new Umzug({
@@ -12,4 +15,4 @@ const umzug = new Umzug({
   logger: console,
 });
 
-export { umzug };
+export { sequelize, umzug };

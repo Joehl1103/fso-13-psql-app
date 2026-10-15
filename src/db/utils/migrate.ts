@@ -1,5 +1,4 @@
-import { sequelize } from "./db.ts";
-import { umzug } from "./umzug.ts";
+import { umzug, sequelize } from "./umzug.ts";
 
 (async function runMigrations() {
   await sequelize.authenticate();
