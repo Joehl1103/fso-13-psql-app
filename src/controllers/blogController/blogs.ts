@@ -61,18 +61,17 @@ interface JwtUserPayload extends JwtPayload {
   id: number;
 }
 
-function validateYear(bodyYear: string | null): null {
+function validateYear(bodyYear: number | undefined): number | null {
   if (!bodyYear) {
     return null;
   }
-  const numYear: number = Number(bodyYear);
-  if (numYear < MIN_YEAR) {
+  if (bodyYear < MIN_YEAR) {
     throw new ErrorWithCustomStatus(
       400,
       `Year must be greater than or equal to ${MIN_YEAR}.`,
     );
   }
-  return null;
+  return bodyYear;
 }
 
 router.post("/", extractToken, async (req, res, next) => {
@@ -80,7 +79,7 @@ router.post("/", extractToken, async (req, res, next) => {
   try {
     const token: string = req.token;
     const { author, url, title, year: bodyYear } = body;
-    // const validatedYear: number | null = validateYear(bodyYear);
+    const year: number | null = validateYear(bodyYear);
     if (!token) {
       throw Object.assign(new Error(`No token present`), {
         status: 500,
@@ -95,7 +94,6 @@ router.post("/", extractToken, async (req, res, next) => {
         status: 500,
       });
     }
-    const year: number | null = bodyYear ? bodyYear : null;
     const payload: Omit<BlogResType, "id"> = {
       author,
       url,

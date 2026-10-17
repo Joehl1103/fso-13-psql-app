@@ -162,7 +162,7 @@ describe("POST", () => {
   });
 });
 
-describe.only("DELETE", () => {
+describe("DELETE", () => {
   let blogId: number;
 
   beforeEach(async () => {
