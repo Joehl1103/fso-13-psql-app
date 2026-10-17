@@ -15,7 +15,7 @@ import type {
   RequestBody,
   RequestQuery,
 } from "../api.js";
-import type { SequelizeUpdateResult } from "../../../db/utils/db.types.ts";
+import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import { parseAuth } from "./blogHelpers.ts";
 import { MIN_YEAR } from "../../util/constants.ts";
 

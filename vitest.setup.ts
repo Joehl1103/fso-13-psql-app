@@ -1,5 +1,5 @@
 import { afterAll, beforeAll } from "vitest";
-import { sequelize } from "./db/utils/db.ts";
+import { sequelize } from "./src/db/utils/db.ts";
 import path from "node:path";
 import { Blog } from "./src/models/index.ts";
 

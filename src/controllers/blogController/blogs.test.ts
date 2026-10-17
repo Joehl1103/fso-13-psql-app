@@ -4,7 +4,7 @@ import app from "../../app.js";
 import { createUsers, createBlogs } from "../../../testing/factories.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
-import { sequelize } from "../../../db/utils/db.js";
+import { sequelize } from "../../db/utils/db.js";
 import { MIN_YEAR } from "../../util/constants.ts";
 
 let usersWithData: UserWithData[];
