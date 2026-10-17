@@ -11,7 +11,9 @@ let usersWithData: UserWithData[];
 let joe: UserWithData | undefined, joey: UserWithData | undefined;
 beforeEach(async () => {
   usersWithData = await createUsers();
+  console.log("usersWithData", usersWithData);
   joe = usersWithData.filter((u) => u.name === "joe")[0];
+  console.log("joe", joe);
   joey = usersWithData.filter((u) => u.name === "joey")[0];
 });
 
@@ -76,7 +78,7 @@ describe("GET", () => {
   });
 });
 
-describe("POST", () => {
+describe.only("POST", () => {
   test("creating blog with token creates blog with user id", async () => {
     if (!joe || !joey) {
       throw Error("joe and joey are undefined");
@@ -85,11 +87,11 @@ describe("POST", () => {
       author: joe.name,
       url: "http://joeys-blog.com",
       title: "Talkin' about my blog",
-      token: joe.data.token,
     };
     const blogsResponse = await supertest(app)
       .post("/api/blogs")
       .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${joe.data.token}`)
       .send(payload);
     const { author, id, likes, title, url, userId } = blogsResponse.body;
     expect(id).toBeTypeOf("number");
@@ -117,8 +119,8 @@ describe("POST", () => {
     expect(blogsResponse.text).toBe("No token present");
   });
 
-  describe("incorrect year throws error", () => {
-    test("sending without year produces no error and returns year as null", async () => {
+  describe("year", () => {
+    test.only("sending without year produces no error and returns year as null", async () => {
       if (!joe || !joey) {
         throw Error("joe and joey are undefined");
       }
@@ -127,6 +129,7 @@ describe("POST", () => {
         url: "http://joeys-blog.com",
         title: "Talkin' about my blog",
       };
+      console.log("joe.data.token", joe.data.token);
       const response = await supertest(app)
         .post("/api/blogs")
         .set("Content-Type", "application/json")
@@ -135,7 +138,7 @@ describe("POST", () => {
 
       expect(response.status).toBe(200);
     });
-    test.only("year < 1991 throws error", async () => {
+    test("year < 1991 throws error", async () => {
       if (!joe || !joey) {
         throw Error("joe and joey are undefined");
       }

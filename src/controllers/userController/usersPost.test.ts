@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { describe, test, expect, afterEach } from "vitest";
 import type { UserRequestType } from "../../models/types/user.d.ts";
-import { sequelize } from "../../../db/utils/db.ts";
+import { sequelize } from "../../db/utils/db.ts";
 
 import app from "../../app.js";
 describe("POST user", () => {
@@ -18,7 +18,7 @@ describe("POST user", () => {
     expect(response.text).toBe("Validation isEmail on username failed");
   });
 
-  test("non-unique email should fail", async () => {
+  test.only("non-unique email should fail", async () => {
     const payload: UserRequestType = {
       username: "joe@joe.com",
       name: "joe",

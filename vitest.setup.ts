@@ -17,9 +17,6 @@ beforeAll(async () => {
   console.log(`${filename} || Authenticating test database ${databaseName}.`);
   await sequelize.authenticate();
   console.log(`${filename} || Test database '${databaseName}' authenticated.`);
-  console.log(`${filename} || Running any migrations`);
-  const description = await Blog.describe();
-  console.log("blog description", description);
 });
 
 afterAll(async () => {

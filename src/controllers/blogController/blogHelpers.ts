@@ -4,6 +4,7 @@ export function parseAuth(auth: string | undefined): string {
   if (!auth) {
     throw new ErrorWithCustomStatus(500, "No auth provided");
   }
+  console.log("auth", auth);
   const authHasRightFormat: Boolean =
     /Bearer\s{1}[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]/.test(auth);
   if (!authHasRightFormat) {
