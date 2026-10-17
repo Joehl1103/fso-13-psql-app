@@ -78,7 +78,7 @@ describe("GET", () => {
   });
 });
 
-describe.only("POST", () => {
+describe("POST", () => {
   test("creating blog with token creates blog with user id", async () => {
     if (!joe || !joey) {
       throw Error("joe and joey are undefined");
@@ -120,7 +120,7 @@ describe.only("POST", () => {
   });
 
   describe("year", () => {
-    test.only("sending without year produces no error and returns year as null", async () => {
+    test("sending without year produces no error and returns year as null", async () => {
       if (!joe || !joey) {
         throw Error("joe and joey are undefined");
       }

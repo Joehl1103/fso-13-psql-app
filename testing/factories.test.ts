@@ -26,3 +26,19 @@ describe("createBlogs", () => {
     });
   });
 });
+
+test("createUsers", async () => {
+  const users: UserWithData[] = await createUsers();
+  expect(users.length).toBeGreaterThan(0);
+  users.forEach((u: UserWithData) => {
+    const { name, data } = u;
+    expect(name).toBeTruthy();
+    const { username, name: nestedName, password, token, blogs, id } = data;
+    expect(username).toBeTruthy();
+    expect(nestedName).toBeTruthy();
+    expect(password).toBeTruthy();
+    expect(token).toBeTruthy();
+    expect(blogs).toBeTypeOf("object");
+    expect(id).toBeTruthy();
+  });
+});

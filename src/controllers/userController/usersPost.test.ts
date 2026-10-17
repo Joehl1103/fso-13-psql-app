@@ -18,7 +18,7 @@ describe("POST user", () => {
     expect(response.text).toBe("Validation isEmail on username failed");
   });
 
-  test.only("non-unique email should fail", async () => {
+  test("non-unique email should fail", async () => {
     const payload: UserRequestType = {
       username: "joe@joe.com",
       name: "joe",

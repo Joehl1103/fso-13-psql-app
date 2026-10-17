@@ -1,4 +1,8 @@
-import type { UserWithData } from "./testing.types.ts";
+import type {
+  UserWithData,
+  BlogPayloadData,
+  BlogPayload,
+} from "./testing.types.ts";
 import supertest from "supertest";
 import app from "../src/app.js";
 import type { BlogResType } from "../src/models/types/blog.d.ts";
@@ -57,22 +61,25 @@ async function createUsers(): Promise<UserWithData[]> {
       return { ...u, data: { ...u.data, id: id } };
     }),
   );
-  const usersWithTokensAndData = await Promise.all(
+  return await Promise.all(
     usersWithId.map(async (u: UserWithData) => {
       const token = await getToken(u.data.username, u.data.password);
       return { ...u, data: { ...u.data, token: token } };
     }),
   );
-  return usersWithTokensAndData;
 }
 
 async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
-  const joe = users.filter((u) => u.name === "joe")[0];
-  const joey = users.filter((u) => u.name === "joey")[0];
+  const joe: UserWithData | undefined = users.filter(
+    (u) => u.name === "joe",
+  )[0];
+  const joey: UserWithData | undefined = users.filter(
+    (u) => u.name === "joey",
+  )[0];
   if (!joe || !joey) {
     throw new Error("Joe or joey is undefined, or both");
   }
-  const blogPayload = [
+  const blogPayloadData: BlogPayloadData[] = [
     {
       author: joe.name,
       url: "http://joes-blog.com",
@@ -94,11 +101,14 @@ async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
     },
   ];
   return await Promise.all(
-    blogPayload.map(async (b) => {
+    blogPayloadData.map(async (b) => {
+      const { token, ...rest } = b;
+      const payload: BlogPayload = rest;
       const res = await supertest(app)
         .post("/api/blogs")
         .set("Content-Type", "application/json")
-        .send(b);
+        .set("Authorization", `Bearer ${b.token}`)
+        .send(payload);
       return res.body;
     }),
   );
