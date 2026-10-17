@@ -11,8 +11,9 @@
     "course:start:test": "CI_TESTING=true node index.js",
     "course:test": "CI_TESTING=true node --test testing/course-ci-tests/api_ch3.test.js",
     "test-note": "to avoid running out of connections",
-    "migrate:up": "node ./src/db/utils/migrate.ts",
-    "migrate:down": "node ./src/db/utils/rollback.ts"
+    "migrate:up": "node ./src/db/utils/umzug/migrate.ts",
+    "migrate:down": "node ./src/db/utils/umzug/rollback.ts",
+    "umzug-cli": "node ./src/db/utils/umzug/cli.ts"
   },
   "keywords": [],
   "author": "",

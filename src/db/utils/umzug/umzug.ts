@@ -8,10 +8,8 @@ console.log(
 );
 const sequelize = new Sequelize(config.DATABASE_URL, databaseOptions);
 
-console.log("sequelize", sequelize);
-
 const umzug = new Umzug({
-  migrations: { glob: "db/migrations/*.js" },
+  migrations: { glob: "src/db/migrations/*.js" },
   context: sequelize.getQueryInterface(),
   storage: new SequelizeStorage({ sequelize }),
   logger: console,
