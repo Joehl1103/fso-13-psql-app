@@ -156,9 +156,65 @@ describe("POST", () => {
         `Year must be greater than or equal to ${MIN_YEAR}.`,
       );
     });
-    test("year with non-4 digits throws error", () => {});
-
-    test("year with 4 digits and > 1991 is successful", () => {});
+    test("year with non-4 digits throws error", async () => {
+      if (!joe || !joey) {
+        throw Error("joe and joey are undefined");
+      }
+      const payload: BlogReqType = {
+        author: joe.name,
+        url: "http://joeys-blog.com",
+        title: "Talkin' about my blog",
+        year: 199,
+      };
+      const response = await supertest(app)
+        .post("/api/blogs")
+        .set("Content-Type", "application/json")
+        .set("Authorization", `Bearer ${joe.data.token}`)
+        .send(payload);
+      expect(response.status).toBe(400);
+      expect(response.text).toBe(
+        `Year must be greater than or equal to ${MIN_YEAR}.`,
+      );
+    });
+    test("year greater than current year fails", async () => {
+      if (!joe || !joey) {
+        throw Error("joe and joey are undefined");
+      }
+      const date: Date = new Date();
+      const nextYear: number = date.getFullYear() + 1;
+      const payload: BlogReqType = {
+        author: joe.name,
+        url: "http://joeys-blog.com",
+        title: "Talkin' about my blog",
+        year: nextYear,
+      };
+      const response = await supertest(app)
+        .post("/api/blogs")
+        .set("Content-Type", "application/json")
+        .set("Authorization", `Bearer ${joe.data.token}`)
+        .send(payload);
+      expect(response.status).toBe(400);
+      expect(response.text).toBe(
+        `Year must not be greater than the current year.`,
+      );
+    });
+    test("year with 4 digits and > 1991 is successful", async () => {
+      if (!joe || !joey) {
+        throw Error("joe and joey are undefined");
+      }
+      const payload: BlogReqType = {
+        author: joe.name,
+        url: "http://joeys-blog.com",
+        title: "Talkin' about my blog",
+        year: 2001,
+      };
+      const response = await supertest(app)
+        .post("/api/blogs")
+        .set("Content-Type", "application/json")
+        .set("Authorization", `Bearer ${joe.data.token}`)
+        .send(payload);
+      expect(response.status).toBe(200);
+    });
   });
 });
 

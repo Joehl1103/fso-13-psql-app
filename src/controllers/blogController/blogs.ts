@@ -71,6 +71,13 @@ function validateYear(bodyYear: number | undefined): number | null {
       `Year must be greater than or equal to ${MIN_YEAR}.`,
     );
   }
+  const date: Date = new Date();
+  if (bodyYear > date.getFullYear()) {
+    throw new ErrorWithCustomStatus(
+      400,
+      `Year must not be greater than the current year.`,
+    );
+  }
   return bodyYear;
 }
 

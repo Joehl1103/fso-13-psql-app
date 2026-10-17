@@ -32,4 +32,4 @@ function extractToken(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-export { extractToken };
+export { parseAuth, extractToken };
