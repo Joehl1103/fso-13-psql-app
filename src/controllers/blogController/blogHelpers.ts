@@ -1,10 +1,10 @@
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
+import type { Request, Response, NextFunction } from "express";
 
-export function parseAuth(auth: string | undefined): string {
+function parseAuth(auth: string | undefined): string {
   if (!auth) {
     throw new ErrorWithCustomStatus(500, "No auth provided");
   }
-  console.log("auth", auth);
   const authHasRightFormat: Boolean =
     /Bearer\s{1}[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]/.test(auth);
   if (!authHasRightFormat) {
@@ -23,3 +23,13 @@ export function parseAuth(auth: string | undefined): string {
 
   return token;
 }
+
+function extractToken(req: Request, res: Response, next: NextFunction) {
+  const auth: string | undefined = req.get("Authorization");
+  const token: string = parseAuth(auth);
+  //NOTE : add to index.d.ts
+  req.token = token;
+  next();
+}
+
+export { extractToken };

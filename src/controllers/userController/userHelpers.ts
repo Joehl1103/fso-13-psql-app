@@ -89,6 +89,7 @@ async function getUserIdToBlogMap(
     userIds,
     allBlogsJson,
   );
+  //NOTE : add to index.d.ts
   req.userIdToBlogMap = userIdToBlogMap;
   next();
 }

@@ -8,7 +8,7 @@ import type {
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
 } from "../../models/types/user.d.ts";
-import type { SequelizeUpdateResult } from "../../../db/utils/db.types.ts";
+import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
@@ -33,8 +33,6 @@ router.post("/", async (req, res, next) => {
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    console.log("1");
-    console.log("req,body", { ...req.body });
     const result = await User.create({ ...req.body, password: passwordHash });
     const {
       id,
@@ -49,7 +47,6 @@ router.post("/", async (req, res, next) => {
     };
     res.status(201).json(payload);
   } catch (error) {
-    console.log("error", error);
     next(error);
   }
 });

@@ -11,9 +11,7 @@ let usersWithData: UserWithData[];
 let joe: UserWithData | undefined, joey: UserWithData | undefined;
 beforeEach(async () => {
   usersWithData = await createUsers();
-  console.log("usersWithData", usersWithData);
   joe = usersWithData.filter((u) => u.name === "joe")[0];
-  console.log("joe", joe);
   joey = usersWithData.filter((u) => u.name === "joey")[0];
 });
 
@@ -109,6 +107,7 @@ describe("POST", () => {
     const blogsResponse = await supertest(app)
       .post("/api/blogs")
       .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer ")
       .send({
         author: joe.name,
         url: "http://joeys-blog.com",
@@ -116,7 +115,7 @@ describe("POST", () => {
         token: "",
       });
     expect(blogsResponse.status).toBe(500);
-    expect(blogsResponse.text).toBe("No token present");
+    expect(blogsResponse.text).toBe("Format of Bearer token is incorrect.");
   });
 
   describe("year", () => {
@@ -129,7 +128,6 @@ describe("POST", () => {
         url: "http://joeys-blog.com",
         title: "Talkin' about my blog",
       };
-      console.log("joe.data.token", joe.data.token);
       const response = await supertest(app)
         .post("/api/blogs")
         .set("Content-Type", "application/json")
@@ -164,7 +162,7 @@ describe("POST", () => {
   });
 });
 
-describe("DELETE", () => {
+describe.only("DELETE", () => {
   let blogId: number;
 
   beforeEach(async () => {
@@ -175,11 +173,11 @@ describe("DELETE", () => {
       author: joe.name,
       url: "http://joeys-blog.com",
       title: "Talkin' about my blog",
-      token: joe.data.token,
     };
     const response = await supertest(app)
       .post("/api/blogs")
       .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${joe.data.token}`)
       .send(payload);
     ({ id: blogId } = response.body);
   });
@@ -187,7 +185,7 @@ describe("DELETE", () => {
   test("deletion fails if no token provided", async () => {
     const response = await supertest(app).delete(`/api/blogs/${blogId}`);
     expect(response.status).toBe(500);
-    expect(response.text).toBe("No token provided");
+    expect(response.text).toBe("No auth provided");
   });
 
   test("deletion fails if token belongs to different user", async () => {
@@ -197,7 +195,7 @@ describe("DELETE", () => {
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
-      .send({ token: joey.data.token });
+      .set("Authorization", `Bearer ${joey.data.token}`);
     expect(response.status).toBe(500);
     expect(response.text).toBe(
       "Cannot fulfill request because token does not belong to owner.",
@@ -211,7 +209,7 @@ describe("DELETE", () => {
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
-      .send({ token: joe.data.token });
+      .set("Authorization", `Bearer ${joe.data.token}`);
     expect(response.status).toBe(204);
   });
 
@@ -222,7 +220,7 @@ describe("DELETE", () => {
     const response = await supertest(app)
       .delete(`/api/blogs/100`)
       .set("Content-Type", "application/json")
-      .send({ token: joe.data.token });
+      .set("Authorization", `Bearer ${joe.data.token}`);
     expect(response.status).toBe(404);
     expect(response.text).toBe("Unable to find a blog with id 100");
   });

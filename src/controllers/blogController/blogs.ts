@@ -16,7 +16,7 @@ import type {
   RequestQuery,
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
-import { parseAuth } from "./blogHelpers.ts";
+import { extractToken } from "./blogHelpers.ts";
 import { MIN_YEAR } from "../../util/constants.ts";
 
 const router = express.Router();
@@ -75,11 +75,10 @@ function validateYear(bodyYear: string | null): null {
   return null;
 }
 
-router.post("/", async (req, res, next) => {
+router.post("/", extractToken, async (req, res, next) => {
   const body: BlogReqType = req.body;
-  const auth: string | undefined = req.get("Authorization");
   try {
-    const token: string = parseAuth(auth);
+    const token: string = req.token;
     const { author, url, title, year: bodyYear } = body;
     // const validatedYear: number | null = validateYear(bodyYear);
     if (!token) {
@@ -106,11 +105,9 @@ router.post("/", async (req, res, next) => {
       year,
     };
     const result: Blog = await Blog.create(payload);
-    console.log("result", result);
     res.status(200).json(result.toJSON());
   } catch (error) {
     if (error instanceof Error) {
-      console.log("error", error.message);
       next(error);
     }
   }
@@ -155,25 +152,13 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
-  if (!req.body || !req.body.token) {
-    throw Object.assign(new Error("No token provided"), {
-      status: 500,
-    });
-  }
-  const user: JwtUserPayload = jwt.verify(
-    req.body.token,
-    SECRET,
-  ) as JwtUserPayload;
+  const user: JwtUserPayload = jwt.verify(req.token, SECRET) as JwtUserPayload;
   if (!user) {
-    throw Object.assign(
-      new Error(
-        "Something went wrong because there is no user that can be identified by that token.",
-      ),
-      {
-        status: 500,
-      },
+    throw new ErrorWithCustomStatus(
+      500,
+      "Something went wrong because there is no user that can be identified by that token.",
     );
   }
   const paramId: string = req.params.id;
@@ -190,13 +175,9 @@ router.delete("/:id", async (req, res, next) => {
     }
     const { userId: blogUserId } = blog.toJSON();
     if (blogUserId !== user.id) {
-      throw Object.assign(
-        new Error(
-          "Cannot fulfill request because token does not belong to owner.",
-        ),
-        {
-          status: 500,
-        },
+      throw new ErrorWithCustomStatus(
+        500,
+        "Cannot fulfill request because token does not belong to owner.",
       );
     }
     const id = req.params.id;
