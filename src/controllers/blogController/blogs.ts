@@ -152,6 +152,16 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
+function validateParam(paramId: string | string[] | undefined): number {
+  if (!paramId) {
+    throw new Error("id undefined");
+  }
+  if (typeof paramId === "object") {
+    throw new Error("id in params cannot be an object ");
+  }
+  return Number(paramId);
+}
+
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
   const user: JwtUserPayload = jwt.verify(req.token, SECRET) as JwtUserPayload;
@@ -161,7 +171,7 @@ router.delete("/:id", extractToken, async (req, res, next) => {
       "Something went wrong because there is no user that can be identified by that token.",
     );
   }
-  const paramId: string = req.params.id;
+  const paramId: number = validateParam(req.params.id);
   try {
     const blog: Blog | null = await Blog.findByPk(paramId);
     if (!blog) {
