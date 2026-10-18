@@ -1,15 +1,19 @@
 import { sequelize } from "../db/utils/db.ts";
 import Blog from "./blog.ts";
 import User from "./user.ts";
+import ReadingList from "./readingList.ts";
 import path from "node:path";
 const filename = path.basename(import.meta.filename);
 
 User.hasMany(Blog, {
   foreignKey: "userId",
 });
+
 Blog.belongsTo(User, {
   foreignKey: "userId",
 });
+
+Blog.belongsToMany(User, { through: ReadingList, as: "blogsMarked" });
 
 async function syncModels() {
   console.log(`${filename} || Syncing models.`);
