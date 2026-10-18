@@ -8,7 +8,7 @@ import path from "node:path";
 2. Module '"./db.d.ts"' declares 'DatabaseOptions' locally, but it is not exported. [2459]
    db.ts:7:15: 'DatabaseOptions' is declared here.
  */
-const filename = path.basename(__filename);
+const filename = path.basename(import.meta.filename);
 
 console.log(`Building sequelize object with ${config.DATABASE_URL}`);
 const sequelize = new Sequelize(config.DATABASE_URL, databaseOptions);
