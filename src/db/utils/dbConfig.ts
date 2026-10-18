@@ -1,11 +1,11 @@
-import type { DatabaseOptions } from "./db.types.ts";
 import config from "./../../util/config.ts";
 const DATABASE_SSL = config.DATABASE_SSL;
 import fs from "node:fs";
+import type { Options } from "sequelize";
 //NOTE: used for troubleshooting
 // import { logSql } from "./sql.js";
 
-const databaseOptions: DatabaseOptions = {
+const databaseOptions: Options = {
   dialect: "postgres",
   logging: false,
   dialectOptions: {},
