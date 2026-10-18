@@ -1,0 +1,55 @@
+import supertest from "supertest";
+import app from "../../app.js";
+import { describe, test, expect, beforeAll } from "vitest";
+import { createUsers, createBlogs } from "../../../testing/factories.ts";
+import type {
+  ReadingListReqBody,
+  ReadingListResBody,
+} from "./readingList.types.ts";
+import type { UserWithData } from "../../../testing/testing.types.ts";
+import type { BlogResType } from "../../models/types/blog.js";
+
+let joe: UserWithData;
+let blogs: BlogResType[];
+let blogIds: number[];
+beforeAll(async () => {
+  const users: UserWithData[] = await createUsers();
+  const joeRes = users.find((u: UserWithData) => u.name === "joe");
+  if (!joeRes) {
+    throw new Error("joe is missing.");
+  }
+  joe = joeRes;
+  blogs = await createBlogs(users);
+  const blogIdsRaw: number[] | undefined[] = blogs.map(
+    (b: BlogResType) => b.id,
+  );
+  if (!blogIdsRaw || blogIdsRaw.length === 0) {
+    throw new Error("blogIds is empty");
+  }
+  blogIds = blogIdsRaw;
+});
+
+describe("reading list", () => {
+  test("", async () => {
+    const firstBlogIdRaw: number | undefined = blogIds[0];
+    if (!firstBlogIdRaw) {
+      throw new Error("no first blog id");
+    }
+    const firstBlogId: number = firstBlogIdRaw;
+    const payload: ReadingListReqBody = {
+      blogId: firstBlogId,
+      userId: joe.data.id,
+    };
+    const res = await supertest(app)
+      .post("/api/readingList")
+      .set("Content-Type", "application/json")
+      .send(payload);
+    expect(res.status).toBe(200);
+    const resBody: ReadingListResBody = res.body;
+    const { id, blogId, userId, read } = resBody;
+    expect(id).toBeTypeOf("number");
+    expect(blogId).toBe(firstBlogId);
+    expect(userId).toBe(joe.data.id);
+    expect(read).toBe(false);
+  });
+});
