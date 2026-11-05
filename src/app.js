@@ -7,6 +7,7 @@ import loginRouter from "./controllers/login.js";
 import authorRouter from "./controllers/authors.ts";
 import healthRouter from "./controllers/health.ts";
 import resetRouter from "./controllers/reset.ts";
+import readingListRouter from "./controllers/readingList/readingList.ts";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/authors", authorRouter);
 app.use("/api", healthRouter);
 app.use("/api/reset", resetRouter);
+app.use("/api/readingList",readingListRouter);
 
 app.use(downstreamErrorHandler);
 

@@ -3,11 +3,13 @@ interface ReadingListReqBody {
   userId: number;
 }
 
+type ReadingListPayload = Omit<ReadingListResBody,"id">
+
 interface ReadingListResBody {
   id: number;
   blogId: number;
   userId: number;
-  read: Boolean;
+  read: boolean;
 }
 
-export type { ReadingListReqBody, ReadingListResBody };
+export type { ReadingListReqBody, ReadingListResBody, ReadingListPayload };

@@ -30,7 +30,7 @@ beforeAll(async () => {
 });
 
 describe("reading list", () => {
-  test("post", async () => {
+  test("post normal", async () => {
     const firstBlogIdRaw: number | undefined = blogIds[0];
     if (!firstBlogIdRaw) {
       throw new Error("no first blog id");
@@ -52,4 +52,11 @@ describe("reading list", () => {
     expect(userId).toBe(joe.data.id);
     expect(read).toBe(false);
   });
+	test('post invalid user id returns error', async () => {
+
+	})
+
+  test('post invalid blog id returns error',async() => {
+
+  })
 });
