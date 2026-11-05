@@ -21,4 +21,4 @@ async function syncModels() {
   console.log(`${filename} || models synced.`);
 }
 
-export { Blog, User, syncModels };
+export { Blog, User, ReadingList, syncModels };

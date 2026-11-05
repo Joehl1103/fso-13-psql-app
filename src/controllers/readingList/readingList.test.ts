@@ -52,11 +52,47 @@ describe("reading list", () => {
     expect(userId).toBe(joe.data.id);
     expect(read).toBe(false);
   });
-	test('post invalid user id returns error', async () => {
 
-	})
+  test('no body returns 400', async () => {
+    const payloads = ["",{}]  
+    for (const pl of payloads) {
+      const res = await supertest(app)
+        .post('/api/readingList')
+        .set("Content-Type","application/json")
+        .send(pl)
+      expect(res.status).toBe(400)
+    };
+  });
+
+  test('body with no user id or blog id fails', async () => {
+    const payloads = [{blogId: "",userId: 3},{blogId: 5,userId: ""}]
+    for (const pl of payloads){
+      const res = await supertest(app)
+        .post('/api/readingList')
+        .set("Content-Type","application/json")
+        .send(pl)
+      expect(res.status).toBe(400)
+    }
+  })
+
+	test('post invalid user id returns error', async () => {
+    const firstBlogIdRaw: number | undefined = blogIds[0];
+    if (!firstBlogIdRaw) {
+      throw new Error("no first blog id");
+    }
+    const firstBlogId: number = firstBlogIdRaw;
+    const payload: ReadingListReqBody = {
+      blogId: 100,
+      userId: joe.data.id,
+    };
+    const res = await supertest(app)
+      .post("/api/readingList")
+      .set("Content-Type", "application/json")
+      .send(payload);
+    expect(res.status).toBe(400);
+	});
 
   test('post invalid blog id returns error',async() => {
 
-  })
+  });
 });
