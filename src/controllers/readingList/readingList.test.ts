@@ -30,7 +30,7 @@ beforeAll(async () => {
 });
 
 describe("reading list", () => {
-  test("", async () => {
+  test("post", async () => {
     const firstBlogIdRaw: number | undefined = blogIds[0];
     if (!firstBlogIdRaw) {
       throw new Error("no first blog id");

@@ -2,6 +2,8 @@ import express from "express";
 
 const router = express.Router();
 
+import type { ReadingListReqBody } from "./readingList.types.ts";
+
 router.post("/", async (req, res) => {
-  const body: ReadingListBody = req.body;
+  const body: ReadingListReqBody = req.body;
 });
