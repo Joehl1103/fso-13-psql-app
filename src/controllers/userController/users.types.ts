@@ -1,3 +1,12 @@
 type UserIdToBlogMap = Map<number, number[] | any[]>;
 
-export type { UserIdToBlogMap };
+interface UserReadings {
+  id: number,
+  url: string,
+  title: string,
+  author: string,
+  likes: number,
+  year: null
+}
+
+export type { UserIdToBlogMap,UserReadings };

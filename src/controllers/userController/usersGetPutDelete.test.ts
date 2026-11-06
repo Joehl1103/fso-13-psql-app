@@ -10,6 +10,8 @@ import { User,ReadingList } from "../../models/index.ts";
 import app from "../../app.js";
 
 const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const urlRegex = /^https?\:\/\/(www.)?[a-zA-Z0-9-\.]*\.[a-z]{3}$/
+const usernameRegex = /[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/
 
 let usersWithData: UserWithData[];
 let joe: UserWithData | undefined,
@@ -28,6 +30,7 @@ beforeEach(async () => {
   }
   johnny = usersWithData.filter((u) => u.name === "johnny")[0];
   blogs = await createBlogs(usersWithData);
+  console.log('blogs',blogs)
   if(!blogs[0] || !blogs[1] || !blogs[2]){
     throw new Error('blogs are undefined');
   }
@@ -65,7 +68,7 @@ describe("GET users", () => {
     users.forEach((u: UserResponseTypeFromAPI) => {
       const { id, username, name, createdAt, updatedAt, blogs } = u;
       expect(id).toBeTypeOf("number");
-      expect(username).toMatch(/[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/);
+      expect(username).toMatch(usernameRegex);
       expect(name).toBeTypeOf("string");
       expect(createdAt).toMatch(timeStampRegex);
       expect(updatedAt).toMatch(timeStampRegex);
@@ -95,6 +98,18 @@ describe("GET users by id", () => {
         joesBlogIds.push(b.id);
       }
     });
+
+    function expectedReadings(){
+      return {
+        id: expect.any(Number),
+        url: expect.stringMatching(urlRegex),
+        title: expect.any(String),
+        author: expect.any(String),
+        likes: expect.any(String),
+        year: null
+      }
+    }
+
     expect(response.body).toStrictEqual({
       id: joe.data.id,
       username: `${joe.data.username}`,
@@ -102,25 +117,7 @@ describe("GET users by id", () => {
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
       blogs: joesBlogIds,
-      readings: [
-        {
-          id:,
-          url:,
-          title: ,
-          author: ,
-          likes: ,
-          year: 
-        },
-        {
-          id:,
-          url:,
-          title: ,
-          author: ,
-          likes: ,
-          year: 
-        },
-        }
-      ]
+      readings: [expectedReadings(),expectedReadings()]
     });
   });
   test("user without blogs should return empty blogs", async () => {
