@@ -83,7 +83,7 @@ describe("GET users by id", () => {
     } else {
     }
   });
-  test("get user by id should get user by id", async () => {
+  test("get user by id should get user by id with their reading list", async () => {
     if (!joe) {
       throw new Error("joe is undefined");
     }
@@ -102,6 +102,25 @@ describe("GET users by id", () => {
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
       blogs: joesBlogIds,
+      readings: [
+        {
+          id:,
+          url:,
+          title: ,
+          author: ,
+          likes: ,
+          year: 
+        },
+        {
+          id:,
+          url:,
+          title: ,
+          author: ,
+          likes: ,
+          year: 
+        },
+        }
+      ]
     });
   });
   test("user without blogs should return empty blogs", async () => {

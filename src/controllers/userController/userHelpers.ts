@@ -1,4 +1,4 @@
-import type { UserIdToBlogMap } from "./userTypes.ts";
+import type { UserIdToBlogMap } from "./users.types.ts";
 import type { BlogResType } from "../../models/types/blog.d.ts";
 import type { UserResponseTypeFromSequelize } from "../../models/types/user.d.ts";
 import { User, Blog } from "../../models/index.ts";

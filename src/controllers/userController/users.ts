@@ -12,7 +12,7 @@ import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
-import type { UserIdToBlogMap } from "./userTypes.ts";
+import type { UserIdToBlogMap } from "./users.types.ts";
 const { SALT_ROUNDS } = config;
 
 const router = express.Router();

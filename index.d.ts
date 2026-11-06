@@ -1,4 +1,4 @@
-import type { UserIdToBlogMap } from "./controllers/userTypes.ts";
+import type { UserIdToBlogMap } from "./controllers/users.types.ts";
 
 declare global {
   namespace Express {
