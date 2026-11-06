@@ -5,7 +5,7 @@ import type { BlogResType } from "../../models/types/blog.js";
 import type { UserResponseTypeFromAPI } from "../../models/types/user.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import { sequelize } from "../../db/utils/db.ts";
-import { User } from "../../models/index.ts";
+import { User,ReadingList } from "../../models/index.ts";
 
 import app from "../../app.js";
 
@@ -28,6 +28,29 @@ beforeEach(async () => {
   }
   johnny = usersWithData.filter((u) => u.name === "johnny")[0];
   blogs = await createBlogs(usersWithData);
+  if(!blogs[0] || !blogs[1] || !blogs[2]){
+    throw new Error('blogs are undefined');
+  }
+  const readingListPayload = [
+    {
+      blogId: Number(blogs[0].id),
+      userId: Number(joe.data.id),
+      read: false
+    },
+    {
+      blogId: Number(blogs[1].id),
+      userId: Number(joe.data.id),
+      read: false
+    },
+    {
+      blogId: Number(blogs[2].id),
+      userId: Number(joey.data.id),
+      read: false
+    }
+  ]
+  for (const readingList of readingListPayload){
+    await ReadingList.create(readingList)
+  }
 });
 
 afterEach(async () => {
