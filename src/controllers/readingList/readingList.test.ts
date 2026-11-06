@@ -37,8 +37,8 @@ describe("reading list", () => {
     }
     const firstBlogId: number = firstBlogIdRaw;
     const payload: ReadingListReqBody = {
-      blogId: firstBlogId,
-      userId: joe.data.id,
+      blogId: String(firstBlogId),
+      userId: String(joe.data.id),
     };
     const res = await supertest(app)
       .post("/api/readingList")
@@ -76,14 +76,9 @@ describe("reading list", () => {
   })
 
 	test('post invalid user id returns error', async () => {
-    const firstBlogIdRaw: number | undefined = blogIds[0];
-    if (!firstBlogIdRaw) {
-      throw new Error("no first blog id");
-    }
-    const firstBlogId: number = firstBlogIdRaw;
     const payload: ReadingListReqBody = {
-      blogId: 100,
-      userId: joe.data.id,
+      blogId: "1",
+      userId: "500",
     };
     const res = await supertest(app)
       .post("/api/readingList")
@@ -92,7 +87,16 @@ describe("reading list", () => {
     expect(res.status).toBe(400);
 	});
 
-  test('post invalid blog id returns error',async() => {
+  test.only('post invalid blog id returns error',async() => {
+     const payload: ReadingListReqBody = {
+      blogId: "100",
+      userId: "1",
+    };
+    const res = await supertest(app)
+      .post("/api/readingList")
+      .set("Content-Type", "application/json")
+      .send(payload);
+    expect(res.status).toBe(400);
 
   });
 });
