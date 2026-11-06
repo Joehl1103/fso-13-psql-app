@@ -64,12 +64,11 @@ router.post("/", async (req, res) => {
     const {id,message,model} = item
     await checkForRecordExistence(id,message,model)
   }
-    //TODO: same for blog; maybe extract to a helper function
-  // const payload: ReadingListPayload = {...body,read: false};
+  const payload: ReadingListPayload = {blogId: Number(blogId), userId: Number(userId),read: false};
 
-  // const response = await ReadingList.create(payload);
+  const response = await ReadingList.create(payload);
 
-  // res.status(200).json(response);
+  res.status(200).json(response);
 });
 
 export default router

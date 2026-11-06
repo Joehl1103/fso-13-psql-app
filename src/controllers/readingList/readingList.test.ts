@@ -87,7 +87,7 @@ describe("reading list", () => {
     expect(res.status).toBe(400);
 	});
 
-  test.only('post invalid blog id returns error',async() => {
+  test('post invalid blog id returns error',async() => {
      const payload: ReadingListReqBody = {
       blogId: "100",
       userId: "1",
