@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
-import { User } from "../../models/index.ts";
+import { User, Blog,ReadingList } from "../../models/index.ts";
 import type {
   UserNoPW,
   UserRequestType,
@@ -14,6 +14,7 @@ import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
 import type { UserIdToBlogMap } from "./users.types.ts";
 const { SALT_ROUNDS } = config;
+import type { InferAttributes } from "sequelize";
 
 const router = express.Router();
 
@@ -31,6 +32,7 @@ router.post("/", async (req, res, next) => {
       }
       throw new Error(errorMessage);
     }
+
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await User.create({ ...req.body, password: passwordHash });
@@ -74,6 +76,27 @@ router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
   }
 });
 
+interface UserWithAssociations extends InferAttributes<User> {
+  blogs: Blog[];
+  readings: Blog[];
+}
+
+
+type BlogMinusUserId = Omit<InferAttributes<Blog>,"userId">
+
+
+interface UserWithAssociationsMinusUserId extends UserNoPW {
+  blogs: BlogMinusUserId[];
+  readings: BlogMinusUserId[];
+}
+
+function removeUserId(arr: Blog[]): BlogMinusUserId[] {
+  return arr.map(i => {
+    const {userId, ...rest} = i
+    return rest
+  })
+}
+
 router.get(
   "/:id",
   getUserIdToBlogMap,
@@ -84,23 +107,42 @@ router.get(
     const id: number = Number(req.params.id);
     const userIdToBlogMap: UserIdToBlogMap = req.userIdToBlogMap;
     try {
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(id,{
+        include: [
+          {
+            association: 'blogs' 
+          },
+          {
+            association: 'readings',
+            through: { attributes: [] }
+          }
+        ]
+      });
       if (!user) {
         throw new ErrorWithCustomStatus(
           404,
           "Unable to find user with that id.",
         );
       }
-      const { password, ...rest } = user.dataValues;
-      const blogIds: number[] | any[] | undefined | null =
-        userIdToBlogMap.get(id) ?? [];
-      const output: UserNoPW = { ...rest, blogs: blogIds };
-      res.status(200).json(output);
+      const userWithAssociations: UserWithAssociations = user.toJSON();
+      const {password, ...rest } = userWithAssociations
+      if(!rest.blogs && !rest.readings){
+        throw new ErrorWithCustomStatus(500,"Something is incorrect with associations. User with associations does not contains a blog and a readings array.")
+      }
+      const userWithAssociationsMinusUserId: UserWithAssociationsMinusUserId = {
+        ...rest,
+        blogs: removeUserId(rest.blogs),
+        readings: removeUserId(rest.readings) 
+      }
+      res.status(200).json(userWithAssociationsMinusUserId);
     } catch (error) {
       next(error);
     }
   },
 );
+
+
+
 
 router.put("/:username", async (req, res, next) => {
   const username: string = req.params.username;

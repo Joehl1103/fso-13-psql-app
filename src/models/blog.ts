@@ -14,6 +14,7 @@ class Blog extends Model<InferAttributes<Blog>, InferCreationAttributes<Blog>> {
   declare title: string;
   declare likes: number;
   declare userId: number;
+  declare year: number
 }
 
 Blog.init(
@@ -38,6 +39,10 @@ Blog.init(
     likes: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    year: {
+      type: DataTypes.INTEGER,
+      defaultValue: null
     },
     userId: {
       type: DataTypes.INTEGER,

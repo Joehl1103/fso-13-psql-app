@@ -30,7 +30,6 @@ beforeEach(async () => {
   }
   johnny = usersWithData.filter((u) => u.name === "johnny")[0];
   blogs = await createBlogs(usersWithData);
-  console.log('blogs',blogs)
   if(!blogs[0] || !blogs[1] || !blogs[2]){
     throw new Error('blogs are undefined');
   }
@@ -99,13 +98,13 @@ describe("GET users by id", () => {
       }
     });
 
-    function expectedReadings(){
+    function expectedBlogs(){
       return {
         id: expect.any(Number),
         url: expect.stringMatching(urlRegex),
         title: expect.any(String),
         author: expect.any(String),
-        likes: expect.any(String),
+        likes: expect.any(Number),
         year: null
       }
     }
@@ -116,8 +115,8 @@ describe("GET users by id", () => {
       name: `${joe.data.name}`,
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
-      blogs: joesBlogIds,
-      readings: [expectedReadings(),expectedReadings()]
+      blogs: [expectedBlogs(),expectedBlogs()],
+      readings: [expectedBlogs(),expectedBlogs()]
     });
   });
   test("user without blogs should return empty blogs", async () => {
@@ -133,6 +132,7 @@ describe("GET users by id", () => {
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
       blogs: [],
+      readings: []
     });
   });
 });

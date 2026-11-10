@@ -1,4 +1,6 @@
 import { User } from "./index.js";
+import type { BlogResType } from "../blog.ts"
+
 interface UserResponseTypeFromSequelize extends UserResponseTypeFromAPI {
   createdAt: string;
   updatedAt: string;
@@ -26,7 +28,7 @@ interface UserType {
   username: string;
   name: string;
   password: string;
-  blogs: number[] | any[];
+  blogs?: BlogResType[];
 }
 
 type FindASingleUserResponse = User | null;

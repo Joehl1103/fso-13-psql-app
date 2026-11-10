@@ -7,13 +7,21 @@ const filename = path.basename(import.meta.filename);
 
 User.hasMany(Blog, {
   foreignKey: "userId",
+  as: 'blogs',
 });
 
 Blog.belongsTo(User, {
   foreignKey: "userId",
+  as: 'blogAuthor',
 });
 
-Blog.belongsToMany(User, { through: ReadingList, as: "blogsMarked" });
+User.belongsToMany(Blog, { 
+  through: ReadingList,
+  as: 'readings',
+  foreignKey: 'userId',
+  otherKey: 'blogId'
+});
+
 
 async function syncModels() {
   console.log(`${filename} || Syncing models.`);

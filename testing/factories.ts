@@ -113,5 +113,7 @@ async function createBlogs(users: UserWithData[]): Promise<BlogResType[]> {
     }),
   );
 }
+      defaultValue: null
+      defaultValue: null
 
 export { createUsers, createBlogs };
