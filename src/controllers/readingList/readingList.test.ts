@@ -5,9 +5,12 @@ import { createUsers, createBlogs } from "../../../testing/factories.ts";
 import type {
   ReadingListReqBody,
   ReadingListResBody,
-} from "./readingList.types.ts";
+  ReadingListRawPayload
+} from "./readingList.api.types.ts";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogResType } from "../../models/types/blog.js";
+import type { ReadingList } from "../../models/index.ts"
+import type { InferAttributes } from "sequelize";
 
 let joe: UserWithData;
 let blogs: BlogResType[];
@@ -29,16 +32,16 @@ beforeAll(async () => {
   blogIds = blogIdsRaw;
 });
 
-describe("reading list", () => {
+describe("POST", () => {
   test("post normal", async () => {
     const firstBlogIdRaw: number | undefined = blogIds[0];
     if (!firstBlogIdRaw) {
       throw new Error("no first blog id");
     }
     const firstBlogId: number = firstBlogIdRaw;
-    const payload: ReadingListReqBody = {
-      blogId: String(firstBlogId),
-      userId: String(joe.data.id),
+    const payload: ReadingListRawPayload = {
+      blogId: firstBlogId,
+      userId: joe.data.id,
     };
     const res = await supertest(app)
       .post("/api/readingList")
@@ -76,7 +79,7 @@ describe("reading list", () => {
   })
 
 	test('post invalid user id returns error', async () => {
-    const payload: ReadingListReqBody = {
+    const payload: InferAttributes<ReadingList> = {
       blogId: "1",
       userId: "500",
     };
@@ -88,7 +91,7 @@ describe("reading list", () => {
 	});
 
   test('post invalid blog id returns error',async() => {
-     const payload: ReadingListReqBody = {
+     const payload: InferAttributes<ReadingList> = {
       blogId: "100",
       userId: "1",
     };
@@ -100,3 +103,18 @@ describe("reading list", () => {
 
   });
 });
+
+describe("PUT", () => {
+  let entry: InferAttributes<ReadingList> = { id: 1, read: false}
+  // beforeEach(async () => {
+  //   //TODO: create new readingList entry
+  // })
+  test("put request with opposite boolean changes read state", async () => {
+    const res = await supertest(app)
+      .put("/api/readingList/:id")
+      .set("Content-Type","application/json")
+      .send(entryId)
+    expect(res.status).toBe(200)
+    expect(res.body.read).toBe(!entry.read)
+  })
+})

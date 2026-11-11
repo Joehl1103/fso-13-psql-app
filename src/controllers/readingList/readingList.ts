@@ -2,11 +2,15 @@ import express from "express";
 
 const router = express.Router();
 
-import type { ReadingListReqBody, ReadingListResBody,ReadingListPayload } from "./readingList.types.ts";
+import type { 
+  ReadingListReqBody, 
+  ReadingListResBody,
+  ReadingListSequelizePayload 
+} from "./readingList.api.types.ts";
 
 import { User,Blog, ReadingList} from "../../models/index.ts"
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
-import type {Model,ModelStatic} from 'sequelize'
+import type {Model,ModelStatic, InferAttributes} from 'sequelize'
 
 async function checkForRecordExistence(id: string,message: string, model: ModelStatic<User | Blog>): Promise<void> {
   const recordExists = await (async (id: string): Promise<boolean> => {
@@ -64,9 +68,10 @@ router.post("/", async (req, res) => {
     const {id,message,model} = item
     await checkForRecordExistence(id,message,model)
   }
-  const payload: ReadingListPayload = {blogId: Number(blogId), userId: Number(userId),read: false};
+  const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
 
-  const response = await ReadingList.create(payload);
+  const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
+  console.log('response',response.toJSON())
 
   res.status(200).json(response);
 });
