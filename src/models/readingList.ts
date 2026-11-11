@@ -15,6 +15,8 @@ class ReadingList extends Model<
   declare userId: number;
   declare blogId: number;
   declare read: boolean;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
 }
 
 ReadingList.init(
@@ -39,6 +41,14 @@ ReadingList.init(
       allowNull: false,
       defaultValue: false,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false
+    }
   },
   {
     sequelize,

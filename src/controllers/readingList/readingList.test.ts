@@ -79,9 +79,9 @@ describe("POST", () => {
   })
 
 	test('post invalid user id returns error', async () => {
-    const payload: InferAttributes<ReadingList> = {
-      blogId: "1",
-      userId: "500",
+    const payload: ReadingListRawPayload = {
+      blogId: 1,
+      userId: 500,
     };
     const res = await supertest(app)
       .post("/api/readingList")
@@ -91,9 +91,9 @@ describe("POST", () => {
 	});
 
   test('post invalid blog id returns error',async() => {
-     const payload: InferAttributes<ReadingList> = {
-      blogId: "100",
-      userId: "1",
+     const payload: ReadingListRawPayload = {
+      blogId: 100,
+      userId: 1,
     };
     const res = await supertest(app)
       .post("/api/readingList")
@@ -105,7 +105,14 @@ describe("POST", () => {
 });
 
 describe("PUT", () => {
-  let entry: InferAttributes<ReadingList> = { id: 1, read: false}
+  let entry: InferAttributes<ReadingList> = { 
+    id: 1,
+    blogId: 1,
+    userId: 1,
+    read: false,
+    updatedAt: "2026-11-11T18:00:33.226Z",
+    createdAt: "2026-11-11T18:00:33.226Z"
+  }
   // beforeEach(async () => {
   //   //TODO: create new readingList entry
   // })
