@@ -1,4 +1,5 @@
 import type { InferAttributes } from "sequelize";
+import type {Blog} from "../../models/index.ts"
 
 interface BlogResType extends BlogType {
   id: number;

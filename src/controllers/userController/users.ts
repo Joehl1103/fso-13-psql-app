@@ -7,14 +7,17 @@ import type {
   UserRequestType,
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
+  UserWithAssociations,
+  UserWithAssociationsMinusUserId
 } from "../../models/types/user.d.ts";
+import type { BlogMinusUserId } from "../../models/types/blog.d.ts"
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
 import type { UserIdToBlogMap } from "./users.types.ts";
+import type { InferAttributes } from "sequelize"
 const { SALT_ROUNDS } = config;
-import type { InferAttributes } from "sequelize";
 
 const router = express.Router();
 
@@ -35,6 +38,7 @@ router.post("/", async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await User.create({ ...req.body, password: passwordHash });
+    // @ts-ignore: rest intentionally not used
     const {
       id,
       username: returnedUsername,
@@ -75,19 +79,9 @@ router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
   }
 });
 
-interface UserWithAssociations extends InferAttributes<User> {
-  blogs: Blog[];
-  readings: Blog[];
-}
 
-type BlogMinusUserId = Omit<InferAttributes<Blog>, "userId">;
 
-interface UserWithAssociationsMinusUserId extends UserNoPW {
-  blogs: BlogMinusUserId[];
-  readings: BlogMinusUserId[];
-}
-
-function removeUserId(arr: Blog[]): BlogMinusUserId[] {
+function removeUserId(arr: InferAttributes<Blog>[]): BlogMinusUserId[] {
   return arr.map((i) => {
     const { userId, ...rest } = i;
     return rest;
@@ -120,7 +114,11 @@ router.get(
           "Unable to find user with that id.",
         );
       }
-      const userWithAssociations: UserWithAssociations = user.toJSON();
+      console.log('user',user.toJSON())
+      if(!user.blogs || !user.readings){
+        throw new Error(`- user blogs blank: ${!user.blogs}\n -user readings blank: ${!user.readings}`)
+      }
+      const userWithAssociations = user.toJSON() as UserWithAssociations;
       const { password, ...rest } = userWithAssociations;
       if (!rest.blogs && !rest.readings) {
         throw new ErrorWithCustomStatus(

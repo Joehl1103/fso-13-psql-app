@@ -1,6 +1,8 @@
-import { User } from "./index.js";
-import type { BlogResType } from "../blog.ts"
-import type { Attributes } from "sequelize";
+import type { User } from "../index.ts";
+import type { BlogResType,BlogMinusUserId } from "../blog.ts"
+import type { InferAttributes } from "sequelize";
+import type { Blog } from "../index.ts"
+
 
 interface UserResponseTypeFromSequelize extends UserResponseTypeFromAPI {
   createdAt: string;
@@ -34,9 +36,9 @@ interface UserType {
 
 type FindASingleUserResponse = User | null;
 
-interface UserWithAssociations extends Attributes<User> {
-  blogs: Blog[];
-  readings: Blog[];
+interface UserWithAssociations extends InferAttributes<User> {
+  blogs: InferAttributes<Blog>[];
+  readings: InferAttributes<Blog>[];
 }
 
 interface UserWithAssociationsMinusUserId extends UserNoPW {
@@ -53,6 +55,6 @@ export type {
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
   SequelizeUserUpdateResult,
-  UserWithAssociations,
-  UserWithAssociationsMinusUserId
+  UserWithAssociationsMinusUserId,
+  UserWithAssociations
 };

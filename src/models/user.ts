@@ -3,7 +3,9 @@ import type {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
+  NonAttribute
 } from "sequelize";
+import type { Blog } from "./index.ts"
 
 import { sequelize } from "../db/utils/db.ts";
 
@@ -12,6 +14,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare username: string;
   declare name: string;
   declare password: string;
+  declare blogs?: NonAttribute<Blog[]>
+  declare readings?: NonAttribute<Blog[]>
 }
 
 User.init(
