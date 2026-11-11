@@ -1,23 +1,20 @@
 import bcrypt from "bcrypt";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
-import { User, Blog } from "../../models/index.ts";
+import { User } from "../../models/index.ts";
 import type {
   UserNoPW,
   UserRequestType,
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
   UserWithAssociations,
-  UserWithAssociationsMinusUserId
 } from "../../models/types/user.d.ts";
 import type { BlogMinusUserId, BlogWithReadingProps } from "../../models/types/blog.d.ts"
-import type { UserReadingProps } from "../../models/types/readingList.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
 import type { UserIdToBlogMap } from "./users.types.ts";
-import type { InferAttributes } from "sequelize"
 const { SALT_ROUNDS } = config;
 
 const router = express.Router();
@@ -39,11 +36,11 @@ router.post("/", async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await User.create({ ...req.body, password: passwordHash });
-    // @ts-ignore: rest intentionally not used
     const {
       id,
       username: returnedUsername,
       name: returnedName,
+    // @ts-ignore: rest intentionally not used
       ...rest
     } = result.toJSON();
     const payload: UserPOSTResponseTypeFromAPI = {

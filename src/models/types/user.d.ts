@@ -41,10 +41,6 @@ interface UserWithAssociations extends InferAttributes<User> {
   readings: InferAttributes<Blog>[];
 }
 
-interface UserWithAssociationsMinusUserId extends UserNoPW {
-  blogs: BlogMinusUserId[];
-  readings: BlogMinusUserId[];
-}
 
 export type {
   UserRequestType,
