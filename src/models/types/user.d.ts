@@ -1,5 +1,6 @@
 import { User } from "./index.js";
 import type { BlogResType } from "../blog.ts"
+import type { Attributes } from "sequelize";
 
 interface UserResponseTypeFromSequelize extends UserResponseTypeFromAPI {
   createdAt: string;
@@ -33,6 +34,16 @@ interface UserType {
 
 type FindASingleUserResponse = User | null;
 
+interface UserWithAssociations extends Attributes<User> {
+  blogs: Blog[];
+  readings: Blog[];
+}
+
+interface UserWithAssociationsMinusUserId extends UserNoPW {
+  blogs: BlogMinusUserId[];
+  readings: BlogMinusUserId[];
+}
+
 export type {
   UserRequestType,
   UserFromToken,
@@ -42,4 +53,6 @@ export type {
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
   SequelizeUserUpdateResult,
+  UserWithAssociations,
+  UserWithAssociationsMinusUserId
 };

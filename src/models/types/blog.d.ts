@@ -1,3 +1,5 @@
+import type { InferAttributes } from "sequelize";
+
 interface BlogResType extends BlogType {
   id: number;
   likes: number;
@@ -15,4 +17,6 @@ interface BlogType {
   title: string;
 }
 
-export type { BlogType, BlogReqType, BlogResType };
+type BlogMinusUserId = Omit<InferAttributes<Blog>,"userId">
+
+export type { BlogType, BlogReqType, BlogResType, BlogMinusUserId };

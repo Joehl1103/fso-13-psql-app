@@ -5,7 +5,8 @@ import type { BlogResType } from "../../models/types/blog.js";
 import type { UserResponseTypeFromAPI } from "../../models/types/user.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import { sequelize } from "../../db/utils/db.ts";
-import { User,ReadingList } from "../../models/index.ts";
+import { User,ReadingList,Blog } from "../../models/index.ts";
+import type {InferAttributes} from "sequelize"
 
 import app from "../../app.js";
 
@@ -98,7 +99,7 @@ describe("GET users by id", () => {
       }
     });
 
-    function expectedBlogs(){
+    function expectedBlogs(): InferAttributes<Blog>{
       return {
         id: expect.any(Number),
         url: expect.stringMatching(urlRegex),
@@ -107,6 +108,10 @@ describe("GET users by id", () => {
         likes: expect.any(Number),
         year: null
       }
+    }
+
+    function expectedReadings(){
+      // const expectedBlogs = 
     }
 
     expect(response.body).toStrictEqual({

@@ -36,7 +36,7 @@ function downstreamErrorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  console.log('err',err)
+  // console.log('err',err)
   if (
     err.name === "SequelizeValidationError" ||
     err.name === "SequelizeUniqueConstraintError"
@@ -51,12 +51,12 @@ function downstreamErrorHandler(
   }
   let code: number;
   if (err instanceof ErrorWithCustomStatus) {
-    console.log('err.status',err.status)
+    // console.log('err.status',err.status)
     code = err.status;
   } else {
     code = 500;
   }
-  console.log('err.message',err.message)
+  // console.log('err.message',err.message)
   res.status(code).end(err.message);
 }
 

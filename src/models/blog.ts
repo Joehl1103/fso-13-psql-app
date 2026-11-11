@@ -14,7 +14,7 @@ class Blog extends Model<InferAttributes<Blog>, InferCreationAttributes<Blog>> {
   declare title: string;
   declare likes: number;
   declare userId: number;
-  declare year: number
+  declare year: number | null
 }
 
 Blog.init(
