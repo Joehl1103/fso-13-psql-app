@@ -10,7 +10,8 @@ import type {
   UserWithAssociations,
   UserWithAssociationsMinusUserId
 } from "../../models/types/user.d.ts";
-import type { BlogMinusUserId } from "../../models/types/blog.d.ts"
+import type { BlogMinusUserId, BlogWithReadingProps } from "../../models/types/blog.d.ts"
+import type { UserReadingProps } from "../../models/types/readingList.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
@@ -79,22 +80,19 @@ router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
   }
 });
 
-
-
-function removeUserId(arr: InferAttributes<Blog>[]): BlogMinusUserId[] {
-  return arr.map((i) => {
-    const { userId, ...rest } = i;
-    return rest;
-  });
-}
+const BLOG_PROPS = ["id","author","url","title","likes","year"] 
 
 const include = [
   {
     association: "blogs",
+    attributes: BLOG_PROPS
   },
   {
     association: "readings",
-    through: { attributes: [] },
+    attributes: BLOG_PROPS, 
+    through: { 
+      attributes: ["id","read"] 
+    },
   },
 ];
 
@@ -107,7 +105,7 @@ router.get(
     }
     const id: number = Number(req.params.id);
     try {
-      const user = await User.findByPk(id, { include });
+      const user = await User.findByPk(id, { attributes: ["id","username","name","createdAt","updatedAt"], include });
       if (!user) {
         throw new ErrorWithCustomStatus(
           404,
@@ -119,19 +117,13 @@ router.get(
         throw new Error(`- user blogs blank: ${!user.blogs}\n -user readings blank: ${!user.readings}`)
       }
       const userWithAssociations = user.toJSON() as UserWithAssociations;
-      const { password, ...rest } = userWithAssociations;
-      if (!rest.blogs && !rest.readings) {
+      if (!userWithAssociations.blogs && !userWithAssociations.readings) {
         throw new ErrorWithCustomStatus(
           500,
           "Something is incorrect with associations. User with associations does not contains a blog and a readings array.",
         );
       }
-      const userWithAssociationsMinusUserId: UserWithAssociationsMinusUserId = {
-        ...rest,
-        blogs: removeUserId(rest.blogs),
-        readings: removeUserId(rest.readings),
-      };
-      res.status(200).json(userWithAssociationsMinusUserId);
+      res.status(200).json(userWithAssociations);
     } catch (error) {
       next(error);
     }

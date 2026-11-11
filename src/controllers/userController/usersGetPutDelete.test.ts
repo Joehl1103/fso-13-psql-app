@@ -114,7 +114,7 @@ describe("GET users by id", () => {
       const blog = expectedBlog() 
       return {
         ...blog,
-        readingList: {
+        reading_list: {
           read: expect.any(Boolean),
           id: expect.any(Number)
         }
