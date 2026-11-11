@@ -1,6 +1,8 @@
 import type { InferAttributes } from "sequelize";
 import type {Blog} from "../../models/index.ts"
 
+type BlogResTypeMinusUserId = Omit<BlogResType,"userId">
+
 interface BlogResType extends BlogType {
   id: number;
   likes: number;
@@ -20,4 +22,4 @@ interface BlogType {
 
 type BlogMinusUserId = Omit<InferAttributes<Blog>,"userId">
 
-export type { BlogType, BlogReqType, BlogResType, BlogMinusUserId };
+export type { BlogType, BlogReqType, BlogResType, BlogMinusUserId, BlogResTypeMinusUserId };

@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createUsers, createBlogs } from "../../../testing/factories.ts";
-import type { BlogResType } from "../../models/types/blog.js";
+import type { BlogResType, BlogResTypeMinusUserId } from "../../models/types/blog.js";
 import type { UserResponseTypeFromAPI } from "../../models/types/user.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import { sequelize } from "../../db/utils/db.ts";
@@ -99,7 +99,7 @@ describe("GET users by id", () => {
       }
     });
 
-    function expectedBlogs(): InferAttributes<Blog>{
+    function expectedBlog(): BlogResTypeMinusUserId {
       return {
         id: expect.any(Number),
         url: expect.stringMatching(urlRegex),
@@ -110,8 +110,15 @@ describe("GET users by id", () => {
       }
     }
 
-    function expectedReadings(){
-      // const expectedBlogs = 
+    function expectedReading(){
+      const blog = expectedBlog() 
+      return {
+        ...blog,
+        readingList: {
+          read: expect.any(Boolean),
+          id: expect.any(Number)
+        }
+      }
     }
 
     expect(response.body).toStrictEqual({
@@ -120,8 +127,8 @@ describe("GET users by id", () => {
       name: `${joe.data.name}`,
       createdAt: expect.stringMatching(timeStampRegex),
       updatedAt: expect.stringMatching(timeStampRegex),
-      blogs: [expectedBlogs(),expectedBlogs()],
-      readings: [expectedBlogs(),expectedBlogs()]
+      blogs: [expectedBlog(),expectedBlog()],
+      readings: [expectedReading(),expectedReading()]
     });
   });
   test("user without blogs should return empty blogs", async () => {
