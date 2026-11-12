@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import app from "../../app.js";
-import { describe, test, expect, beforeAll } from "vitest";
+import { describe, test, expect, beforeAll, beforeEach } from "vitest";
 import { createUsers, createBlogs } from "../../../testing/factories.ts";
 import type {
   ReadingListReqBody,
@@ -9,7 +9,7 @@ import type {
 } from "./readingList.api.types.ts";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogResType } from "../../models/types/blog.js";
-import type { ReadingList } from "../../models/index.ts"
+import { ReadingList } from "../../models/index.ts"
 import type { InferAttributes } from "sequelize";
 
 let joe: UserWithData;
@@ -105,22 +105,24 @@ describe("POST", () => {
 });
 
 describe("PUT", () => {
-  let entry: InferAttributes<ReadingList> = { 
-    id: 1,
-    blogId: 1,
-    userId: 1,
-    read: false,
-    updatedAt: "2026-11-11T18:00:33.226Z",
-    createdAt: "2026-11-11T18:00:33.226Z"
-  }
-  // beforeEach(async () => {
-  //   //TODO: create new readingList entry
-  // })
-  test("put request with opposite boolean changes read state", async () => {
+  // let entry: InferAttributes<ReadingList> = { 
+  //   id: 1,
+  //   blogId: 1,
+  //   userId: 1,
+  //   read: false,
+  //   updatedAt: new Date(),
+  //   createdAt: new Date()
+  // }
+  let entry: InferAttributes<ReadingList>;
+  beforeEach(async () => {
+    //TODO: create new readingList entry
+    const res = await ReadingList.create({userId: 1,blogId: 1})
+    entry = res.toJSON()
+  })
+  test.only("put request with opposite boolean changes read state", async () => {
     const res = await supertest(app)
-      .put("/api/readingList/:id")
+      .put(`/api/readingList/${entry.id}`)
       .set("Content-Type","application/json")
-      .send(entryId)
     expect(res.status).toBe(200)
     expect(res.body.read).toBe(!entry.read)
   })

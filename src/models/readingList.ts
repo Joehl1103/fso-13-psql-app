@@ -14,7 +14,7 @@ class ReadingList extends Model<
   declare id: CreationOptional<number>;
   declare userId: number;
   declare blogId: number;
-  declare read: boolean;
+  declare read: CreationOptional<boolean>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
