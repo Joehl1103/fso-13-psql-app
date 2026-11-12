@@ -86,20 +86,45 @@ router.get("/", getUserIdToBlogMap, async (req: Request, res, next) => {
 
 const BLOG_PROPS = ["id","author","url","title","likes","year"] 
 
-const include = [
-  {
-    association: "blogs",
-    attributes: BLOG_PROPS
-  },
-  {
-    association: "readings",
-    attributes: BLOG_PROPS, 
-    through: { 
-      attributes: ["id","read"],
-      where: { read: true }
+interface IncludeProps {
+  association: string;
+  attributes: string[];
+  through?: {
+    attributes: string[];
+    where: { read: boolean }
+  }
+}
+
+function include(querySearchParam: string = ""): IncludeProps[] {
+  const BASE_INCLUDE = [
+    {
+      association: "blogs",
+      attributes: BLOG_PROPS
     },
-  },
-];
+    {
+      association: "readings",
+      attributes: BLOG_PROPS, 
+      through: { 
+        attributes: ["id","read"],
+        where: { read: true }
+      },
+    },
+  ]
+  if(querySearchParam){
+    return [
+      ...BASE_INCLUDE,
+      {
+        association: "readings",
+        attributes: BLOG_PROPS, 
+        through: { 
+          attributes: ["id","read"],
+          where: { read: Boolean(querySearchParam) }
+        },
+      }
+    ]
+  }
+  return BASE_INCLUDE
+}
 
 router.get(
   "/:id",
@@ -113,13 +138,13 @@ router.get(
       throw new Error("No id.");
     }
     const id: number = Number(req.params.id);
-    const readQueryParam: string | undefined = req.query.read ?? ""
+    const readQueryParam: string = req.query.read ?? ""
     try {
       const user = await User.findByPk(
         id, 
         { 
           attributes: ["id","username","name","createdAt","updatedAt"],
-          include 
+          include: include(readQueryParam)
         });
       if (!user) {
         throw new ErrorWithCustomStatus(
