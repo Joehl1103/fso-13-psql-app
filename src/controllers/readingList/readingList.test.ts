@@ -12,7 +12,7 @@ import type { BlogResType } from "../../models/types/blog.js";
 import { ReadingList } from "../../models/index.ts"
 import type { InferAttributes } from "sequelize";
 
-let joe: UserWithData;
+let joe: UserWithData, joey: UserWithData;
 let blogs: BlogResType[];
 let blogIds: number[];
 beforeAll(async () => {
@@ -22,6 +22,11 @@ beforeAll(async () => {
     throw new Error("joe is missing.");
   }
   joe = joeRes;
+  const joeyRes = users.find((u: UserWithData) => u.name == 'joey')
+  if(!joeyRes){
+    throw new Error("joey is missing")
+  }
+  joey = joeyRes
   blogs = await createBlogs(users);
   const blogIdsRaw: number[] | undefined[] = blogs.map(
     (b: BlogResType) => b.id,
@@ -116,14 +121,20 @@ describe("PUT", () => {
   let entry: InferAttributes<ReadingList>;
   beforeEach(async () => {
     //TODO: create new readingList entry
-    const res = await ReadingList.create({userId: 1,blogId: 1})
+    const res = await ReadingList.create({userId: joe.data.id,blogId: 1})
     entry = res.toJSON()
   })
-  test.only("put request with opposite boolean changes read state", async () => {
+  test("put request with opposite boolean changes read state", async () => {
+    const res = await supertest(app)
+      .put(`/api/readingList/${entry.id}`)
+    expect(res.status).toBe(200)
+    expect(res.body.read).toBe(!entry.read)
+  })
+  test.only("request fails if entry does not belong to user", async () => {
     const res = await supertest(app)
       .put(`/api/readingList/${entry.id}`)
       .set("Content-Type","application/json")
-    expect(res.status).toBe(200)
-    expect(res.body.read).toBe(!entry.read)
+      .set("Authorization", `Bearer ${joey.data.token}`)
+    expect(res.status).toBe(401)
   })
 })

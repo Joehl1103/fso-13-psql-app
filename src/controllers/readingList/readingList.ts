@@ -72,13 +72,15 @@ router.post("/", async (req, res) => {
 
   const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
   console.log('response',response.toJSON())
-
   res.status(200).json(response);
 });
 
 router.put("/:id", async (req,res) => {
-  console.log
   const id = req.params.id
+  const token = req.params.token
+  if(!token){
+    throw new Error("no Authorization token provided")
+  }
   if(!id){
     throw new Error('no id')
   }
@@ -104,7 +106,6 @@ router.put("/:id", async (req,res) => {
     console.warn('updated object',updated)
     throw new Error(`Something went wrong with the update. Affected count should be 1 and is ${affectedCount}`)
   }
-  //TODO: resolve issue with undefined object
   if(affectedRows[0].read == current.read){
     throw new Error(`Update method did not work. Read status was not changed`)
   }

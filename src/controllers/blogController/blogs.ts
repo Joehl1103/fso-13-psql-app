@@ -16,7 +16,7 @@ import type {
   RequestQuery,
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
-import { extractToken } from "./blogHelpers.ts";
+import { extractToken } from "./../helpers.ts";
 import { MIN_YEAR } from "../../util/constants.ts";
 
 const router = express.Router();

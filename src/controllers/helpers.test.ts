@@ -1,6 +1,6 @@
 import { test, describe, expect } from "vitest";
-import { parseAuth } from "./blogHelpers.ts";
-import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
+import { parseAuth } from "./helpers.ts";
+import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 
 describe("Parse auth", () => {
   test("no auth throws 500", () => {

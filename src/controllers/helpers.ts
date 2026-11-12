@@ -1,4 +1,4 @@
-import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
+import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import type { Request, Response, NextFunction } from "express";
 
 function parseAuth(auth: string | undefined): string {
