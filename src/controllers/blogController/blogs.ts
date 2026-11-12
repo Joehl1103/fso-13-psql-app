@@ -21,6 +21,33 @@ import type {
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import type { JwtUserPayload } from "../controllers.types.general.ts";
 
+// HELPERS
+
+function validateYear(bodyYear: number | undefined): number | null {
+  if (!bodyYear) {
+    return null;
+  }
+  if (bodyYear < MIN_YEAR) {
+    throw new ErrorWithCustomStatus(
+      400,
+      `Year must be greater than or equal to ${MIN_YEAR}.`,
+    );
+  }
+  const date: Date = new Date();
+  if (bodyYear > date.getFullYear()) {
+    throw new ErrorWithCustomStatus(
+      400,
+      `Year must not be greater than the current year.`,
+    );
+  }
+  return bodyYear;
+}
+
+// TYPES
+interface BlogPatchBody {
+  likes: number;
+}
+
 // INITIALIZATION
 const router = express.Router();
 
@@ -57,26 +84,6 @@ router.get(
     }
   },
 );
-
-function validateYear(bodyYear: number | undefined): number | null {
-  if (!bodyYear) {
-    return null;
-  }
-  if (bodyYear < MIN_YEAR) {
-    throw new ErrorWithCustomStatus(
-      400,
-      `Year must be greater than or equal to ${MIN_YEAR}.`,
-    );
-  }
-  const date: Date = new Date();
-  if (bodyYear > date.getFullYear()) {
-    throw new ErrorWithCustomStatus(
-      400,
-      `Year must not be greater than the current year.`,
-    );
-  }
-  return bodyYear;
-}
 
 router.post("/", extractToken, async (req, res, next) => {
   const body: BlogReqType = req.body;
@@ -115,10 +122,6 @@ router.post("/", extractToken, async (req, res, next) => {
   }
 });
 
-interface BlogPatchBody {
-  likes: number;
-}
-
 router.patch("/:id", async (req, res) => {
   try {
     const id: string = req.params.id;
@@ -153,8 +156,6 @@ router.patch("/:id", async (req, res) => {
     }
   }
 });
-
-
 
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
