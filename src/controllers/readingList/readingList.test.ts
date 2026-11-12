@@ -127,10 +127,12 @@ describe("PUT", () => {
   test("put request with opposite boolean changes read state", async () => {
     const res = await supertest(app)
       .put(`/api/readingList/${entry.id}`)
+      .set("Content-Type","application/json")
+      .set("Authorization", `Bearer ${joe.data.token}`)
     expect(res.status).toBe(200)
     expect(res.body.read).toBe(!entry.read)
   })
-  test.only("request fails if entry does not belong to user", async () => {
+  test("request fails if entry does not belong to user", async () => {
     const res = await supertest(app)
       .put(`/api/readingList/${entry.id}`)
       .set("Content-Type","application/json")
