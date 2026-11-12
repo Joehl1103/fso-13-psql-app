@@ -11,6 +11,13 @@ import type {
 } from "../../models/types/user.d.ts";
 import type { BlogMinusUserId, BlogWithReadingProps } from "../../models/types/blog.d.ts"
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
+import type {
+  RequestParams,
+  ResponseBody,
+  RequestBody,
+  RequestQuery,
+} from "../api.js";
+
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
 import config from "../../util/config.ts";
@@ -96,11 +103,16 @@ const include = [
 router.get(
   "/:id",
   getUserIdToBlogMap,
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (
+    req: Request<RequestParams,ResponseBody,Requestbody,RequestQuery>,
+    res: Response, 
+    next: NextFunction
+  ) => {
     if (!req.params.id) {
       throw new Error("No id.");
     }
     const id: number = Number(req.params.id);
+    const readQueryParam: string | undefined = req.query.read ?? ""
     try {
       const user = await User.findByPk(id, { attributes: ["id","username","name","createdAt","updatedAt"], include });
       if (!user) {

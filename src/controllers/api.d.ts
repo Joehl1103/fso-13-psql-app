@@ -4,8 +4,8 @@ interface ResponseBody {}
 
 interface RequestBody {}
 
-interface RequestQuery {
-  search: string;
+type RequestQuery<K extends string> =  {
+  [Key in K]?: string;
 }
 
 export type { RequestParams, ResponseBody, RequestBody, RequestQuery };
