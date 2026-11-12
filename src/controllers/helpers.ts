@@ -1,5 +1,9 @@
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import type { Request, Response, NextFunction } from "express";
+import type { JwtUserPayload } from "./controllers.types.general.ts";
+import config from "../util/config.ts"
+const SECRET = config.SECRET
+import jwt from "jsonwebtoken"
 
 function parseAuth(auth: string | undefined): string {
   if (!auth) {
@@ -42,6 +46,18 @@ function requireStringParam(name: string,value: string | string[] | undefined):s
   return value
 }
 
+function verifyUserFromToken(token: string, secret: string, compId: string): void {
+  const user: JwtUserPayload = jwt.verify(token,SECRET) as JwtUserPayload
+  if(!user){
+    throw new Error("Something went wrong because there is no user that can be identified by that token.")
+  }
+  if (compId !== user.id.toString()) {
+      throw new Error(
+        "Cannot fulfill request because token does not belong to owner.",
+      );
+    }
+}
 
 
-export { parseAuth, extractToken, requireStringParam };
+
+export { parseAuth, extractToken, requireStringParam, verifyUserFromToken};

@@ -1,14 +1,17 @@
+// packages and methods
 import express from "express";
 import jwt from "jsonwebtoken";
-import type { JwtPayload } from "jsonwebtoken";
-import config from "../../util/config.ts";
-const { SECRET } = config;
-import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
-import { Blog, User } from "../../models/index.ts";
-import type { Request, Response } from "express";
-import { Op } from "sequelize";
-import type { WhereOptions } from "sequelize";
+import { extractToken,requireStringParam,verifyUserFromToken } from "./../helpers.ts";
+import { MIN_YEAR } from "../../util/constants.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
+import config from "../../util/config.ts";
+import { Blog, User } from "../../models/index.ts";
+import { Op } from "sequelize";
+// types
+import type { JwtPayload } from "jsonwebtoken";
+import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
+import type { Request, Response } from "express";
+import type { WhereOptions } from "sequelize";
 import type {
   RequestParams,
   ResponseBody,
@@ -16,15 +19,14 @@ import type {
   RequestQuery,
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
-import { extractToken,requireStringParam } from "./../helpers.ts";
-import { MIN_YEAR } from "../../util/constants.ts";
+import type { JwtUserPayload } from "../controllers.types.general.ts";
 
+// INITIALIZATION
 const router = express.Router();
 
-if (!SECRET) {
-  throw new Error("SECRET is undefined");
-}
+const { SECRET } = config;
 
+// ROUTER
 router.get(
   "/",
   async (
@@ -55,11 +57,6 @@ router.get(
     }
   },
 );
-
-interface JwtUserPayload extends JwtPayload {
-  username: string;
-  id: number;
-}
 
 function validateYear(bodyYear: number | undefined): number | null {
   if (!bodyYear) {
@@ -158,15 +155,10 @@ router.patch("/:id", async (req, res) => {
 });
 
 
+
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
   const user: JwtUserPayload = jwt.verify(req.token, SECRET) as JwtUserPayload;
-  if (!user) {
-    throw new ErrorWithCustomStatus(
-      500,
-      "Something went wrong because there is no user that can be identified by that token.",
-    );
-  }
   const paramId: string = requireStringParam('id',req.params.id);
   try {
     const blog: Blog | null = await Blog.findByPk(paramId);
@@ -180,12 +172,7 @@ router.delete("/:id", extractToken, async (req, res, next) => {
       throw new Error("Cannot find a userId on blog");
     }
     const { userId: blogUserId } = blog.toJSON();
-    if (blogUserId !== user.id) {
-      throw new ErrorWithCustomStatus(
-        500,
-        "Cannot fulfill request because token does not belong to owner.",
-      );
-    }
+    verifyUserFromToken(req.token,SECRET,blogUserId.toString())
     const id = req.params.id;
     await Blog.destroy({ where: { id: id } });
     res.status(204).end();

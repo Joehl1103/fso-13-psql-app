@@ -1,18 +1,21 @@
+// packages and methods
 import express from "express";
+import { extractToken,requireStringParam } from "../helpers.ts"; 
+import jwt from "jsonwebtoken"
+import { User,Blog, ReadingList} from "../../models/index.ts"
+import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
+import config from "../../util/config.ts"
 
-const router = express.Router();
-
+// types
 import type { 
   ReadingListReqBody, 
   ReadingListResBody,
   ReadingListSequelizePayload 
 } from "./readingList.api.types.ts";
-
-import { User,Blog, ReadingList} from "../../models/index.ts"
-import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import type {Model,ModelStatic, InferAttributes} from 'sequelize'
-import { extractToken,requireStringParam } from "../helpers.ts"; 
+import type { JwtUserPayload } from "../controllers.types.general.ts";
 
+// Helpers
 async function checkForRecordExistence(id: string,message: string, model: ModelStatic<User | Blog>): Promise<void> {
   const recordExists = await (async (id: string): Promise<boolean> => {
     const res = await model.findByPk(id);
@@ -26,6 +29,12 @@ async function checkForRecordExistence(id: string,message: string, model: ModelS
   }
   return
 }
+
+//INITIALIZATION
+const router = express.Router();
+const SECRET = config.SECRET
+
+// ROUTER 
 
 router.post("/", async (req, res) => {
   const body: ReadingListReqBody = req.body;
@@ -79,6 +88,13 @@ router.post("/", async (req, res) => {
 interface ParamObject {
   name: string,
   value: string | string[] | undefined
+}
+
+function verifyUserFromToken(token: string, secret: string, compId): void {
+  const user: JwtUserPayload = jwt.verify(token,SECRET) as JwtUserPayload
+  if(!user){
+    throw new Error("Something went wrong because there is no user that can be identified by that token.")
+  }
 }
 
 router.put("/:id", extractToken, async (req,res) => {
