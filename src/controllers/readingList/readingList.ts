@@ -11,7 +11,7 @@ import type {
 import { User,Blog, ReadingList} from "../../models/index.ts"
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import type {Model,ModelStatic, InferAttributes} from 'sequelize'
-import { extractToken } from "../helpers.ts"; 
+import { extractToken,requireStringParam } from "../helpers.ts"; 
 
 async function checkForRecordExistence(id: string,message: string, model: ModelStatic<User | Blog>): Promise<void> {
   const recordExists = await (async (id: string): Promise<boolean> => {
@@ -75,15 +75,6 @@ router.post("/", async (req, res) => {
   res.status(200).json(response);
 });
 
-function requireStringParam(name: string,value: string | string[] | undefined):string {
-  if(Array.isArray(value)){
-    throw new Error(`This method only accepts a single id.`)
-  }
-  if(typeof value !== 'string' || value === ''){
-    throw new Error(`${name} must be a non-empty string`)
-  }
-  return value
-}
 
 interface ParamObject {
   name: string,

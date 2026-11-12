@@ -16,7 +16,7 @@ import type {
   RequestQuery,
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
-import { extractToken } from "./../helpers.ts";
+import { extractToken,requireStringParam } from "./../helpers.ts";
 import { MIN_YEAR } from "../../util/constants.ts";
 
 const router = express.Router();
@@ -157,15 +157,6 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-function validateParam(paramId: string | string[] | undefined): number {
-  if (!paramId) {
-    throw new Error("id undefined");
-  }
-  if (typeof paramId === "object") {
-    throw new Error("id in params cannot be an object ");
-  }
-  return Number(paramId);
-}
 
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
@@ -176,7 +167,7 @@ router.delete("/:id", extractToken, async (req, res, next) => {
       "Something went wrong because there is no user that can be identified by that token.",
     );
   }
-  const paramId: number = validateParam(req.params.id);
+  const paramId: string = requireStringParam('id',req.params.id);
   try {
     const blog: Blog | null = await Blog.findByPk(paramId);
     if (!blog) {
