@@ -31,7 +31,6 @@ function parseAuth(auth: string | undefined): string {
 function extractToken(req: Request, res: Response, next: NextFunction) {
   const auth: string | undefined = req.get("Authorization");
   const token: string = parseAuth(auth);
-  //NOTE : add to index.d.ts
   req.token = token;
   next();
 }
@@ -41,6 +40,7 @@ function requireStringParam(name: string,value: string | string[] | undefined):s
     throw new Error(`This method only accepts a single id.`)
   }
   if(typeof value !== 'string' || value === ''){
+    console.log(`${name} must be a non-empty string`)
     throw new Error(`${name} must be a non-empty string`)
   }
   return value
@@ -52,7 +52,7 @@ function verifyUserFromToken(token: string, secret: string, compId: string): voi
     throw new Error("Something went wrong because there is no user that can be identified by that token.")
   }
   if (compId !== user.id.toString()) {
-      throw new Error(
+      throw new ErrorWithCustomStatus(401,
         "Cannot fulfill request because token does not belong to owner.",
       );
     }

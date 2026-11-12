@@ -1,6 +1,6 @@
 // packages and methods
 import express from "express";
-import { extractToken,requireStringParam } from "../helpers.ts"; 
+import { extractToken,requireStringParam, verifyUserFromToken } from "../helpers.ts"; 
 import jwt from "jsonwebtoken"
 import { User,Blog, ReadingList} from "../../models/index.ts"
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
@@ -90,20 +90,15 @@ interface ParamObject {
   value: string | string[] | undefined
 }
 
-function verifyUserFromToken(token: string, secret: string, compId): void {
-  const user: JwtUserPayload = jwt.verify(token,SECRET) as JwtUserPayload
-  if(!user){
-    throw new Error("Something went wrong because there is no user that can be identified by that token.")
-  }
-}
-
 router.put("/:id", extractToken, async (req,res) => {
   const id: string = requireStringParam('id',req.params.id)
-  const token: string = requireStringParam('token',req.params.token)
+  const token: string = requireStringParam('token',req.token)
   const current: ReadingList | null = await ReadingList.findByPk(id)
   if(!current){
     throw new ErrorWithCustomStatus(404,`Cannot find a reading list entry with id: ${id}`)
   }
+  verifyUserFromToken(token,SECRET,current.userId.toString())
+  
   if(!(Object.keys(current.toJSON()).includes('read'))){
     throw new Error(`Something went wrong. No read property on reading list entry with id ${id}`)
   }
