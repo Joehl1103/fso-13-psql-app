@@ -3,11 +3,13 @@ import type {Blog} from "../../models/index.ts"
 
 type BlogResTypeMinusUserId = Omit<BlogResType,"userId">
 
+interface BlogResReadingList{
+  id: number;
+  read: boolean;
+}
+
 interface BlogWithReadingProps extends BlogResTypeMinusUserId {
-  [readingList: string]: {
-    id: number,
-    read: boolean
-  }
+  reading_list: BlogResReadingList
 }
 
 interface BlogResType extends BlogType {
@@ -29,13 +31,12 @@ interface BlogType {
 
 type BlogMinusUserId = Omit<InferAttributes<Blog>,"userId">
 
-
-
 export type { 
   BlogType,
   BlogReqType,
   BlogResType,
   BlogMinusUserId,
   BlogResTypeMinusUserId,
-  BlogWithReadingProps
+  BlogWithReadingProps,
+  BlogResReadingList
 };

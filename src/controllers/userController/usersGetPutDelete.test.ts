@@ -1,8 +1,13 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createUsers, createBlogs } from "../../../testing/factories.ts";
-import type { BlogResType, BlogResTypeMinusUserId } from "../../models/types/blog.js";
-import type { UserResponseTypeFromAPI } from "../../models/types/user.js";
+import type { 
+  BlogResType,
+  BlogResTypeMinusUserId,
+  BlogWithReadingProps,
+  BlogResReadingList
+} from "../../models/types/blog.js";
+import type { UserResponseTypeFromAPI, UserWithAssociations } from "../../models/types/user.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import { sequelize } from "../../db/utils/db.ts";
 import { User,ReadingList,Blog } from "../../models/index.ts";
@@ -110,13 +115,13 @@ describe("GET users by id", () => {
       }
     }
 
-    function expectedReading(){
-      const blog = expectedBlog() 
+    function expectedReading(): BlogWithReadingProps {
+      const blog: BlogResTypeMinusUserId = expectedBlog() 
       return {
         ...blog,
         reading_list: {
-          read: expect.any(Boolean),
-          id: expect.any(Number)
+          id: expect.any(Number),
+          read: expect.any(Boolean)
         }
       }
     }
@@ -147,6 +152,26 @@ describe("GET users by id", () => {
       readings: []
     });
   });
+
+  describe('getting users by id with reading list filters', () => {
+    test('getting users with reading list param `read = true` should return only read', async() => {
+      if(!joe){
+        throw new Error('joe is undefined')       
+      }
+      const res = await supertest(app)
+        .get(`/api/users/${joe.data.id}`)
+        .query({ read: true })
+      expect(res.status).toBe(200)
+      console.log('res.body',res.body)
+      const readingList: BlogResReadingList[] = res.body.readings.map(
+        (r: BlogWithReadingProps ): BlogResReadingList  => {
+        return r.reading_list
+      })
+      console.log(readingList)
+      readingList.forEach(rl => expect(rl.read).toBe(true))
+      // expect(res.body).toStrictEqual()
+    })
+  })
 });
 describe("PUT", () => {
   test("PUT for non-existing user returns 404", async () => {
