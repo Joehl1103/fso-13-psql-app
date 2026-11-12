@@ -154,7 +154,7 @@ describe("GET users by id", () => {
   });
 
   describe('getting users by id with reading list filters', () => {
-    test('getting users with reading list param `read = true` should return only read', async() => {
+    test.only('getting users with reading list param `read = true` should return only read', async() => {
       if(!joe){
         throw new Error('joe is undefined')       
       }

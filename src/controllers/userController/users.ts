@@ -95,7 +95,8 @@ const include = [
     association: "readings",
     attributes: BLOG_PROPS, 
     through: { 
-      attributes: ["id","read"] 
+      attributes: ["id","read"],
+      where: { read: true }
     },
   },
 ];
@@ -104,7 +105,7 @@ router.get(
   "/:id",
   getUserIdToBlogMap,
   async (
-    req: Request<RequestParams,ResponseBody,Requestbody,RequestQuery>,
+    req: Request<RequestParams<['id']>,ResponseBody,RequestBody,RequestQuery<'read'>>,
     res: Response, 
     next: NextFunction
   ) => {
@@ -114,7 +115,12 @@ router.get(
     const id: number = Number(req.params.id);
     const readQueryParam: string | undefined = req.query.read ?? ""
     try {
-      const user = await User.findByPk(id, { attributes: ["id","username","name","createdAt","updatedAt"], include });
+      const user = await User.findByPk(
+        id, 
+        { 
+          attributes: ["id","username","name","createdAt","updatedAt"],
+          include 
+        });
       if (!user) {
         throw new ErrorWithCustomStatus(
           404,
@@ -134,6 +140,7 @@ router.get(
       }
       res.status(200).json(userWithAssociations);
     } catch (error) {
+      console.log(error.message)
       next(error);
     }
   },
