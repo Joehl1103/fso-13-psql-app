@@ -110,17 +110,8 @@ describe("POST", () => {
 });
 
 describe("PUT", () => {
-  // let entry: InferAttributes<ReadingList> = { 
-  //   id: 1,
-  //   blogId: 1,
-  //   userId: 1,
-  //   read: false,
-  //   updatedAt: new Date(),
-  //   createdAt: new Date()
-  // }
   let entry: InferAttributes<ReadingList>;
   beforeEach(async () => {
-    //TODO: create new readingList entry
     const res = await ReadingList.create({userId: joe.data.id,blogId: 1})
     entry = res.toJSON()
   })
