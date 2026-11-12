@@ -153,26 +153,23 @@ describe("GET users by id", () => {
     });
   });
 
-  describe('getting users by id with reading list filters', () => {
-    test.only('getting users with reading list param `read = true` should return only read', async() => {
-      if(!joe){
-        throw new Error('joe is undefined')       
-      }
+  test('getting users with reading list params should return only bool value of read', async() => {
+    if(!joe){
+      throw new Error('joe is undefined')       
+    }
+    for(const bool in [true,false]){
       const res = await supertest(app)
-        .get(`/api/users/${joe.data.id}`)
-        .query({ read: true })
+              .get(`/api/users/${joe.data.id}`)
+              .query({ read: true })
       expect(res.status).toBe(200)
-      console.log('res.body',res.body)
       const readingList: BlogResReadingList[] = res.body.readings.map(
         (r: BlogWithReadingProps ): BlogResReadingList  => {
         return r.reading_list
       })
-      console.log(readingList)
-      readingList.forEach(rl => expect(rl.read).toBe(true))
-      // expect(res.body).toStrictEqual()
-    })
+      readingList.forEach(rl => expect(rl.read).toBe(bool))
+    }
   })
-});
+})
 describe("PUT", () => {
   test("PUT for non-existing user returns 404", async () => {
     const response = await supertest(app)

@@ -91,7 +91,7 @@ interface IncludeProps {
   attributes: string[];
   through?: {
     attributes: string[];
-    where: { read: boolean }
+    where?: { read: boolean }
   }
 }
 
@@ -106,11 +106,10 @@ function include(querySearchParam: string = ""): IncludeProps[] {
       attributes: BLOG_PROPS, 
       through: { 
         attributes: ["id","read"],
-        where: { read: true }
       },
     },
   ]
-  if(querySearchParam){
+  if(querySearchParam !== ""){
     return [
       ...BASE_INCLUDE,
       {
@@ -123,6 +122,7 @@ function include(querySearchParam: string = ""): IncludeProps[] {
       }
     ]
   }
+  console.log('BASE_INCLUDE',BASE_INCLUDE)
   return BASE_INCLUDE
 }
 
@@ -165,8 +165,9 @@ router.get(
       }
       res.status(200).json(userWithAssociations);
     } catch (error) {
-      console.log(error.message)
-      next(error);
+      if(error instanceof Error){
+        next(error);
+      }
     }
   },
 );
