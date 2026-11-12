@@ -11,6 +11,7 @@ import type {
 import { User,Blog, ReadingList} from "../../models/index.ts"
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import type {Model,ModelStatic, InferAttributes} from 'sequelize'
+import { extractToken } from "../helpers.ts"; 
 
 async function checkForRecordExistence(id: string,message: string, model: ModelStatic<User | Blog>): Promise<void> {
   const recordExists = await (async (id: string): Promise<boolean> => {
@@ -71,20 +72,28 @@ router.post("/", async (req, res) => {
   const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
 
   const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
-  console.log('response',response.toJSON())
   res.status(200).json(response);
 });
 
-router.put("/:id", async (req,res) => {
-  const id = req.params.id
-  const token = req.params.token
-  if(!token){
-    throw new Error("no Authorization token provided")
+function requireStringParam(name: string,value: string | string[] | undefined):string {
+  if(Array.isArray(value)){
+    throw new Error(`This method only accepts a single id.`)
   }
-  if(!id){
-    throw new Error('no id')
+  if(typeof value !== 'string' || value === ''){
+    throw new Error(`${name} must be a non-empty string`)
   }
-  const current = await ReadingList.findByPk(id)
+  return value
+}
+
+interface ParamObject {
+  name: string,
+  value: string | string[] | undefined
+}
+
+router.put("/:id", extractToken, async (req,res) => {
+  const id: string = requireStringParam('id',req.params.id)
+  const token: string = requireStringParam('token',req.params.token)
+  const current: ReadingList | null = await ReadingList.findByPk(id)
   if(!current){
     throw new ErrorWithCustomStatus(404,`Cannot find a reading list entry with id: ${id}`)
   }
