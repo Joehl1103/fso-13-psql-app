@@ -122,7 +122,6 @@ function include(querySearchParam: string = ""): IncludeProps[] {
       }
     ]
   }
-  console.log('BASE_INCLUDE',BASE_INCLUDE)
   return BASE_INCLUDE
 }
 

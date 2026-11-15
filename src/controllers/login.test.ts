@@ -1,8 +1,13 @@
 import supertest from "supertest";
-import { describe, test, expect, beforeEach } from "vitest";
-import app from "../app";
+import { describe, test, expect, beforeAll } from "vitest";
+import app from "../app.js";
+import { createUsers } from "../../testing/factories.ts";
 
-const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+const jwtRegex: RegExp = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+beforeAll(async () => {
+  await createUsers()
+})
 
 describe("LOGIN", () => {
   test("incorrect password returns 401", async () => {
@@ -23,6 +28,6 @@ describe("LOGIN", () => {
     const { token, username, id } = response.body;
     expect(token).toMatch(jwtRegex);
     expect(username).toBe("joe@joe.com");
-    expect(id).toBeTypeOf("number");
+    expect(id).toBeTruthy();
   });
 });

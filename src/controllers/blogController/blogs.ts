@@ -57,7 +57,7 @@ const { SECRET } = config;
 router.get(
   "/",
   async (
-    req: Request<RequestParams, ResponseBody, RequestBody, RequestQuery<'search'>>,
+    req: Request<RequestParams<['search']>, ResponseBody, RequestBody, RequestQuery<'search'>>,
     res: Response,
   ) => {
     const searchParam: string = req.query.search ?? "";

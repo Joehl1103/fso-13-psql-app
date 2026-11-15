@@ -252,7 +252,7 @@ describe("DELETE", () => {
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
       .set("Authorization", `Bearer ${joey.data.token}`);
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(401);
     expect(response.text).toBe(
       "Cannot fulfill request because token does not belong to owner.",
     );
