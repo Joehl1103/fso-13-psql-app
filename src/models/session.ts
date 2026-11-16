@@ -6,6 +6,7 @@ class Session extends Model<InferAttributes<Session>, InferCreationAttributes<Se
   declare id: CreationOptional<number>;
   declare userId: number;
   declare token: string;
+  declare active: boolean;
 }
 
 Session.init(
@@ -22,6 +23,11 @@ Session.init(
     token: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
     }
   },
   {

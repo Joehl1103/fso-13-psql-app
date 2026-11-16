@@ -30,4 +30,8 @@ describe("LOGIN", () => {
     expect(username).toBe("joe@joe.com");
     expect(id).toBeTruthy();
   });
+
+  test('login saves token in session id', async () => {
+
+  })
 })
