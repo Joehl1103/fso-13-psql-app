@@ -29,8 +29,6 @@ interface LoginRes {
   id: string;
 }
 
-
-
 router.post("/", async (req, res, next) => {
   const body: UserAndPassword = req.body;
   const { password: receivedPassword } = body;

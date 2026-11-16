@@ -19,19 +19,16 @@ describe("LOGIN", () => {
     expect(response.text).toBe("Incorrect password");
   });
 
-  test("login returns token,username,id", async () => {
+  test("login returns token,username,id, and session id", async () => {
     const response = await supertest(app)
       .post("/api/login")
       .set("Content-Type", "application/json")
       .send({ username: "joe@joe.com", password: "ABcd12!&" });
     expect(response.status).toBe(200);
-    const { token, username, id } = response.body;
+    const { token, username, id, sessionId } = response.body;
     expect(token).toMatch(jwtRegex);
     expect(username).toBe("joe@joe.com");
     expect(id).toBeTruthy();
+    expect(sessionId).toBeTypeOf('number')
   });
-
-  test('login saves token in session id', async () => {
-
-  })
 })
