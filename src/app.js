@@ -3,7 +3,7 @@ import { downstreamErrorHandler } from "./util/middleware.ts";
 
 import blogsRouter from "./controllers/blogController/blogs.ts";
 import usersRouter from "./controllers/userController/users.ts";
-import loginRouter from "./controllers/login.js";
+import loginRouter from "./controllers/login.ts";
 import authorRouter from "./controllers/authors.ts";
 import healthRouter from "./controllers/health.ts";
 import resetRouter from "./controllers/reset.ts";
