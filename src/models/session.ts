@@ -6,7 +6,7 @@ class Session extends Model<InferAttributes<Session>, InferCreationAttributes<Se
   declare id: CreationOptional<number>;
   declare userId: number;
   declare token: string;
-  declare active: boolean;
+  declare active: CreationOptional<boolean>;
 }
 
 Session.init(

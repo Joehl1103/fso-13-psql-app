@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import config from "../../util/config.ts";
 const SECRET = config.SECRET;
-import { User } from "../../models/index.ts";
+import { User,Session } from "../../models/index.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 const router = express.Router();
 
@@ -28,6 +28,8 @@ interface LoginRes {
   username: string;
   id: string;
 }
+
+
 
 router.post("/", async (req, res, next) => {
   const body: UserAndPassword = req.body;
