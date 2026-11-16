@@ -1,8 +1,8 @@
 import supertest from "supertest";
 import { describe, test, expect, beforeAll } from "vitest";
-import app from "../app.js";
-import { createUsers } from "../../testing/factories.ts";
-import { jwtRegex } from "../../testing/constants.ts";
+import app from "../../app.js";
+import { createUsers } from "../../../testing/factories.ts";
+import { jwtRegex } from "../../../testing/constants.ts";
 
 
 beforeAll(async () => {

@@ -1,10 +1,10 @@
 import express, { type NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import config from "../util/config.ts";
+import config from "../../util/config.ts";
 const SECRET = config.SECRET;
-import { User } from "../models/index.ts";
-import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
+import { User } from "../../models/index.ts";
+import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 const router = express.Router();
 
 if (!SECRET) {
