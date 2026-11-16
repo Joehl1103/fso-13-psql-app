@@ -47,22 +47,27 @@ const userSource: UserWithData[] = data.map((u) =>
 async function createUsers(): Promise<UserWithData[]> {
   const usersWithId: UserWithData[] = await Promise.all(
     userSource.map(async (u: UserWithData, i: number) => {
+      console.log(`${i} of ${userSource.length}`)
       const { username, name, password } = u.data;
       const payload: UserRequestType = {
         username: username,
         name: name,
         password: password,
       };
+      // console.log('payload',payload)
       const res = await supertest(app)
         .post("/api/users")
         .set("Content-Type", "application/json")
         .send(payload);
+      console.log('res.body',res.body)
       const { id } = res.body;
       return { ...u, data: { ...u.data, id: id } };
     }),
   );
+  // console.log('usersWithId',usersWithId)
   return await Promise.all(
     usersWithId.map(async (u: UserWithData) => {
+      // console.log('u',u)
       const token = await getToken(u.data.username, u.data.password);
       return { ...u, data: { ...u.data, token: token } };
     }),

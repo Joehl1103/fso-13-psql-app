@@ -151,7 +151,6 @@ router.get(
           "Unable to find user with that id.",
         );
       }
-      console.log('user',user.toJSON())
       if(!user.blogs || !user.readings){
         throw new Error(`- user blogs blank: ${!user.blogs}\n -user readings blank: ${!user.readings}`)
       }

@@ -2,8 +2,8 @@ import supertest from "supertest";
 import { describe, test, expect, beforeAll } from "vitest";
 import app from "../app.js";
 import { createUsers } from "../../testing/factories.ts";
+import { jwtRegex } from "../../testing/constants.ts";
 
-const jwtRegex: RegExp = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 
 beforeAll(async () => {
   await createUsers()
@@ -30,4 +30,4 @@ describe("LOGIN", () => {
     expect(username).toBe("joe@joe.com");
     expect(id).toBeTruthy();
   });
-});
+})

@@ -1,44 +1,46 @@
-import { expect, describe, test, beforeEach } from "vitest";
+import { expect, describe, test, beforeAll } from "vitest";
 import { createBlogs, createUsers } from "./factories.ts";
 import type { BlogResType } from "../src/models/types/blog.d.ts";
 import { returnJoeAndJoey, urlRegex } from "./testingHelpers.ts";
 import type { UserWithData } from "./testing.types.ts";
+import { jwtRegex } from "./constants.ts";
+
+let users: UserWithData[];
+
+beforeAll(async () => {
+  users = await createUsers();
+})
 
 describe("createBlogs", () => {
-  let joe: UserWithData, joey: UserWithData;
-  let users: UserWithData[];
-  beforeEach(async () => {
-    const { joe: joeRes, joey: joeyRes } = await returnJoeAndJoey();
-    joe = joeRes;
-    joey = joeyRes;
-    users = await createUsers();
-  });
   test("createBlogs returns an array of created blogs with 0 likes", async () => {
     const blogs: BlogResType[] = await createBlogs(users);
     blogs.forEach((b) => {
-      const { author, url, title, id, likes, userId } = b;
-      expect(author).toBeTypeOf("string");
-      expect(url).toMatch(urlRegex);
-      expect(title).toBeTypeOf("string");
-      expect(id).toBeTypeOf("number");
-      expect(likes).toEqual(0);
-      expect(userId).toBeTypeOf("number");
+      expect(b).toStrictEqual({
+        author: expect.any(String),
+        url: expect.stringMatching(urlRegex),
+        title: expect.any(String),
+        id: expect.any(Number),
+        likes: 0,
+        userId: expect.any(Number),
+        year: null
+        })
+      });
     });
   });
-});
 
-test("createUsers", async () => {
-  const users: UserWithData[] = await createUsers();
-  expect(users.length).toBeGreaterThan(0);
-  users.forEach((u: UserWithData) => {
-    const { name, data } = u;
-    expect(name).toBeTruthy();
-    const { username, name: nestedName, password, token, blogs, id } = data;
-    expect(username).toBeTruthy();
-    expect(nestedName).toBeTruthy();
-    expect(password).toBeTruthy();
-    expect(token).toBeTruthy();
-    expect(blogs).toBeTypeOf("object");
-    expect(id).toBeTruthy();
+  test("createUsers", async () => {
+    expect(users.length).toBeGreaterThan(0);
+    users.forEach((u: UserWithData) => {
+      expect(u).toStrictEqual({
+      name: expect.any(String),
+      data: {
+        username:expect.any(String),
+        name: expect.any(String),
+        password: expect.any(String),
+        token: expect.stringMatching(jwtRegex),
+        blogs: expect.any(Array),
+        id: expect.any(Number),
+      }
+    })
   });
 });
