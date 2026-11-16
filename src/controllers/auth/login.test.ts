@@ -28,7 +28,7 @@ describe("LOGIN", () => {
     const { token, username, id, sessionId } = response.body;
     expect(token).toMatch(jwtRegex);
     expect(username).toBe("joe@joe.com");
-    expect(id).toBeTruthy();
+    expect(id).toBeTypeOf('number');
     expect(sessionId).toBeTypeOf('number')
   });
 })

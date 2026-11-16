@@ -6,6 +6,7 @@ const SECRET = config.SECRET;
 import { User,Session } from "../../models/index.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 const router = express.Router();
+import { addLoginSession } from "./loginHelpers.ts";
 
 if (!SECRET) {
   throw new Error("SECRET string is empty");
@@ -26,7 +27,8 @@ interface UserAndPassword {
 interface LoginRes {
   token: string;
   username: string;
-  id: string;
+  id: number;
+  sessionId: number
 }
 
 router.post("/", async (req, res, next) => {
@@ -47,7 +49,8 @@ router.post("/", async (req, res, next) => {
     }
 
     const token: string = jwt.sign({ username, id }, SECRET);
-    const loginRes: LoginRes = {token,username,id: String(id)}
+    const sessionId: number = await addLoginSession(token,user.id)
+    const loginRes: LoginRes = {token,username,id,sessionId}
     res.status(200).json(loginRes);
   } catch (error) {
     next(error);
