@@ -20,9 +20,11 @@ import type {
 
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
+import { extractToken,verifyUserFromToken } from "../helpers.ts";
 import config from "../../util/config.ts";
 import type { UserIdToBlogMap } from "./users.types.ts";
-const { SALT_ROUNDS } = config;
+const { SALT_ROUNDS, SECRET } = config;
+
 
 const router = express.Router();
 
@@ -210,26 +212,26 @@ router.put("/:username", async (req, res, next) => {
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id",extractToken, async (req, res, next) => {
   const id: string | null = req.params.id;
+  const token = req.token
   if (!id) {
     throw new Error(`No id in params`);
   }
   try {
-    const findByPkRes: FindASingleUserResponse = await User.findByPk(id);
-    if (!findByPkRes) {
+    const user: FindASingleUserResponse = await User.findByPk(id);
+    if (!user) {
       throw new Error(`No user with id: ${id}`);
     }
+    await verifyUserFromToken(token,SECRET,String(user.id))
     const destroyRes:number = await User.destroy({ where: { id: id } });
-    console.log('destroyRes',destroyRes)
     if (destroyRes !== 1) {
       throw new Error(`number of destroyed rows greater than or less than expected (1): ${destroyRes}`);
     }
     res.status(204).end();
   } catch (error) {
-    console.log('error',error.message)
     if(error instanceof Error){
-      throw new Error(error.message)
+      next(error)
     }
   }
 });

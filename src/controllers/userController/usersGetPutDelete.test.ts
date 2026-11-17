@@ -10,7 +10,7 @@ import type {
 import type { UserResponseTypeFromAPI, UserWithAssociations } from "../../models/types/user.js";
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import { sequelize } from "../../db/utils/db.ts";
-import { User,ReadingList,Blog } from "../../models/index.ts";
+import { User,ReadingList,Blog,Session } from "../../models/index.ts";
 import type {InferAttributes} from "sequelize"
 import { userNamed } from "../../../testing/testingHelpers.ts";
 
@@ -210,7 +210,15 @@ describe("DELETE", () => {
     expect(response.status).toBe(500);
     expect(response.text).toStrictEqual("No user with id: 100");
   });
-  test('fails if token session is inactive', async () => {
-    
+  test.only('fails if token session is inactive', async () => {
+    const joe: UserWithData = userNamed(usersWithData,'joe');
+    const res = await Session.update({active: false},{ where: { token: joe.data.token }})
+    console.log('res',res)
+    const response = await supertest(app)
+      .delete(`/api/users/${joe.data.id}`)
+      .set("Content-Type", "application/json")
+      .set("Authorization",`Bearer ${joe.data.token}`);
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Cannot perform this action on this session. User must log in.');
   })
 });
