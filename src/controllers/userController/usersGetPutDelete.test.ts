@@ -212,6 +212,6 @@ describe("DELETE", () => {
       .set("Content-Type", "application/json")
       .set("Authorization",`Bearer ${joe.data.token}`);
     expect(response.status).toBe(500);
-    expect(response.text).toBe('Cannot perform this action on this session. User must log in.');
+    expect(response.text).toBe('Session inactive. User must log in.');
   })
 });

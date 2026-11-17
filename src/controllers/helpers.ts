@@ -49,7 +49,7 @@ async function verifyUserFromToken(token: string, secret: string, compId: string
     throw new Error('Unable to find a session for this token.')
   }
   if(!session.active){
-    throw new Error('Cannot perform this action on this session. User must log in.')
+    throw new Error('Session inactive. User must log in.')
   }
   const decoded = jwt.verify(token,SECRET)
   if(typeof decoded === 'string'){

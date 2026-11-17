@@ -2,7 +2,7 @@ import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../../app.js";
 import { createUsers, createBlogs } from "../../../testing/factories.js";
-import {Blog} from "../../models/index.ts"
+import { Blog, Session } from "../../models/index.ts"
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
 import { sequelize } from "../../db/utils/db.js";
@@ -148,9 +148,7 @@ describe("POST", () => {
       );
     });
     test("year with non-4 digits throws error", async () => {
-      if (!joe || !joey) {
-        throw Error("joe and joey are undefined");
-      }
+      const joe: UserWithData = userNamed(usersWithData,'joe')
       const payload: BlogReqType = {
         author: joe.name,
         url: "http://joeys-blog.com",
@@ -168,9 +166,7 @@ describe("POST", () => {
       );
     });
     test("year greater than current year fails", async () => {
-      if (!joe || !joey) {
-        throw Error("joe and joey are undefined");
-      }
+      const joe: UserWithData = userNamed(usersWithData,'joe')
       const date: Date = new Date();
       const nextYear: number = date.getFullYear() + 1;
       const payload: BlogReqType = {
@@ -190,9 +186,7 @@ describe("POST", () => {
       );
     });
     test("year with 4 digits and > 1991 is successful", async () => {
-      if (!joe || !joey) {
-        throw Error("joe and joey are undefined");
-      }
+      const joe: UserWithData = userNamed(usersWithData,'joe')
       const payload: BlogReqType = {
         author: joe.name,
         url: "http://joeys-blog.com",
@@ -249,7 +243,6 @@ describe("DELETE", () => {
 
   test("deletion if user id is same as blog user id ", async () => {
     const joe: UserWithData = userNamed(usersWithData,'joe')
-    console.log('blogId',blogId)
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
@@ -268,7 +261,15 @@ describe("DELETE", () => {
     expect(response.text).toBe(`Unable to find a blog with id ${FAKE_BLOG_ID}`);
   });
 
-  test.only('fails if session is inactive', async () => {
-    
+  test('fails if session is inactive', async () => {
+    const joe: UserWithData = userNamed(usersWithData,'joe')
+    await Session.update({ active: false },{ where: { token: joe.data.token } })
+    const response = await supertest(app)
+      .delete(`/api/blogs/${blogId}`)
+      .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${joe.data.token}`);
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Session inactive. User must log in.');
+
   })
 });
