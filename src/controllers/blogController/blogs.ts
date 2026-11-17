@@ -2,11 +2,11 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import { extractToken,requireStringParam,verifyUserFromToken } from "./../helpers.ts";
-import { MIN_YEAR } from "../../util/constants.ts";
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import config from "../../util/config.ts";
 import { Blog, User } from "../../models/index.ts";
 import { Op } from "sequelize";
+import { validateYear } from "./blogHelpers.ts"
 // types
 import type { JwtPayload } from "jsonwebtoken";
 import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
@@ -20,33 +20,8 @@ import type {
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import type { JwtUserPayload } from "../controllers.types.general.ts";
-
-// HELPERS
-
-function validateYear(bodyYear: number | undefined): number | null {
-  if (!bodyYear) {
-    return null;
-  }
-  if (bodyYear < MIN_YEAR) {
-    throw new ErrorWithCustomStatus(
-      400,
-      `Year must be greater than or equal to ${MIN_YEAR}.`,
-    );
-  }
-  const date: Date = new Date();
-  if (bodyYear > date.getFullYear()) {
-    throw new ErrorWithCustomStatus(
-      400,
-      `Year must not be greater than the current year.`,
-    );
-  }
-  return bodyYear;
-}
-
-// TYPES
-interface BlogPatchBody {
-  likes: number;
-}
+import type { BlogPatchBody } from "./blogs.d.ts";
+import type { ModelStatic } from "sequelize";
 
 // INITIALIZATION
 const router = express.Router();
@@ -85,26 +60,26 @@ router.get(
   },
 );
 
-router.post("/", extractToken, async (req, res, next) => {
-  const body: BlogReqType = req.body;
-  try {
-    const token: string = req.token;
-    const { author, url, title, year: bodyYear } = body;
-    const year: number | null = validateYear(bodyYear);
-    if (!token) {
-      throw Object.assign(new Error(`No token present`), {
-        status: 500,
-      });
-    }
-    const jwtPayload = jwt.verify(token, SECRET) as JwtPayload;
+async function verifyUserWithJwt(token: string,secret: string): Promise<User> {
+    const jwtPayload = jwt.verify(token, secret) as JwtPayload;
     const user = await User.findOne({
       where: { username: jwtPayload.username },
     });
     if (!user) {
-      throw Object.assign(new Error(`No user found with id ${jwtPayload.id}`), {
-        status: 500,
-      });
+      throw new Error(`No user found with id ${jwtPayload.id}`)
     }
+  return user
+}
+
+router.post("/", extractToken, async (req, res, next) => {
+  const body: BlogReqType = req.body;
+  try {
+    const { author, url, title, year: bodyYear } = body;
+    const year: number | null = validateYear(bodyYear);
+    const token: string = req.token;
+  console.log('here')
+    const user = await verifyUserWithJwt(token,SECRET)
+    console.log('user',user)
     const payload: Omit<BlogResType, "id"> = {
       author,
       url,

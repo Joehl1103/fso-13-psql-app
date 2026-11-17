@@ -241,7 +241,7 @@ describe("DELETE", () => {
   test("deletion fails if no token provided", async () => {
     const response = await supertest(app).delete(`/api/blogs/${blogId}`);
     expect(response.status).toBe(500);
-    expect(response.text).toBe("No auth provided");
+    expect(response.text).toBe("An authorization token is required for this request.");
   });
 
   test("deletion fails if token belongs to different user", async () => {

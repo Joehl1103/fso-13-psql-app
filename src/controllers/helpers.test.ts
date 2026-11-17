@@ -9,7 +9,7 @@ describe("Parse auth", () => {
     } catch (error) {
       if (error instanceof ErrorWithCustomStatus) {
         expect(error.status).toBe(500);
-        expect(error.message).toBe("No auth provided");
+        expect(error.message).toBe("An authorization token is required for this request.");
       }
     }
   });
