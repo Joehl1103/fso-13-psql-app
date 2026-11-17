@@ -1,6 +1,7 @@
-import { test, describe, expect } from "vitest";
-import { parseAuth } from "./helpers.ts";
+import { test, describe, expect, beforeAll } from "vitest";
+import { parseAuth, verifyUserFromToken } from "./helpers.ts";
 import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
+import { Session, User } from "../models/index.ts";
 
 describe("Parse auth", () => {
   test("no auth throws 500", () => {
@@ -32,3 +33,13 @@ describe("Parse auth", () => {
     expect(res).toBe(token);
   });
 });
+
+describe('verifyUserFromToken', () => {
+  beforeAll(async () => {
+    const user = await User.create({ name: 'joe', username: 'joe@joe.com',password: 'temp',disabled: false})
+    await Session.create({ userId: user.id, token: 'FAKE.TOKEN',active: false })
+  })
+  test('inactive session throws error', async () => {
+    await expect(() => verifyUserFromToken('FAKE.TOKEN','temp secret')).rejects.toThrow('Cannot perform this action on this session. User must log in.')
+  })
+})

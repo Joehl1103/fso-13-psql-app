@@ -4,7 +4,7 @@ import type { JwtUserPayload } from "./controllers.types.general.ts";
 import config from "../util/config.ts"
 const SECRET = config.SECRET
 import jwt from "jsonwebtoken"
-import {User} from "../models/index.ts"
+import { User,Session } from "../models/index.ts"
 import { jwtRegex } from "../../testing/testingHelpers.ts";
 
 function parseAuth(auth: string): string {
@@ -45,6 +45,13 @@ function requireStringParam(name: string,value: string | string[] | undefined):s
 //NOTE: I don't like that compId is optional. It couples too many operations in the same function
 async function verifyUserFromToken(token: string, secret: string, compId: string | null = null): Promise<User> {
   //NOTE: I don't know why this is happening.
+  const session = await Session.findOne({ where: { token: token }})
+  if(!session){
+    throw new Error('Unable to find a session for this token.')
+  }
+  if(!session.active){
+    throw new Error('Cannot perform this action on this session. User must log in.')
+  }
   const jwtPayload: JwtUserPayload = jwt.verify(token,SECRET)
   const user = await User.findOne({
       where: { username: jwtPayload.username },
