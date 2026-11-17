@@ -7,3 +7,5 @@ output/
 .worktrees/
 package.json.ci.bak
 .swp
+nvim.log
+
