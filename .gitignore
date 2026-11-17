@@ -6,3 +6,4 @@ input/
 output/
 .worktrees/
 package.json.ci.bak
+.swp
