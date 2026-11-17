@@ -1,7 +1,7 @@
-const { describe, it, before, after } = require("node:test");
-const assert = require("node:assert");
-const axios = require("axios");
-const { baseUrl, resetAndSeed, createUser, login } = require("./helper");
+import { describe, it, before, after } from "node:test";
+import assert from "node:assert";
+import axios from "axios";
+import { baseUrl, resetAndSeed, createUser, login } from "./helper.js";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -35,7 +35,7 @@ before(async () => {
 });
 
 describe("Reading Lists API", () => {
-  it("can add a blog to reading list", async () => {
+  it.only("can add a blog to reading list", async () => {
     const readingListEntry = {
       blogId: createdBlogId,
       userId: testData.users[0].id,

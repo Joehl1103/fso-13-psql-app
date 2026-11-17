@@ -5,7 +5,7 @@ export const up = async ({ context: queryInterface }) => {
 };
 
 export const down = async ({ context: queryInterface }) => {
-  await queryInterface.addTable("reading_list", {
+  await queryInterface.createTable("reading_list", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,

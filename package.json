@@ -24,7 +24,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^8.71.1",
     "@typescript-eslint/parser": "^8.71.1",
-    "axios": "^1.20.0",
+    "axios": "^1.21.1",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "env-var": "^7.5.0",
