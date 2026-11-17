@@ -1,5 +1,5 @@
 type RequestParams<T extends string[]> = {
-  [Key in T[number]]?: string
+  [Key in T[number]]: string
 }
 
 interface ResponseBody {}

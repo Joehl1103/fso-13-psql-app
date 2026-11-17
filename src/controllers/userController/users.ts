@@ -16,7 +16,7 @@ import type {
   ResponseBody,
   RequestBody,
   RequestQuery,
-} from "../api.js";
+} from "../api.d.ts";
 
 import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import { parseUser, getUserIdToBlogMap } from "./userHelpers.ts";
@@ -212,8 +212,8 @@ router.put("/:username", async (req, res, next) => {
   }
 });
 
-router.delete("/:id",extractToken, async (req, res, next) => {
-  const id: string | null = req.params.id;
+router.delete("/:id",extractToken, async (req: Request<RequestParams<['id']>>, res, next) => {
+  const id: string = req.params.id;
   const token = req.token
   if (!id) {
     throw new Error(`No id in params`);
