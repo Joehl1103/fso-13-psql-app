@@ -51,7 +51,17 @@ async function verifyUserFromToken(token: string, secret: string, compId: string
   if(!session.active){
     throw new Error('Cannot perform this action on this session. User must log in.')
   }
-  const jwtPayload: JwtUserPayload = jwt.verify(token,SECRET)
+  const decoded = jwt.verify(token,SECRET)
+  if(typeof decoded === 'string'){
+    throw new Error('Invalid JWT Payload');
+  }
+  if(
+    !decoded.username || typeof decoded.username !== 'string' || !decoded.id || 
+    typeof decoded.id !== 'number'
+  ){
+    throw new Error("Invalid JWT payload");
+  }
+  const jwtPayload = decoded as JwtUserPayload;
   const user = await User.findOne({
       where: { username: jwtPayload.username },
     });

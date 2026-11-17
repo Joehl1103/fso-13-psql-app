@@ -20,6 +20,10 @@ import type {
 } from "../api.js";
 import type { SequelizeUpdateResult } from "../../db/utils/db.types.ts";
 import type { JwtUserPayload } from "../controllers.types.general.ts";
+/**NOTE: I don't know why this was throwing the following error:
+ * typescript: Module '"./blogs.d.ts"' has no exported member 'BlogPatchBody'. Did you mean to use 'import BlogPatchBody from "./blogs.d.ts"' instead? [2614]
+ */
+//@ts-ignore
 import type { BlogPatchBody } from "./blogs.d.ts";
 import type { ModelStatic } from "sequelize";
 

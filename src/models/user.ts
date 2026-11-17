@@ -17,6 +17,10 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare blogs?: NonAttribute<Blog[]>;
   declare readings?: NonAttribute<Blog[]>;
   declare disabled: boolean;
+  /**NOTE: assigned type string so that it could be compatible with the response from API in src/controllers/userController/userHelpers.ts in getUserUserIdToBlogMap
+  */
+  declare createdAt: CreationOptional<string>;
+  declare updatedAt: CreationOptional<string>;
 }
 
 User.init(
@@ -46,6 +50,12 @@ User.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    createdAt: {
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      type: DataTypes.DATE
     }
   },
   {
