@@ -15,6 +15,9 @@ import type { InferAttributes } from "sequelize";
 let joe: UserWithData, joey: UserWithData;
 let blogs: BlogResType[];
 let blogIds: number[];
+
+
+
 beforeAll(async () => {
   const users: UserWithData[] = await createUsers();
   const joeRes = users.find((u: UserWithData) => u.name === "joe");
@@ -110,11 +113,14 @@ describe("POST", () => {
 });
 
 describe("PUT", () => {
+
   let entry: InferAttributes<ReadingList>;
+
   beforeEach(async () => {
     const res = await ReadingList.create({userId: joe.data.id,blogId: 1})
     entry = res.toJSON()
   })
+
   test("put request with opposite boolean changes read state", async () => {
     const res = await supertest(app)
       .put(`/api/readingList/${entry.id}`)
@@ -123,6 +129,7 @@ describe("PUT", () => {
     expect(res.status).toBe(200)
     expect(res.body.read).toBe(!entry.read)
   })
+
   test("request fails if entry does not belong to user", async () => {
     const res = await supertest(app)
       .put(`/api/readingList/${entry.id}`)

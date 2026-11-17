@@ -16,6 +16,13 @@ export async function returnJoeAndJoey() {
   joey = joeyRes;
   return { joe, joey };
 }
+export function userNamed(users: UserWithData[],name: string): UserWithData {
+  const user: UserWithData | undefined = users.find((u: UserWithData) => u.name === name)
+  if(!user){
+    throw new Error(`No user with name ${name}`);
+  }
+  return user
+}
 
 export const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 export const urlRegex =

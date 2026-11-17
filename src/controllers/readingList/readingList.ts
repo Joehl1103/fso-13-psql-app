@@ -87,37 +87,42 @@ interface ParamObject {
   value: string | string[] | undefined
 }
 
-router.put("/:id", extractToken, async (req,res) => {
+router.put("/:id", extractToken, async (req,res,next) => {
   const id: string = requireStringParam('id',req.params.id)
   const token: string = requireStringParam('token',req.token)
-  const current: ReadingList | null = await ReadingList.findByPk(id)
-  if(!current){
-    throw new ErrorWithCustomStatus(404,`Cannot find a reading list entry with id: ${id}`)
-  }
-  verifyUserFromToken(token,SECRET,current.userId.toString())
-  
-  if(!(Object.keys(current.toJSON()).includes('read'))){
-    throw new Error(`Something went wrong. No read property on reading list entry with id ${id}`)
-  }
-  const { read: currentRead } = current.toJSON()
-  const updated = await ReadingList.update({read: !currentRead }, 
-    {
-      where: { id: id },
-      returning: true
+  try {
+    const current: ReadingList | null = await ReadingList.findByPk(id)
+    if(!current){
+      throw new ErrorWithCustomStatus(404,`Cannot find a reading list entry with id: ${id}`)
     }
-  )
-  if(!updated){
-    throw new Error('Something went wrong with the update')
+    await verifyUserFromToken(token,SECRET,current.userId.toString())
+    if(!(Object.keys(current.toJSON()).includes('read'))){
+      throw new Error(`Something went wrong. No read property on reading list entry with id ${id}`)
+    }
+    const { read: currentRead } = current.toJSON()
+    const updated = await ReadingList.update({read: !currentRead }, 
+      {
+        where: { id: id },
+        returning: true
+      }
+    )
+    if(!updated){
+      throw new Error('Something went wrong with the update')
+    }
+    const [affectedCount,affectedRows] = updated
+    if(!(affectedCount == 1) || !affectedRows || affectedRows.length !== 1 || !affectedRows[0]){
+      console.warn('updated object',updated)
+      throw new Error(`Something went wrong with the update. Affected count should be 1 and is ${affectedCount}`)
+    }
+    if(affectedRows[0].read == current.read){
+      throw new Error(`Update method did not work. Read status was not changed`)
+    }
+    res.status(200).send(affectedRows[0])
+  } catch (error){
+    if (error instanceof Error){
+      next(error)
+    }
   }
-  const [affectedCount,affectedRows] = updated
-  if(!(affectedCount == 1) || !affectedRows || affectedRows.length !== 1 || !affectedRows[0]){
-    console.warn('updated object',updated)
-    throw new Error(`Something went wrong with the update. Affected count should be 1 and is ${affectedCount}`)
-  }
-  if(affectedRows[0].read == current.read){
-    throw new Error(`Update method did not work. Read status was not changed`)
-  }
-  res.status(200).send(affectedRows[0])
 })
 
 export default router

@@ -122,7 +122,6 @@ router.patch("/:id", async (req, res) => {
 
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
-  console.log('here')
   const paramId: string = requireStringParam('id',req.params.id);
   try {
     const blog: Blog | null = await Blog.findByPk(paramId);
@@ -140,7 +139,6 @@ router.delete("/:id", extractToken, async (req, res, next) => {
     await Blog.destroy({ where: { id: id } });
     res.status(204).end();
   } catch (error) {
-    console.log(error.message)
     if(error instanceof Error){
       next(error)
     }

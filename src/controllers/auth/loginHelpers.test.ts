@@ -4,17 +4,12 @@ import type { UserWithData } from "../../../testing/testing.types.ts";
 import { Session } from "../../models/index.ts";
 import type { InferAttributes } from "sequelize"; 
 import { addLoginSession } from "./loginHelpers.ts";
+import { userNamed } from "../../../testing/testingHelpers.ts";
 
 const FAKE_TOKEN_VALUE = "THIS.IS.A.FAKE.TOKEN";
 
 let users: UserWithData[];
-function userNamed(users: UserWithData[],name: string): UserWithData {
-  const user: UserWithData | undefined = users.find((u: UserWithData) => u.name === name)
-  if(!user){
-    throw new Error(`No user with name ${name}`);
-  }
-  return user
-}
+
 beforeAll(async () => {
   users = await createUsers(); 
 })
