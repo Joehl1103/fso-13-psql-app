@@ -60,26 +60,14 @@ router.get(
   },
 );
 
-async function verifyUserWithJwt(token: string,secret: string): Promise<User> {
-    const jwtPayload = jwt.verify(token, secret) as JwtPayload;
-    const user = await User.findOne({
-      where: { username: jwtPayload.username },
-    });
-    if (!user) {
-      throw new Error(`No user found with id ${jwtPayload.id}`)
-    }
-  return user
-}
-
 router.post("/", extractToken, async (req, res, next) => {
   const body: BlogReqType = req.body;
   try {
     const { author, url, title, year: bodyYear } = body;
     const year: number | null = validateYear(bodyYear);
     const token: string = req.token;
-  console.log('here')
-    const user = await verifyUserWithJwt(token,SECRET)
-    console.log('user',user)
+    //NOTE: it is unclear to me what I am verifying apart since there is nothing to compare to.
+    const user = await verifyUserFromToken(token,SECRET)
     const payload: Omit<BlogResType, "id"> = {
       author,
       url,
@@ -134,9 +122,10 @@ router.patch("/:id", async (req, res) => {
 
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
-  const user: JwtUserPayload = jwt.verify(req.token, SECRET) as JwtUserPayload;
+  console.log('here')
   const paramId: string = requireStringParam('id',req.params.id);
   try {
+    const user: User = await verifyUserFromToken(req.token,SECRET,paramId);
     const blog: Blog | null = await Blog.findByPk(paramId);
     if (!blog) {
       throw new ErrorWithCustomStatus(

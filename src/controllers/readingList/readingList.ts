@@ -21,10 +21,7 @@ async function checkForRecordExistence(id: string,message: string, model: ModelS
     const res = await model.findByPk(id);
     return !!res
   })(id)
-  console.log('recordExists',recordExists)
-  console.log('message',message)
   if(!recordExists){
-    console.log('here')
     throw new ErrorWithCustomStatus(400,message)
   }
   return

@@ -11,6 +11,11 @@ User.hasMany(Blog, {
   as: 'blogs',
 });
 
+User.hasMany(Session, {
+  foreignKey: 'userId',
+  onDelete: 'CASCADE'
+})
+
 Blog.belongsTo(User, {
   foreignKey: "userId",
   as: 'blogAuthor',

@@ -213,27 +213,25 @@ router.put("/:username", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   const id: string | null = req.params.id;
   if (!id) {
-    throw new ErrorWithCustomStatus(500, `No id in params`);
+    throw new Error(`No id in params`);
   }
-
   try {
     const findByPkRes: FindASingleUserResponse = await User.findByPk(id);
     if (!findByPkRes) {
-      throw new ErrorWithCustomStatus(500, `No user with id: ${id}`);
+      throw new Error(`No user with id: ${id}`);
     }
-    if (!findByPkRes) {
-      throw new ErrorWithCustomStatus(500, "No user by that id.");
-    }
-    const destroyRes = await User.destroy({ where: { id: id } });
+    const destroyRes:number = await User.destroy({ where: { id: id } });
+    console.log('destroyRes',destroyRes)
     if (destroyRes !== 1) {
-      throw new ErrorWithCustomStatus(
-        500,
-        `number of destroyed rows greater than or less than expected (1): ${destroyRes}`,
-      );
+      throw new Error(`number of destroyed rows greater than or less than expected (1): ${destroyRes}`);
     }
+    console.log('here')
     res.status(204).end();
   } catch (error) {
-    next(error);
+    console.log('error',error.message)
+    if(error instanceof Error){
+      throw new Error(error.message)
+    }
   }
 });
 

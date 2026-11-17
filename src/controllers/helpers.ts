@@ -4,8 +4,10 @@ import type { JwtUserPayload } from "./controllers.types.general.ts";
 import config from "../util/config.ts"
 const SECRET = config.SECRET
 import jwt from "jsonwebtoken"
+import {User} from "../models/index.ts"
+import { jwtRegex } from "../../testing/testingHelpers.ts";
 
-function parseAuth(auth: string | undefined): string {
+function parseAuth(auth: string): string {
   const authHasRightFormat: Boolean =
     /Bearer\s{1}[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]/.test(auth);
   if (!authHasRightFormat) {
@@ -15,7 +17,6 @@ function parseAuth(auth: string | undefined): string {
   if (!token || typeof token !== "string") {
     throw new Error("Something went wrong while trying to process this auth header.");
   }
-
   return token;
 }
 
@@ -40,18 +41,28 @@ function requireStringParam(name: string,value: string | string[] | undefined):s
   return value
 }
 
-function verifyUserFromToken(token: string, secret: string, compId: string): void {
-  const user: JwtUserPayload = jwt.verify(token,SECRET) as JwtUserPayload
+//NOTE: I don't like that compId is optional. It couples too many operations in the same function
+async function verifyUserFromToken(token: string, secret: string, compId: string | null = null): Promise<User> {
+  //NOTE: I don't know why this is happening.
+  const jwtPayload: JwtUserPayload = jwt.verify(token,SECRET)
+  const user = await User.findOne({
+      where: { username: jwtPayload.username },
+    });
+  if (!user) {
+    throw new Error(`No user found with id ${jwtPayload.id}`)
+  }
+
   if(!user){
     throw new Error("Something went wrong because there is no user that can be identified by that token.")
   }
-  if (compId !== user.id.toString()) {
+  //NOTE: I don't like that this is optional
+  if (compId && compId !== user.id.toString()) {
       throw new ErrorWithCustomStatus(401,
         "Cannot fulfill request because token does not belong to owner.",
       );
-    }
+  }
+
+  return user
 }
-
-
 
 export { parseAuth, extractToken, requireStringParam, verifyUserFromToken};

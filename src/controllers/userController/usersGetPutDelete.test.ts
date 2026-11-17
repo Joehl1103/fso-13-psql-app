@@ -204,13 +204,14 @@ describe("PUT", () => {
 });
 
 describe("DELETE", () => {
-  test("DELETE returns 204 and user is no longer available", async () => {
+  test.only("DELETE returns 204 and user is no longer available", async () => {
     if (!joe) {
       throw new Error("joe is undefined");
     }
     const response = await supertest(app)
       .delete(`/api/users/${joe.data.id}`)
-      .set("Content-Type", "application/json");
+      .set("Content-Type", "application/json")
+      .set("Authorization",`Bearer ${joe.data.token}`);
     expect(response.status).toBe(204);
     expect(response.body).toStrictEqual({});
     const allRows = await supertest(app).get("/api/users");
