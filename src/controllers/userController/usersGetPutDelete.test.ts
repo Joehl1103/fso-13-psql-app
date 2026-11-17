@@ -12,6 +12,7 @@ import type { UserWithData } from "../../../testing/testing.types.ts";
 import { sequelize } from "../../db/utils/db.ts";
 import { User,ReadingList,Blog } from "../../models/index.ts";
 import type {InferAttributes} from "sequelize"
+import { userNamed } from "../../../testing/testingHelpers.ts";
 
 import app from "../../app.js";
 
@@ -20,21 +21,10 @@ const urlRegex = /^https?\:\/\/(www.)?[a-zA-Z0-9-\.]*\.[a-z]{3}$/
 const usernameRegex = /[A-Za-z]+\@[A-Za-z]+\.[A-Za-z]+/
 
 let usersWithData: UserWithData[];
-let joe: UserWithData | undefined,
-  joey: UserWithData | undefined,
-  johnny: UserWithData | undefined;
 let blogs: BlogResType[];
 beforeEach(async () => {
   usersWithData = await createUsers();
-  joe = usersWithData.filter((u) => u.name === "joe")[0];
-  if (!joe) {
-    throw new Error("joe is undefined");
-  }
-  joey = usersWithData.filter((u) => u.name === "joey")[0];
-  if (!joey) {
-    throw new Error("joey is undefined");
-  }
-  johnny = usersWithData.filter((u) => u.name === "johnny")[0];
+  const [joe,joey,johnny]: [UserWithData,UserWithData,UserWithData] = [userNamed(usersWithData,'joe'),userNamed(usersWithData,'joey'),userNamed(usersWithData,'johnny')]
   blogs = await createBlogs(usersWithData);
   if(!blogs[0] || !blogs[1] || !blogs[2]){
     throw new Error('blogs are undefined');
@@ -92,9 +82,7 @@ describe("GET users by id", () => {
     }
   });
   test("get user by id should get user by id with their reading list", async () => {
-    if (!joe) {
-      throw new Error("joe is undefined");
-    }
+    const joe: UserWithData = userNamed(usersWithData,'joe');
     const response = await supertest(app).get(`/api/users/${joe.data.id}`);
     expect(response.status).toBe(200);
     const joesBlogIds: number[] = [];
@@ -137,9 +125,7 @@ describe("GET users by id", () => {
     });
   });
   test("user without blogs should return empty blogs", async () => {
-    if (!johnny) {
-      throw new Error("johnny is undefined");
-    }
+    const johnny: UserWithData = userNamed(usersWithData,'johnny')
     const response = await supertest(app).get(`/api/users/${johnny.data.id}`);
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({
@@ -154,9 +140,7 @@ describe("GET users by id", () => {
   });
 
   test('getting users with reading list params should return only bool value of read', async() => {
-    if(!joe){
-      throw new Error('joe is undefined')       
-    }
+    const joe: UserWithData = userNamed(usersWithData,'joe');
     for(const bool in [true,false]){
       const res = await supertest(app)
               .get(`/api/users/${joe.data.id}`)
@@ -204,10 +188,8 @@ describe("PUT", () => {
 });
 
 describe("DELETE", () => {
-  test.only("DELETE returns 204 and user is no longer available", async () => {
-    if (!joe) {
-      throw new Error("joe is undefined");
-    }
+  test("DELETE returns 204 and user is no longer available", async () => {
+    const joe: UserWithData = userNamed(usersWithData,'joe');
     const response = await supertest(app)
       .delete(`/api/users/${joe.data.id}`)
       .set("Content-Type", "application/json")
@@ -228,4 +210,7 @@ describe("DELETE", () => {
     expect(response.status).toBe(500);
     expect(response.text).toStrictEqual("No user with id: 100");
   });
+  test('fails if token session is inactive', async () => {
+    
+  })
 });

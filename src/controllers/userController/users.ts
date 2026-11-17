@@ -225,7 +225,6 @@ router.delete("/:id", async (req, res, next) => {
     if (destroyRes !== 1) {
       throw new Error(`number of destroyed rows greater than or less than expected (1): ${destroyRes}`);
     }
-    console.log('here')
     res.status(204).end();
   } catch (error) {
     console.log('error',error.message)
