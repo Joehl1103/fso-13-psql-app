@@ -40,6 +40,6 @@ describe('verifyUserFromToken', () => {
     await Session.create({ userId: user.id, token: 'FAKE.TOKEN',active: false })
   })
   test('inactive session throws error', async () => {
-    await expect(() => verifyUserFromToken('FAKE.TOKEN','temp secret')).rejects.toThrow('Cannot perform this action on this session. User must log in.')
+    await expect(() => verifyUserFromToken('FAKE.TOKEN','temp secret')).rejects.toThrow('Session inactive. User must log in.')
   })
 })
