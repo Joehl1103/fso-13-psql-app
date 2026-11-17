@@ -100,7 +100,7 @@ router.put("/:id", extractToken, async (req,res,next) => {
       throw new Error(`Something went wrong. No read property on reading list entry with id ${id}`)
     }
     const { read: currentRead } = current.toJSON()
-    const updated = await ReadingList.update({read: !currentRead }, 
+    const updated = await ReadingList.update({ read: !currentRead },
       {
         where: { id: id },
         returning: true

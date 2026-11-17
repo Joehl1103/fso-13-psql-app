@@ -50,7 +50,6 @@ export type {
   UserNoPW,
   UserPOSTResponseTypeFromAPI,
   FindASingleUserResponse,
-  SequelizeUserUpdateResult,
   UserWithAssociationsMinusUserId,
   UserWithAssociations
 };

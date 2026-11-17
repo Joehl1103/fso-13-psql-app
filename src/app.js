@@ -4,6 +4,7 @@ import { downstreamErrorHandler } from "./util/middleware.ts";
 import blogsRouter from "./controllers/blogController/blogs.ts";
 import usersRouter from "./controllers/userController/users.ts";
 import loginRouter from "./controllers/auth/login.ts";
+import logoutRouter from "./controllers/auth/logout.ts";
 import authorRouter from "./controllers/authors.ts";
 import healthRouter from "./controllers/health.ts";
 import resetRouter from "./controllers/reset.ts";
@@ -23,6 +24,7 @@ app.use("/api/authors", authorRouter);
 app.use("/api", healthRouter);
 app.use("/api/reset", resetRouter);
 app.use("/api/readingList",readingListRouter);
+app.use("/api/logout",logoutRouter);
 
 app.use(downstreamErrorHandler);
 
