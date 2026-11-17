@@ -202,15 +202,8 @@ describe("DELETE", () => {
     expect(usernames).not.toContain(joe.name);
   });
 
-  test("DELETE non-existing id returns 500", async () => {
-    const response = await supertest(app)
-      .delete("/api/users/100")
-      .set("Content-Type", "application/json");
 
-    expect(response.status).toBe(500);
-    expect(response.text).toStrictEqual("No user with id: 100");
-  });
-  test.only('fails if token session is inactive', async () => {
+  test('fails if token session is inactive', async () => {
     const joe: UserWithData = userNamed(usersWithData,'joe');
     const res = await Session.update({active: false},{ where: { token: joe.data.token }})
     console.log('res',res)

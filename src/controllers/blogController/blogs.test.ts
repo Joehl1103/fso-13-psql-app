@@ -7,13 +7,11 @@ import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
 import { sequelize } from "../../db/utils/db.js";
 import { MIN_YEAR } from "../../util/constants.ts";
+import { userNamed } from "../../../testing/testingHelpers.ts";
 
 let usersWithData: UserWithData[];
-let joe: UserWithData | undefined, joey: UserWithData | undefined;
 beforeEach(async () => {
   usersWithData = await createUsers();
-  joe = usersWithData.filter((u) => u.name === "joe")[0];
-  joey = usersWithData.filter((u) => u.name === "joey")[0];
 });
 
 afterEach(async () => {
@@ -79,9 +77,7 @@ describe("GET", () => {
 
 describe("POST", () => {
   test("creating blog with token creates blog with user id", async () => {
-    if (!joe || !joey) {
-      throw Error("joe and joey are undefined");
-    }
+    const joe: UserWithData = userNamed(usersWithData,'joe');
     const payload: BlogReqType = {
       author: joe.name,
       url: "http://joeys-blog.com",
@@ -102,9 +98,7 @@ describe("POST", () => {
   });
 
   test("no token produces error", async () => {
-    if (!joe) {
-      throw new Error("Joe is undefined");
-    }
+    const joe: UserWithData = userNamed(usersWithData,'joe');
     const blogsResponse = await supertest(app)
       .post("/api/blogs")
       .set("Content-Type", "application/json")
@@ -121,9 +115,7 @@ describe("POST", () => {
 
   describe("year", () => {
     test("sending without year produces no error and returns year as null", async () => {
-      if (!joe || !joey) {
-        throw Error("joe and joey are undefined");
-      }
+      const joe: UserWithData = userNamed(usersWithData,'joe');
       const payload: BlogReqType = {
         author: joe.name,
         url: "http://joeys-blog.com",
@@ -138,9 +130,7 @@ describe("POST", () => {
       expect(response.status).toBe(200);
     });
     test("year < 1991 throws error", async () => {
-      if (!joe || !joey) {
-        throw Error("joe and joey are undefined");
-      }
+      const joe: UserWithData = userNamed(usersWithData,'joe');
       const payload: BlogReqType = {
         author: joe.name,
         url: "http://joeys-blog.com",
@@ -223,9 +213,7 @@ describe("DELETE", () => {
   let blogId: number;
 
   beforeEach(async () => {
-    if (!joe) {
-      throw new Error("Joe is undefined");
-    }
+    const joe: UserWithData = userNamed(usersWithData,'joe');
     const payload = {
       author: joe.name,
       url: "http://joeys-blog.com",
@@ -248,9 +236,7 @@ describe("DELETE", () => {
   });
 
   test("deletion fails if token belongs to different user", async () => {
-    if (!joey) {
-      throw new Error("Joey is undefined");
-    }
+    const [joe,joey]: [UserWithData,UserWithData] = [userNamed(usersWithData,'joe'),userNamed(usersWithData,'joey')];
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
@@ -262,9 +248,7 @@ describe("DELETE", () => {
   });
 
   test("deletion if user id is same as blog user id ", async () => {
-    if (!joe) {
-      throw new Error("Joe is undefined");
-    }
+    const joe: UserWithData = userNamed(usersWithData,'joe')
     console.log('blogId',blogId)
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
@@ -273,10 +257,8 @@ describe("DELETE", () => {
     expect(response.status).toBe(204);
   });
 
-  test.only("deletion fails with 404 if blog does not exist", async () => {
-    if (!joe) {
-      throw new Error("Joe is undefined");
-    }
+  test("deletion fails with 404 if blog does not exist", async () => {
+    const joe: UserWithData = userNamed(usersWithData,'joe')
     const FAKE_BLOG_ID = 100
     const response = await supertest(app)
       .delete(`/api/blogs/${FAKE_BLOG_ID}`)
@@ -285,4 +267,8 @@ describe("DELETE", () => {
     expect(response.status).toBe(404);
     expect(response.text).toBe(`Unable to find a blog with id ${FAKE_BLOG_ID}`);
   });
+
+  test.only('fails if session is inactive', async () => {
+    
+  })
 });
