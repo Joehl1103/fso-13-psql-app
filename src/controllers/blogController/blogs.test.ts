@@ -261,7 +261,7 @@ describe("DELETE", () => {
     );
   });
 
-  test.only("deletion if user id is same as blog user id ", async () => {
+  test("deletion if user id is same as blog user id ", async () => {
     if (!joe) {
       throw new Error("Joe is undefined");
     }
@@ -273,15 +273,16 @@ describe("DELETE", () => {
     expect(response.status).toBe(204);
   });
 
-  test("deletion fails with 404 if userId does not exist", async () => {
+  test.only("deletion fails with 404 if blog does not exist", async () => {
     if (!joe) {
       throw new Error("Joe is undefined");
     }
+    const FAKE_BLOG_ID = 100
     const response = await supertest(app)
-      .delete(`/api/blogs/100`)
+      .delete(`/api/blogs/${FAKE_BLOG_ID}`)
       .set("Content-Type", "application/json")
       .set("Authorization", `Bearer ${joe.data.token}`);
     expect(response.status).toBe(404);
-    expect(response.text).toBe("Unable to find a blog with id 100");
+    expect(response.text).toBe(`Unable to find a blog with id ${FAKE_BLOG_ID}`);
   });
 });
