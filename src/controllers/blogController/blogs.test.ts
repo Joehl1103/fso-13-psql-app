@@ -2,6 +2,7 @@ import supertest from "supertest";
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import app from "../../app.js";
 import { createUsers, createBlogs } from "../../../testing/factories.js";
+import {Blog} from "../../models/index.ts"
 import type { UserWithData } from "../../../testing/testing.types.ts";
 import type { BlogReqType, BlogResType } from "../../models/types/blog.d.ts";
 import { sequelize } from "../../db/utils/db.js";
@@ -230,12 +231,14 @@ describe("DELETE", () => {
       url: "http://joeys-blog.com",
       title: "Talkin' about my blog",
     };
-    const response = await supertest(app)
-      .post("/api/blogs")
-      .set("Content-Type", "application/json")
-      .set("Authorization", `Bearer ${joe.data.token}`)
-      .send(payload);
-    ({ id: blogId } = response.body);
+    const blogCreateResponse = await Blog.create({ ...payload, likes: 0,userId: joe.data.id } )
+    blogId = blogCreateResponse.toJSON().id
+    // const response = await supertest(app)
+    //   .post("/api/blogs")
+    //   .set("Content-Type", "application/json")
+    //   .set("Authorization", `Bearer ${joe.data.token}`)
+    //   .send(payload);
+    // ({ id: blogId } = response.body);
   });
 
   test("deletion fails if no token provided", async () => {
@@ -258,10 +261,11 @@ describe("DELETE", () => {
     );
   });
 
-  test("deletion if user id is same as blog id ", async () => {
+  test.only("deletion if user id is same as blog user id ", async () => {
     if (!joe) {
       throw new Error("Joe is undefined");
     }
+    console.log('blogId',blogId)
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")

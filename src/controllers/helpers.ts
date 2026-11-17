@@ -56,6 +56,7 @@ async function verifyUserFromToken(token: string, secret: string, compId: string
     throw new Error("Something went wrong because there is no user that can be identified by that token.")
   }
   //NOTE: I don't like that this is optional
+  console.log({compId,userId: user.id})
   if (compId && compId !== user.id.toString()) {
       throw new ErrorWithCustomStatus(401,
         "Cannot fulfill request because token does not belong to owner.",

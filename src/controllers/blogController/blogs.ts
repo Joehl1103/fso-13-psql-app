@@ -122,17 +122,14 @@ router.patch("/:id", async (req, res) => {
 
 router.delete("/:id", extractToken, async (req, res, next) => {
   //NOTE: no body means no token since only tokens are sent
-  console.log('here')
   const paramId: string = requireStringParam('id',req.params.id);
   try {
-    const user: User = await verifyUserFromToken(req.token,SECRET,paramId);
     const blog: Blog | null = await Blog.findByPk(paramId);
     if (!blog) {
-      throw new ErrorWithCustomStatus(
-        404,
-        `Unable to find a blog with id ${paramId}`,
-      );
+      throw new ErrorWithCustomStatus(404,`Unable to find a blog with id ${paramId}`);
     }
+    const user: User = await verifyUserFromToken(req.token,SECRET,String(blog.userId));
+    
     if (!blog.toJSON().userId) {
       throw new Error("Cannot find a userId on blog");
     }
@@ -142,7 +139,10 @@ router.delete("/:id", extractToken, async (req, res, next) => {
     await Blog.destroy({ where: { id: id } });
     res.status(204).end();
   } catch (error) {
-    next(error);
+    console.log(error.message)
+    if(error instanceof Error){
+      throw new Error(error.message)
+    }
   }
 });
 
