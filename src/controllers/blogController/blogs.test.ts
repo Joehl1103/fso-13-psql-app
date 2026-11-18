@@ -28,12 +28,14 @@ describe("GET", () => {
     blogLen = blogs.length;
   });
   test("getting all blogs returns all blogs and their users", async () => {
+    console.log('a')
     const response = await supertest(app).get("/api/blogs");
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(blogLen);
     response.body.forEach((b: BlogResType) => {
       expect(b.userId).toBeTypeOf("number");
     });
+    console.log('b')
   });
   test("specifying a react substring search query should 1 blog from joe", async () => {
     const response = await supertest(app)
@@ -109,7 +111,7 @@ describe("POST", () => {
         title: "Talkin' about my blog",
         token: "",
       });
-    expect(blogsResponse.status).toBe(500);
+    expect(blogsResponse.status).toBe(401);
     expect(blogsResponse.text).toBe("Format of Bearer token is incorrect.");
   });
 
@@ -225,7 +227,7 @@ describe("DELETE", () => {
 
   test("deletion fails if no token provided", async () => {
     const response = await supertest(app).delete(`/api/blogs/${blogId}`);
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(401);
     expect(response.text).toBe("An authorization token is required for this request.");
   });
 
@@ -261,15 +263,15 @@ describe("DELETE", () => {
     expect(response.text).toBe(`Unable to find a blog with id ${FAKE_BLOG_ID}`);
   });
 
-  test('fails if session is inactive', async () => {
+  test('fails if session does not exist', async () => {
     const joe: UserWithData = userNamed(usersWithData,'joe')
-    await Session.update({ active: false },{ where: { token: joe.data.token } })
+    await Session.destroy({ where: { token: joe.data.token } })
     const response = await supertest(app)
       .delete(`/api/blogs/${blogId}`)
       .set("Content-Type", "application/json")
       .set("Authorization", `Bearer ${joe.data.token}`);
-    expect(response.status).toBe(500);
-    expect(response.text).toBe('Session inactive. User must log in.');
+    expect(response.status).toBe(401);
+    expect(response.text).toBe('Unable to find a session for this token.');
 
   })
 });
