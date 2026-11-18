@@ -99,34 +99,33 @@ interface IncludeProps {
   }
 }
 
-function include(querySearchParam: string = ""): IncludeProps[] {
-  const BASE_INCLUDE = [
-    {
+function buildInclude(querySearchParam: string = ""): IncludeProps[] {
+  const BLOGS_INCLUDE = {
       association: "blogs",
       attributes: BLOG_PROPS
-    },
-    {
+    } 
+  const READINGS_INCLUDE = {
       association: "readings",
       attributes: BLOG_PROPS, 
       through: { 
         attributes: ["id","read"],
       },
-    },
-  ]
+    } 
   if(querySearchParam !== ""){
+    const bool: boolean = querySearchParam === 'true';
     return [
-      ...BASE_INCLUDE,
       {
-        association: "readings",
-        attributes: BLOG_PROPS, 
-        through: { 
-          attributes: ["id","read"],
-          where: { read: Boolean(querySearchParam) }
-        },
+        ...BLOGS_INCLUDE
+      },
+      {...READINGS_INCLUDE,
+      through: {
+        ...READINGS_INCLUDE.through,
+        where: { read:bool }
+        }
       }
     ]
   }
-  return BASE_INCLUDE
+  return [{...BLOGS_INCLUDE},{...READINGS_INCLUDE}]
 }
 
 router.get(
@@ -142,12 +141,13 @@ router.get(
     }
     const id: number = Number(req.params.id);
     const readQueryParam: string = req.query.read ?? ""
+    const include: IncludeProps[] = buildInclude(readQueryParam);
     try {
       const user = await User.findByPk(
         id, 
         { 
           attributes: ["id","username","name","createdAt","updatedAt"],
-          include: include(readQueryParam)
+          include: buildInclude(readQueryParam)
         });
       if (!user) {
         throw new ErrorWithCustomStatus(

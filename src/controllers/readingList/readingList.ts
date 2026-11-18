@@ -14,6 +14,7 @@ import type {
 } from "./readingList.api.types.ts";
 import type {Model,ModelStatic, InferAttributes} from 'sequelize'
 import type { JwtUserPayload } from "../controllers.types.general.ts";
+import { checkForReadingListExistence } from "./readingListHelpers.ts";
 
 // Helpers
 async function checkForRecordExistence(id: string,message: string, model: ModelStatic<User | Blog>): Promise<void> {
@@ -59,33 +60,16 @@ router.post("/", async (req, res, next) => {
 `)
   }
 
-  const items = [
-    {
-      id: blogId,
-      message: `blog does not exist for blog id: ${blogId}`,
-      model: Blog
-    },
-    {
-      id: userId,
-      message:`user does not exist for user id: ${userId}`,
-      model: User
-    }
-  ]
   try {
-    for (const item of items){
-      const {id,message,model} = item
-      await checkForRecordExistence(id,message,model)
-    }
-
-    console.log('here')
     const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
 
-    const alreadyExists: boolean = await checkForReadingListExistence(blogId,userId)
+    const alreadyExists: boolean = await checkForReadingListExistence(Number(userId),Number(blogId))
+    if(alreadyExists){
+      throw new ErrorWithCustomStatus(400,`Reading list already exists for blogId ${blogId}`);
+    }
     const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
-    console.log('response',response)
     res.status(200).json(response);
   } catch (error){
-    console.log('error',error.message)
     if (error instanceof Error){
       next(error)
     }

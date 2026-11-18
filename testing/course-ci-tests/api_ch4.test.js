@@ -34,7 +34,7 @@ before(async () => {
   createdBlogId = blogResponse.data.id;
 });
 
-describe("Reading Lists API", () => {
+describe.only("Reading Lists API", () => {
   it("can add a blog to reading list", async () => {
     const readingListEntry = {
       blogId: createdBlogId,
@@ -50,7 +50,7 @@ describe("Reading Lists API", () => {
     assert.strictEqual(response.data.read, false);
   });
 
-  it.only("cannot add same blog to reading list twice", async () => {
+  it("cannot add same blog to reading list twice", async () => {
     const readingListEntry = {
       blogId: createdBlogId,
       userId: testData.users[0].id,
@@ -60,8 +60,6 @@ describe("Reading Lists API", () => {
       await axios.post(`${baseUrl}/readinglists`, readingListEntry);
       assert.fail("Should have thrown an error");
     } catch (error) {
-      console.log('error',error)
-      console.log('error.response',error.response)
       assert.strictEqual(error.response.status, 400);
     }
   });
@@ -139,22 +137,29 @@ describe("Reading Lists API", () => {
     assert.ok(reading.reading_list);
     assert.strictEqual(typeof reading.reading_list.read, "boolean");
   });
+  
+  describe("user can filter reading list by read status", () => {
+    it("read = false returns unread", async () => {
+      const responseUnread = await axios.get(
+        `${baseUrl}/users/${testData.users[0].id}?read=false`,
+      );
+      // const responseUnread = await axios.get(`${baseUrl}/users/${testData.users[0].id}`)
+      assert.ok([200, 201].includes(responseUnread.status));
 
-  it("user can filter reading list by read status", async () => {
-    const responseUnread = await axios.get(
-      `${baseUrl}/users/${testData.users[0].id}?read=false`,
-    );
-    assert.ok([200, 201].includes(responseUnread.status));
+      // All readings should be unread at this point
+      assert.ok(responseUnread.data.readings.length > 0);
+    });
 
-    const responseRead = await axios.get(
-      `${baseUrl}/users/${testData.users[0].id}?read=true`,
-    );
-    assert.ok([200, 201].includes(responseRead.status));
+    it("read = true returns read", async () => {
+      const responseRead = await axios.get(
+        `${baseUrl}/users/${testData.users[0].id}?read=true`,
+      );
+      assert.ok([200, 201].includes(responseRead.status));
 
-    // All readings should be unread at this point
-    assert.ok(responseUnread.data.readings.length > 0);
-    assert.strictEqual(responseRead.data.readings.length, 0);
-  });
+      assert.strictEqual(responseRead.data.readings.length, 0);
+    });
+  })
+  
 
   it("user can mark a blog as read with authentication", async () => {
     const userResponse = await axios.get(
