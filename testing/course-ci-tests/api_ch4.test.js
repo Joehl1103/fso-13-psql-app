@@ -158,7 +158,7 @@ describe.only("Reading Lists API", () => {
 
       assert.strictEqual(responseRead.data.readings.length, 0);
     });
-  })
+  });
   
 
   it("user can mark a blog as read with authentication", async () => {

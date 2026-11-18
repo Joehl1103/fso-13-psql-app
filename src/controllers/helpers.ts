@@ -23,7 +23,7 @@ function parseAuth(auth: string): string {
 function extractToken(req: Request, res: Response, next: NextFunction) {
   const auth: string | undefined = req.get("Authorization");
   if(!auth){
-    throw new Error('An authorization token is required for this request.')
+    throw new ErrorWithCustomStatus(401,'An authorization token is required for this request.')
   }
   const token: string = parseAuth(auth);
   req.token = token;
