@@ -18,7 +18,7 @@ before(async () => {
   sessionUser = await createUser(
     "session@example.com",
     "Session User",
-    "sessionpass",
+    "ABcd1234!",
   );
 
   // Create a blog for reading list tests
@@ -45,6 +45,7 @@ describe("Reading Lists API", () => {
       `${baseUrl}/readinglists`,
       readingListEntry,
     );
+    console.log('response.data',response.data);
 
     assert.ok([200, 201].includes(response.status));
     assert.strictEqual(response.data.blog_id, createdBlogId);

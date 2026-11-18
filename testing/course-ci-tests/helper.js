@@ -7,7 +7,9 @@ const resetDatabase = async () => {
 };
 
 const createUser = async (username, name, password) => {
+  console.group('createUser')
   try {
+    console.log('here')
     const response = await axios.post(`${baseUrl}/users`, {
       username,
       name,
@@ -15,6 +17,7 @@ const createUser = async (username, name, password) => {
     });
     return response.data;
   } catch (error) {
+    console.log('error',error.message)
     if (error.response) {
       const divider = ">".repeat(28);
       const hint = [
@@ -31,6 +34,7 @@ const createUser = async (username, name, password) => {
     }
     throw error;
   }
+  console.groupEnd()
 };
 
 const login = async (username, password) => {

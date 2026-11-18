@@ -29,6 +29,8 @@ const { SALT_ROUNDS, SECRET } = config;
 const router = express.Router();
 
 router.post("/", async (req, res, next) => {
+  console.group('user post')
+  console.log('here')
   const body: UserRequestType = req.body;
   const { username, name, password } = body;
   try {
@@ -58,6 +60,7 @@ router.post("/", async (req, res, next) => {
       name: returnedName,
     };
     res.status(201).json(payload);
+    console.groupEnd()
   } catch (error) {
     next(error);
   }
