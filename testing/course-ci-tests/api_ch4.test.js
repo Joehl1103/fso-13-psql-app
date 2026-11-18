@@ -35,7 +35,7 @@ before(async () => {
 });
 
 describe("Reading Lists API", () => {
-  it.only("can add a blog to reading list", async () => {
+  it("can add a blog to reading list", async () => {
     const readingListEntry = {
       blogId: createdBlogId,
       userId: testData.users[0].id,
@@ -44,15 +44,13 @@ describe("Reading Lists API", () => {
       `${baseUrl}/readinglists`,
       readingListEntry,
     );
-    console.log('response.data',response.data);
-    
     assert.ok([200, 201].includes(response.status));
-    assert.strictEqual(response.data.blog_id, createdBlogId);
-    assert.strictEqual(response.data.user_id, testData.users[0].id);
+    assert.strictEqual(response.data.blogId, createdBlogId);
+    assert.strictEqual(response.data.userId, testData.users[0].id);
     assert.strictEqual(response.data.read, false);
   });
 
-  it("cannot add same blog to reading list twice", async () => {
+  it.only("cannot add same blog to reading list twice", async () => {
     const readingListEntry = {
       blogId: createdBlogId,
       userId: testData.users[0].id,
@@ -62,6 +60,8 @@ describe("Reading Lists API", () => {
       await axios.post(`${baseUrl}/readinglists`, readingListEntry);
       assert.fail("Should have thrown an error");
     } catch (error) {
+      console.log('error',error)
+      console.log('error.response',error.response)
       assert.strictEqual(error.response.status, 400);
     }
   });

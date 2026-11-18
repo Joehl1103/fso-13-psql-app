@@ -33,9 +33,9 @@ const SECRET = config.SECRET
 
 // ROUTER 
 
-router.post("/", async (req, res) => {
+
+router.post("/", async (req, res, next) => {
   const body: ReadingListReqBody = req.body;
-  console.log('body',body)
   if((typeof body === 'string' && !body) || (typeof body === 'object' && Object.keys(body).length === 0)){
     throw new ErrorWithCustomStatus(400,
       `request must contain a payload of shape:
@@ -71,16 +71,25 @@ router.post("/", async (req, res) => {
       model: User
     }
   ]
-  console.log('A')
-  for (const item of items){
-    const {id,message,model} = item
-    await checkForRecordExistence(id,message,model)
-  }
-  console.log('B')
-  const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
+  try {
+    for (const item of items){
+      const {id,message,model} = item
+      await checkForRecordExistence(id,message,model)
+    }
 
-  const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
-  res.status(200).json(response);
+    console.log('here')
+    const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
+
+    const alreadyExists: boolean = await checkForReadingListExistence(blogId,userId)
+    const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
+    console.log('response',response)
+    res.status(200).json(response);
+  } catch (error){
+    console.log('error',error.message)
+    if (error instanceof Error){
+      next(error)
+    }
+  }
 });
 
 
