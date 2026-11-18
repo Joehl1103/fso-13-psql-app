@@ -29,8 +29,6 @@ const { SALT_ROUNDS, SECRET } = config;
 const router = express.Router();
 
 router.post("/", async (req, res, next) => {
-  console.group('user post')
-  console.log('here')
   const body: UserRequestType = req.body;
   const { username, name, password } = body;
   try {
@@ -44,7 +42,6 @@ router.post("/", async (req, res, next) => {
       }
       throw new Error(errorMessage);
     }
-
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await User.create({ ...req.body, password: passwordHash });
     const {
@@ -54,11 +51,13 @@ router.post("/", async (req, res, next) => {
     // @ts-ignore: rest intentionally not used
       ...rest
     } = result.toJSON();
+
     const payload: UserPOSTResponseTypeFromAPI = {
       id,
       username: returnedUsername,
       name: returnedName,
     };
+
     res.status(201).json(payload);
     console.groupEnd()
   } catch (error) {

@@ -43,7 +43,6 @@ function parseUser(
       pwAnalysis.forEach((m: string) => errorMessages.push(m));
     }
   }
-  console.log('errorMessages',errorMessages)
   return errorMessages;
 }
 

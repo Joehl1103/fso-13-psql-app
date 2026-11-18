@@ -71,10 +71,12 @@ router.post("/", async (req, res) => {
       model: User
     }
   ]
+  console.log('A')
   for (const item of items){
     const {id,message,model} = item
     await checkForRecordExistence(id,message,model)
   }
+  console.log('B')
   const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
 
   const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });

@@ -23,7 +23,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/authors", authorRouter);
 app.use("/api", healthRouter);
 app.use("/api/reset", resetRouter);
-app.use("/api/readingList",readingListRouter);
+app.use("/api/readingLists",readingListRouter);
 app.use("/api/logout",logoutRouter);
 
 app.use(downstreamErrorHandler);
