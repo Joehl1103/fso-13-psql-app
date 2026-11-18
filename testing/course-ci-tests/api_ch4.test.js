@@ -10,6 +10,7 @@ let testData;
 let createdBlogId;
 let sessionUser;
 const USER_PW = 'ABcd1234!';
+const TEST_USER_2_PW = "Password456!";
 // Single setup for the entire test file
 before(async () => {
   console.group('before')
@@ -245,11 +246,10 @@ describe("Reading Lists API", () => {
   });
 });
 
-describe.only("Session Management API", () => {
+describe("Session Management API", () => {
   let sessionToken;
 
   it("login creates a session", async () => {
-    console.group("login creates a session")
     const response = await axios.post(`${baseUrl}/login`, {
       username: "session@example.com",
       password: USER_PW,
@@ -259,7 +259,6 @@ describe.only("Session Management API", () => {
     assert.strictEqual(response.data.username, "session@example.com");
     assert.strictEqual(response.data.name, "Session User");
     sessionToken = response.data.token;
-    console.groupEnd()
   });
 
   it("authenticated request works with valid session", async () => {
@@ -403,8 +402,7 @@ describe("Integration: Reading Lists and Sessions", () => {
   let integrationToken;
 
   it("create blog and add to reading list", async () => {
-    integrationToken = await login("test2@example.com", "password456");
-
+    integrationToken = await login("test2@example.com", TEST_USER_2_PW,3);
     const newBlog = {
       title: "Integration Test Blog",
       author: "Integration Author",
@@ -422,12 +420,11 @@ describe("Integration: Reading Lists and Sessions", () => {
     };
 
     const response = await axios.post(
-      `${baseUrl}/readinglists`,
+      `${baseUrl}/readingLists`,
       readingListEntry,
     );
-
     assert.ok([200, 201].includes(response.status));
-    assert.strictEqual(response.data.blog_id, integrationBlogId);
+    assert.strictEqual(response.data.blogId, integrationBlogId);
     integrationReadingListId = response.data.id;
   });
 
@@ -461,7 +458,7 @@ describe("Integration: Reading Lists and Sessions", () => {
 
   it("new session allows access to reading list operations again", async () => {
     await sleep(1100);
-    const newToken = await login("test2@example.com", "password456");
+    const newToken = await login("test2@example.com", TEST_USER_2_PW);
 
     const response = await axios.put(
       `${baseUrl}/readinglists/${integrationReadingListId}`,
