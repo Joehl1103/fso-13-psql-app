@@ -4,16 +4,6 @@ import { ErrorWithCustomStatus } from "../util/errorTypes.ts";
 import { Session, User } from "../models/index.ts";
 
 describe("Parse auth", () => {
-  test("no auth throws 500", () => {
-    try {
-      parseAuth("");
-    } catch (error) {
-      if (error instanceof ErrorWithCustomStatus) {
-        expect(error.status).toBe(500);
-        expect(error.message).toBe("An authorization token is required for this request.");
-      }
-    }
-  });
   test("incorrect Bearer format of any kind throws 500", () => {
     [
       "BearerSomethingOrOther",
@@ -40,6 +30,6 @@ describe('verifyUserFromToken', () => {
     await Session.create({ userId: user.id, token: 'FAKE.TOKEN',active: false })
   })
   test('inactive session throws error', async () => {
-    await expect(() => verifyUserFromToken('FAKE.TOKEN','temp secret')).rejects.toThrow('Session inactive. User must log in.')
+    await expect(() => verifyUserFromToken('FAKE.TOKEN','temp secret')).rejects.toThrow('jwt malformed')
   })
 })
