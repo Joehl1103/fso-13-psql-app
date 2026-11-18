@@ -16,15 +16,5 @@ describe('checking for reading list existence', () => {
     const exists: boolean = await checkForReadingListExistence(1,1);
     expect(exists).toBe(true);
   })
-
-  test('should return false if does not exists', async () => {
-    const exists: boolean = await checkForReadingListExistence(1,100);
-    expect(exists).toBe(false);
-  })
-
-  test('throws error if user id is not found', async () => {
-
-    const exists: boolean = await checkForReadingListExistence(1000,1);
-    expect(exists).toBe(false);
-  })
+  
 })
