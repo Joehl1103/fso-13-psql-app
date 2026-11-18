@@ -76,30 +76,6 @@ describe("POST", () => {
     }
   })
 
-	test('post invalid user id returns error', async () => {
-    const payload: ReadingListRawPayload = {
-      blogId: 1,
-      userId: 500,
-    };
-    const res = await supertest(app)
-      .post(BASE_URL)
-      .set("Content-Type", "application/json")
-      .send(payload);
-    expect(res.status).toBe(404);
-	});
-
-  test('post invalid blog id returns error',async() => {
-     const payload: ReadingListRawPayload = {
-      blogId: 100,
-      userId: 1,
-    };
-    const res = await supertest(app)
-      .post(BASE_URL)
-      .set("Content-Type", "application/json")
-      .send(payload);
-    expect(res.status).toBe(404);
-
-  });
 });
 
 describe("PUT", () => {

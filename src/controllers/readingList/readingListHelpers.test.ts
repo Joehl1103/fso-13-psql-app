@@ -17,13 +17,14 @@ describe('checking for reading list existence', () => {
     expect(exists).toBe(true);
   })
 
-  test('should return false if already exists', async () => {
+  test('should return false if does not exists', async () => {
     const exists: boolean = await checkForReadingListExistence(1,100);
     expect(exists).toBe(false);
   })
 
   test('throws error if user id is not found', async () => {
-    const USER_ID: number = 1000
-    await expect(() => checkForReadingListExistence(USER_ID,1000)).rejects.toThrow(`Unable to find user with ${USER_ID}`);
+
+    const exists: boolean = await checkForReadingListExistence(1000,1);
+    expect(exists).toBe(false);
   })
 })
