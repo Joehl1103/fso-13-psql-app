@@ -381,7 +381,7 @@ describe.only("Session Management API", () => {
 
   it("active user can make authenticated requests", async () => {
     await sleep(1100);
-    const token = await login("session@example.com", "sessionpass");
+    const token = await login("session@example.com", USER_PW);
 
     const newBlog = {
       title: "Blog for Active User",
