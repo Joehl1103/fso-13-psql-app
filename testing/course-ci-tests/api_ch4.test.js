@@ -248,7 +248,7 @@ describe("Reading Lists API", () => {
 describe.only("Session Management API", () => {
   let sessionToken;
 
-  it.only("login creates a session", async () => {
+  it("login creates a session", async () => {
     console.group("login creates a session")
     const response = await axios.post(`${baseUrl}/login`, {
       username: "session@example.com",
@@ -277,20 +277,14 @@ describe.only("Session Management API", () => {
     assert.strictEqual(response.data.title, newBlog.title);
   });
 
-  it.only("logout removes user sessions", async () => {
-    console.group("logout removes user sessions")
-    console.log(`${baseUrl}/logout`)
-    console.log('session token', sessionToken)
-    //NOTE: I modified this to be a put endpoint since I am not technically deleting the session, I am just modifying it.
+  it("logout removes user sessions", async () => {
     const response = await axios.delete(`${baseUrl}/logout`, {
       headers: 
         { 
           Authorization: `Bearer ${sessionToken}`,
         },
     });
-    console.log('response',response.status)
     assert.strictEqual(response.status, 204);
-    console.groupEnd()
   });
 
   it("authenticated request fails after logout", async () => {
@@ -331,9 +325,9 @@ describe.only("Session Management API", () => {
   });
 
   it("multiple logins create separate sessions", async () => {
-    const token1 = await login("session@example.com", "sessionpass");
+    const token1 = await login("session@example.com", USER_PW);
     await sleep(1100);
-    const token2 = await login("session@example.com", "sessionpass");
+    const token2 = await login("session@example.com", USER_PW);
 
     assert.notStrictEqual(token1, token2);
 
@@ -363,7 +357,7 @@ describe.only("Session Management API", () => {
   it("logout removes all sessions for that user", async () => {
     // Previous test created two sessions; logout should remove both
     await sleep(1100);
-    const token = await login("session@example.com", "sessionpass");
+    const token = await login("session@example.com", USER_PW);
 
     await axios.delete(`${baseUrl}/logout`, {
       headers: { Authorization: `Bearer ${token}` },

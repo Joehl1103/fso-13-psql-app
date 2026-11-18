@@ -11,7 +11,7 @@ function parseAuth(auth: string): string {
   const authHasRightFormat: Boolean =
     /Bearer\s{1}[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]/.test(auth);
   if (!authHasRightFormat) {
-    throw new Error("Format of Bearer token is incorrect.");
+    throw new ErrorWithCustomStatus(401,"Format of Bearer token is incorrect.");
   }
   const token = auth.split(" ")[1];
   if (!token || typeof token !== "string") {
@@ -55,12 +55,9 @@ async function verifyUserFromToken(token: string, secret: string, compId: string
   const session = await Session.findOne({ where: { token: token }})
   console.log('a')
   if(!session){
-    throw new Error('Unable to find a session for this token.')
+    throw new ErrorWithCustomStatus(401,'Unable to find a session for this token.')
   }
   console.log('b')
-  if(!session.active){
-    throw new Error('Session inactive. User must log in.')
-  }
   const decoded = jwt.verify(token,SECRET)
   console.log('c')
   if(typeof decoded === 'string'){
