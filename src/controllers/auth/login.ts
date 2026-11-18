@@ -27,11 +27,13 @@ interface UserAndPassword {
 interface LoginRes {
   token: string;
   username: string;
+  name: string;
   id: number;
   sessionId: number
 }
 
 router.post("/", async (req, res, next) => {
+  console.group('login group')
   const body: UserAndPassword = req.body;
   const { password: receivedPassword } = body;
   try {
@@ -40,21 +42,30 @@ router.post("/", async (req, res, next) => {
       throw new Error(`No user with username: ${body.username}`)
     }
     const { password: hashedPassword, username, id } = user;
+
+    console.log('a')
     const passwordCorrect: boolean = await bcrypt.compare(
       receivedPassword,
       hashedPassword,
     );
+
+    console.log('b')
     if (!passwordCorrect) {
       throw new ErrorWithCustomStatus(401,"Incorrect password");
     }
-
+    console.log('c')
     const token: string = jwt.sign({ username, id }, SECRET);
+
+    console.log('d')
     const sessionId: number = await addLoginSession(token,user.id)
-    const loginRes: LoginRes = {token,username,id,sessionId}
+    console.log('e')
+    const loginRes: LoginRes = {token,username,name: user.name,id,sessionId}
+    console.log('f')
     res.status(200).json(loginRes);
   } catch (error) {
     next(error);
   }
+  console.groupEnd()
 });
 
 export default router;

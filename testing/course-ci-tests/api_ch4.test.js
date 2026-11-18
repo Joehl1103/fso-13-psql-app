@@ -9,16 +9,17 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 let testData;
 let createdBlogId;
 let sessionUser;
-
+const USER_PW = 'ABcd1234!';
 // Single setup for the entire test file
 before(async () => {
+  console.group('before')
   testData = await resetAndSeed();
 
   // Create session user
   sessionUser = await createUser(
     "session@example.com",
     "Session User",
-    "ABcd1234!",
+    USER_PW,
   );
 
   // Create a blog for reading list tests
@@ -29,12 +30,17 @@ before(async () => {
   };
 
   const blogResponse = await axios.post(`${baseUrl}/blogs`, newBlog, {
-    headers: { Authorization: `Bearer ${testData.tokens[0]}` },
+    headers: 
+    { 
+      Authorization: `Bearer ${testData.tokens[0]}`,
+    },
+
   });
   createdBlogId = blogResponse.data.id;
+  console.groupEnd()
 });
 
-describe.only("Reading Lists API", () => {
+describe("Reading Lists API", () => {
   it("can add a blog to reading list", async () => {
     const readingListEntry = {
       blogId: createdBlogId,
@@ -239,20 +245,21 @@ describe.only("Reading Lists API", () => {
   });
 });
 
-describe("Session Management API", () => {
+describe.only("Session Management API", () => {
   let sessionToken;
 
-  it("login creates a session", async () => {
+  it.only("login creates a session", async () => {
+    console.group("login creates a session")
     const response = await axios.post(`${baseUrl}/login`, {
       username: "session@example.com",
-      password: "sessionpass",
+      password: USER_PW,
     });
-
     assert.ok([200, 201].includes(response.status));
     assert.ok(response.data.token);
     assert.strictEqual(response.data.username, "session@example.com");
     assert.strictEqual(response.data.name, "Session User");
     sessionToken = response.data.token;
+    console.groupEnd()
   });
 
   it("authenticated request works with valid session", async () => {
@@ -270,12 +277,20 @@ describe("Session Management API", () => {
     assert.strictEqual(response.data.title, newBlog.title);
   });
 
-  it("logout removes user sessions", async () => {
+  it.only("logout removes user sessions", async () => {
+    console.group("logout removes user sessions")
+    console.log(`${baseUrl}/logout`)
+    console.log('session token', sessionToken)
+    //NOTE: I modified this to be a put endpoint since I am not technically deleting the session, I am just modifying it.
     const response = await axios.delete(`${baseUrl}/logout`, {
-      headers: { Authorization: `Bearer ${sessionToken}` },
+      headers: 
+        { 
+          Authorization: `Bearer ${sessionToken}`,
+        },
     });
-
+    console.log('response',response.status)
     assert.strictEqual(response.status, 204);
+    console.groupEnd()
   });
 
   it("authenticated request fails after logout", async () => {

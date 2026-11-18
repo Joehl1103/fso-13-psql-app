@@ -10,32 +10,24 @@ const SECRET: string = config.SECRET
 
 const router = express.Router()
 
-router.post('/',extractToken,async (req,res,next) => {
+router.delete('/',extractToken, async (req,res,next) => {
+  console.group('logout group')
   try {
-    console.log('here')
     const token: string = req.token
-    const {sessionId} = req.body
-    if(!sessionId){
-      throw new Error('Request must contain a session id.')
+    await verifyUserFromToken(token,SECRET)
+    const session = await Session.destroy({ where: { token: token }});
+    console.log('here')
+    if(session !== 1){
+      throw new ErrorWithCustomStatus(404,'Unable to delete session.')
     }
-    const session = await Session.findByPk(sessionId)
-    if(!session){
-      throw new ErrorWithCustomStatus(404,`Unable to find a session with id ${sessionId}`)
-    }
-    await verifyUserFromToken(token,SECRET,String(session.userId))
-    const updateResult: SequelizeUpdateResult<Session> = await Session.update({ active: false },{
-      where: { id: sessionId },
-      returning: true
-    })
-    if(!updateResult || updateResult[0] !== 1 || !updateResult[1][0]){
-      throw new Error(`Number of affected rows should be 1 and is ${updateResult[0]}`)
-    }
-    res.status(200).json({ sessionId: updateResult[1][0].id, active: updateResult[1][0].active})
+    res.status(204).end();
   } catch (error){
     if(error instanceof Error){
+      console.warn('error',error.message)
       next(error)
     }
   }
+  console.groupEnd()
 })
 
 export default router

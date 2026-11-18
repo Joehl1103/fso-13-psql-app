@@ -21,12 +21,20 @@ function parseAuth(auth: string): string {
 }
 
 function extractToken(req: Request, res: Response, next: NextFunction) {
+  console.group('extractToken group')
   const auth: string | undefined = req.get("Authorization");
+  console.log('req.get(\'authorization\')',req.get('authorization'))
+  console.log('req.headers.authorization',req.headers.authorization)
+  console.log('req.header(\'Authorization\')',req.header('Authorization'))
+  const body = req.body
+  console.log('body',body)
+  console.log('auth',auth)
   if(!auth){
     throw new ErrorWithCustomStatus(401,'An authorization token is required for this request.')
   }
   const token: string = parseAuth(auth);
   req.token = token;
+  console.groupEnd()
   next();
 }
 
@@ -45,16 +53,20 @@ function requireStringParam(name: string,value: string | string[] | undefined):s
 async function verifyUserFromToken(token: string, secret: string, compId: string | null = null): Promise<User> {
   //NOTE: I don't know why this is happening.
   const session = await Session.findOne({ where: { token: token }})
+  console.log('a')
   if(!session){
     throw new Error('Unable to find a session for this token.')
   }
+  console.log('b')
   if(!session.active){
     throw new Error('Session inactive. User must log in.')
   }
   const decoded = jwt.verify(token,SECRET)
+  console.log('c')
   if(typeof decoded === 'string'){
     throw new Error('Invalid JWT Payload');
   }
+  console.log('d')
   if(
     !decoded.username || typeof decoded.username !== 'string' || !decoded.id || 
     typeof decoded.id !== 'number'
@@ -65,19 +77,19 @@ async function verifyUserFromToken(token: string, secret: string, compId: string
   const user = await User.findOne({
       where: { username: jwtPayload.username },
     });
+  console.log('e')
   if (!user) {
     throw new Error(`No user found with id ${jwtPayload.id}`)
   }
 
-  if(!user){
-    throw new Error("Something went wrong because there is no user that can be identified by that token.")
-  }
   //NOTE: I don't like that this is optional
+  console.log('f')
   if (compId && compId !== user.id.toString()) {
       throw new ErrorWithCustomStatus(401,
         "Cannot fulfill request because token does not belong to owner.",
       );
   }
+  console.log('g')
   return user
 }
 
