@@ -14,19 +14,10 @@ import type {
 } from "./readingList.api.types.ts";
 import type {Model,ModelStatic, InferAttributes} from 'sequelize'
 import type { JwtUserPayload } from "../controllers.types.general.ts";
-import { checkForReadingListExistence } from "./readingListHelpers.ts";
+import { checkForReadingListExistence,checkForRecordExistence } from "./readingListHelpers.ts";
 
 // Helpers
-async function checkForRecordExistence(id: string,message: string, model: ModelStatic<User | Blog>): Promise<void> {
-  const recordExists = await (async (id: string): Promise<boolean> => {
-    const res = await model.findByPk(id);
-    return !!res
-  })(id)
-  if(!recordExists){
-    throw new ErrorWithCustomStatus(400,message)
-  }
-  return
-}
+
 
 //INITIALIZATION
 const router = express.Router();
@@ -36,6 +27,7 @@ const SECRET = config.SECRET
 
 
 router.post("/", async (req, res, next) => {
+  console.log('reading list post')
   const body: ReadingListReqBody = req.body;
   if((typeof body === 'string' && !body) || (typeof body === 'object' && Object.keys(body).length === 0)){
     throw new ErrorWithCustomStatus(400,
@@ -46,7 +38,7 @@ router.post("/", async (req, res, next) => {
         }
 `)
   }
-  
+  console.log('a') 
   const { userId, blogId } = body
   if (!userId || !blogId){
     const hasUserId = !!userId
@@ -59,21 +51,24 @@ router.post("/", async (req, res, next) => {
         }
 `)
   }
-
+  console.log('b') 
   try {
     const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
-
+    console.log('c') 
     const alreadyExists: boolean = await checkForReadingListExistence(Number(userId),Number(blogId))
     if(alreadyExists){
       throw new ErrorWithCustomStatus(400,`Reading list already exists for blogId ${blogId}`);
     }
+    console.log('d') 
     const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
+    console.log('e') 
     res.status(200).json(response);
   } catch (error){
     if (error instanceof Error){
       next(error)
     }
   }
+  console.groupEnd()
 });
 
 

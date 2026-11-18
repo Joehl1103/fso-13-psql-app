@@ -85,7 +85,7 @@ describe("POST", () => {
       .post(BASE_URL)
       .set("Content-Type", "application/json")
       .send(payload);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
 	});
 
   test('post invalid blog id returns error',async() => {
@@ -97,7 +97,7 @@ describe("POST", () => {
       .post(BASE_URL)
       .set("Content-Type", "application/json")
       .send(payload);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
 
   });
 });

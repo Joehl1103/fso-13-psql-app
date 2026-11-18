@@ -4,7 +4,7 @@ import supertest from "supertest";
 import app from "../../app.js";
 import { createUsers } from "../../../testing/factories.ts";
 
-let token: string,sessionId: number;
+let token: string;
 beforeAll(async () => {
   await createUsers()
   const res = await supertest(app)
@@ -13,20 +13,12 @@ beforeAll(async () => {
     .send({ username: 'joe@joe.com', password: "ABcd12!&" })
   const {token: receivedToken, sessionId: receivedSessionId} = res.body
   token = receivedToken
-  sessionId = receivedSessionId
 })
 
-test('logging out disables session', async () => {
+test('logging out deletes a session', async () => {
   const res = await supertest(app)
-    .post('/api/logout')
+    .delete('/api/logout')
     .set('Content-Type','application/json')
     .set('Authorization',`Bearer ${token}`)
-    .send({
-      sessionId: sessionId
-    })
-  expect(res.status).toBe(200)
-  expect(res.body).toStrictEqual({
-    sessionId: sessionId,
-    active: false
-  })
+  expect(res.status).toBe(204)
 })

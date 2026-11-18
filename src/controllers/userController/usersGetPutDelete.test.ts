@@ -203,15 +203,15 @@ describe("DELETE", () => {
   });
 
 
-  test('fails if token session is inactive', async () => {
+  test('fails ifsession does not exist', async () => {
     const joe: UserWithData = userNamed(usersWithData,'joe');
-    const res = await Session.update({active: false},{ where: { token: joe.data.token }})
+    const res = await Session.destroy({ where: { token: joe.data.token }})
     console.log('res',res)
     const response = await supertest(app)
       .delete(`/api/users/${joe.data.id}`)
       .set("Content-Type", "application/json")
       .set("Authorization",`Bearer ${joe.data.token}`);
-    expect(response.status).toBe(500);
-    expect(response.text).toBe('Session inactive. User must log in.');
+    expect(response.status).toBe(401);
+    expect(response.text).toBe('Unable to find a session for this token.');
   })
 });
