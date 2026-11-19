@@ -11,26 +11,19 @@ const SECRET: string = config.SECRET
 const router = express.Router()
 
 router.delete('/',extractToken, async (req,res,next) => {
-  console.group('logout')
   try {
     const token: string = req.token
-    console.log('a')
     const user: User = await verifyUserFromToken(token,SECRET)
-    console.log('b')
     const session: number = await Session.destroy({ where: { userId: user.id }, individualHooks: true });
-    console.log('c')
     if(!session || session == 0){
       throw new ErrorWithCustomStatus(404,'Unable to delete session.')
     }
-    console.log('d')
     res.status(204).end();
   } catch (error){
     if(error instanceof Error){
-      console.warn('error',error.message)
       next(error)
     }
   }
-  console.groupEnd()
 })
 
 export default router

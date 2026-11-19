@@ -59,7 +59,6 @@ router.post("/", async (req, res, next) => {
     };
 
     res.status(201).json(payload);
-    console.groupEnd()
   } catch (error) {
     next(error);
   }

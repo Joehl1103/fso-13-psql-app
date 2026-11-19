@@ -28,14 +28,12 @@ describe("GET", () => {
     blogLen = blogs.length;
   });
   test("getting all blogs returns all blogs and their users", async () => {
-    console.log('a')
     const response = await supertest(app).get("/api/blogs");
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(blogLen);
     response.body.forEach((b: BlogResType) => {
       expect(b.userId).toBeTypeOf("number");
     });
-    console.log('b')
   });
   test("specifying a react substring search query should 1 blog from joe", async () => {
     const response = await supertest(app)

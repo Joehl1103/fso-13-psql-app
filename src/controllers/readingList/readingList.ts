@@ -27,7 +27,6 @@ const SECRET = config.SECRET
 
 
 router.post("/", async (req, res, next) => {
-  console.log('reading list post')
   const body: ReadingListReqBody = req.body;
   if((typeof body === 'string' && !body) || (typeof body === 'object' && Object.keys(body).length === 0)){
     throw new ErrorWithCustomStatus(400,
@@ -38,7 +37,6 @@ router.post("/", async (req, res, next) => {
         }
 `)
   }
-  console.log('a') 
   const { userId, blogId } = body
   if (!userId || !blogId){
     const hasUserId = !!userId
@@ -51,24 +49,19 @@ router.post("/", async (req, res, next) => {
         }
 `)
   }
-  console.log('b') 
   try {
     const payload: ReadingListSequelizePayload = {blogId: Number(blogId), userId: Number(userId),read: false};
-    console.log('c') 
     const alreadyExists: boolean = await checkForReadingListExistence(Number(userId),Number(blogId))
     if(alreadyExists){
       throw new ErrorWithCustomStatus(400,`Reading list already exists for blogId ${blogId}`);
     }
-    console.log('d') 
     const response: InferAttributes<ReadingList> = await ReadingList.create(payload, { returning: true });
-    console.log('e') 
     res.status(200).json(response);
   } catch (error){
     if (error instanceof Error){
       next(error)
     }
   }
-  console.groupEnd()
 });
 
 
@@ -101,7 +94,6 @@ router.put("/:id", extractToken, async (req,res,next) => {
     }
     const [affectedCount,affectedRows] = updated
     if(!(affectedCount == 1) || !affectedRows || affectedRows.length !== 1 || !affectedRows[0]){
-      console.warn('updated object',updated)
       throw new Error(`Something went wrong with the update. Affected count should be 1 and is ${affectedCount}`)
     }
     if(affectedRows[0].read == current.read){

@@ -72,7 +72,6 @@ async function verifyUserFromToken(token: string, secret: string, compId: string
         "Cannot fulfill request because token does not belong to owner.",
       );
   }
-  console.log('g')
   return user
 }
 

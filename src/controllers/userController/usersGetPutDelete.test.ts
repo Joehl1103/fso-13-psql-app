@@ -205,8 +205,7 @@ describe("DELETE", () => {
 
   test('fails ifsession does not exist', async () => {
     const joe: UserWithData = userNamed(usersWithData,'joe');
-    const res = await Session.destroy({ where: { token: joe.data.token }})
-    console.log('res',res)
+    await Session.destroy({ where: { token: joe.data.token }})
     const response = await supertest(app)
       .delete(`/api/users/${joe.data.id}`)
       .set("Content-Type", "application/json")

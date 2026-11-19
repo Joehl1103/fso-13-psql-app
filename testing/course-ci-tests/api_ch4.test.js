@@ -13,7 +13,6 @@ const USER_PW = 'ABcd1234!';
 const TEST_USER_2_PW = "Password456!";
 // Single setup for the entire test file
 before(async () => {
-  console.group('before')
   testData = await resetAndSeed();
 
   // Create session user
@@ -38,7 +37,6 @@ before(async () => {
 
   });
   createdBlogId = blogResponse.data.id;
-  console.groupEnd()
 });
 
 describe("Reading Lists API", () => {

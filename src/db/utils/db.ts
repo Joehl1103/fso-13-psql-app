@@ -10,14 +10,11 @@ import path from "node:path";
  */
 const filename = path.basename(import.meta.filename);
 
-console.log(`Building sequelize object with ${config.DATABASE_URL}`);
 const sequelize = new Sequelize(config.DATABASE_URL, databaseOptions);
 
 const connectToDatabase = async () => {
   try {
-    console.log(
-      `${filename} || Connecting to database at '${config.DATABASE_URL}'...`,
-    );
+    console.log(`${filename} || Connecting to database...`);
     await sequelize.authenticate();
     console.log(`${filename} || Connected to database`);
   } catch (error) {

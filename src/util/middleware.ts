@@ -19,14 +19,6 @@ import colors from "picocolors";
 //
 
 function blogPostValidator(req: Request, res: Response, next: NextFunction) {
-  console.log("validating request for blog post.");
-  const { author, url, title, token } = req.body;
-  console.log({
-    author: author,
-    url: url,
-    title: title,
-    token: token,
-  });
   next();
 }
 

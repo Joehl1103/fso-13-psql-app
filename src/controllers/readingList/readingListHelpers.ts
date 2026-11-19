@@ -3,7 +3,6 @@ import { ErrorWithCustomStatus } from "../../util/errorTypes.ts";
 import type { ModelStatic } from "sequelize";
 
 export async function checkForReadingListExistence(userId: number, blogId: number): Promise<boolean> {
-  console.group('checkForReadingListExistence')
   const blog: Blog | null = await Blog.findByPk(blogId);
   if(!blog){
     throw new ErrorWithCustomStatus(404,`Unable to find blog with ${blogId}`);
@@ -14,7 +13,6 @@ export async function checkForReadingListExistence(userId: number, blogId: numbe
   }
   const all_rls = await ReadingList.findAll()
   const rl: ReadingList | null = await ReadingList.findOne({ where: { userId: userId, blogId: blogId }});
-  console.groupEnd()
   return !!rl
 }
 

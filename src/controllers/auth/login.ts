@@ -1,4 +1,4 @@
-import express, { type NextFunction } from "express";
+import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import config from "../../util/config.ts";
@@ -10,13 +10,6 @@ import { addLoginSession } from "./loginHelpers.ts";
 
 if (!SECRET) {
   throw new Error("SECRET string is empty");
-}
-
-function printReq(req: Request, res: Response, next: NextFunction) {
-  console.log({
-    body: req.body,
-  });
-  next();
 }
 
 interface UserAndPassword {
@@ -33,7 +26,6 @@ interface LoginRes {
 }
 
 router.post("/", async (req, res, next) => {
-  console.group('login group')
   const body: UserAndPassword = req.body;
   const { password: receivedPassword } = body;
   try {
@@ -43,29 +35,22 @@ router.post("/", async (req, res, next) => {
     }
     const { password: hashedPassword, username, id } = user;
 
-    console.log('a')
     const passwordCorrect: boolean = await bcrypt.compare(
       receivedPassword,
       hashedPassword,
     );
 
-    console.log('b')
     if (!passwordCorrect) {
       throw new ErrorWithCustomStatus(401,"Incorrect password");
     }
-    console.log('c')
     const token: string = jwt.sign({ username, id }, SECRET);
 
-    console.log('d')
     const sessionId: number = await addLoginSession(token,user.id)
-    console.log('e')
     const loginRes: LoginRes = {token,username,name: user.name,id,sessionId}
-    console.log('f')
     res.status(200).json(loginRes);
   } catch (error) {
     next(error);
   }
-  console.groupEnd()
 });
 
 export default router;
