@@ -9,7 +9,7 @@
     "test:migrate:up": "NODE_ENV=test node ./src/db/utils/umzug/migrate.ts",
     "test:migrate:down": "NODE_ENV=test node ./src/db/utils/umzug/rollback.ts",
     "course:start:test": "CI_TESTING=true node index.js",
-    "course:test": "CI_TESTING=true node --test testing/course-ci-tests/api_ch3.test.js",
+    "course:test": "CI_TESTING=true node --test testing/course-ci-tests/api_ch3.test.js && node --test testing/course-ci-tests/api_ch4.test.js",
     "test-note": "to avoid running out of connections",
     "migrate:up": "node ./src/db/utils/umzug/migrate.ts",
     "migrate:down": "node ./src/db/utils/umzug/rollback.ts",
